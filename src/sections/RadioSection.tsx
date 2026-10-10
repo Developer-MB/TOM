@@ -117,13 +117,10 @@ export const RadioSection: React.FC<RadioSectionProps> = ({
           <div>
             <div className="flex items-center gap-3 mb-3">
               <span className="bg-[#DC2626] text-white font-mono text-[10px] font-bold tracking-[0.2em] uppercase px-2.5 py-1 flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-white animate-ping" /> SEÑAL EN VIVO 24/7
-              </span>
-              <span className="font-mono text-[11px] text-zinc-500 uppercase tracking-widest">
-                // TRANSMISIÓN CONTINUA SIN ALGORITMOS NI ANUNCIOS
+                <span className="w-2 h-2 rounded-full bg-white animate-ping" /> SEÑAL EN VIVO
               </span>
             </div>
-            <h1 className="font-display font-black text-4xl sm:text-6xl lg:text-7xl uppercase tracking-tight leading-[0.92] text-white">
+            <h1 className="font-display font-black text-4xl sm:text-6xl lg:text-5xl uppercase tracking-tight leading-[0.92] text-white">
               LA FRECUENCIA DEL <span className="text-[#DC2626]">ABISMO</span>
             </h1>
             <p className="text-zinc-400 text-sm sm:text-base max-w-2xl mt-3 leading-relaxed">
@@ -137,7 +134,7 @@ export const RadioSection: React.FC<RadioSectionProps> = ({
               <Users className="w-5 h-5 text-[#DC2626]" />
               <div>
                 <div className="font-display font-black text-xl text-white leading-none">
-                  1,428
+                  666
                 </div>
                 <div className="font-mono text-[9px] uppercase tracking-widest text-zinc-500 mt-1">
                   OYENTES ACTIVOS
@@ -167,34 +164,8 @@ export const RadioSection: React.FC<RadioSectionProps> = ({
             <div className="flex items-center gap-3">
               <span className="w-2.5 h-2.5 rounded-full bg-[#DC2626] animate-pulse" />
               <span className="font-mono text-xs font-bold uppercase tracking-widest text-white">
-                CONSOLA MAESTRA DE TRANSMISIÓN // CABINA ESTOCOLMO - CDMX
+                CABINA CDMX
               </span>
-            </div>
-
-            {/* Stream Quality Selector */}
-            <div className="flex items-center gap-2">
-              <span className="font-mono text-[10px] uppercase tracking-widest text-zinc-500 mr-1">
-                FLUJO DE AUDIO:
-              </span>
-              {(
-                [
-                  { id: 'FLAC', label: 'FLAC LOSSLESS (1411k)' },
-                  { id: 'MP3_320', label: 'MP3 HQ (320k)' },
-                  { id: 'AAC_128', label: 'MÓVIL AAC (128k)' },
-                ] as const
-              ).map((fmt) => (
-                <button
-                  key={fmt.id}
-                  onClick={() => setStreamFormat(fmt.id)}
-                  className={`px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider border transition-colors cursor-pointer ${
-                    streamFormat === fmt.id
-                      ? 'bg-[#DC2626] text-white border-[#DC2626] font-bold'
-                      : 'bg-[#070709] text-zinc-400 border-zinc-800 hover:text-white'
-                  }`}
-                >
-                  {fmt.label}
-                </button>
-              ))}
             </div>
           </div>
 
@@ -212,9 +183,6 @@ export const RadioSection: React.FC<RadioSectionProps> = ({
                       isPlaying ? 'scale-105' : 'opacity-80'
                     }`}
                   />
-                  <div className="absolute top-2 left-2 bg-[#DC2626] text-white font-mono text-[9px] font-bold uppercase tracking-widest px-2 py-0.5">
-                    SONANDO AHORA
-                  </div>
                 </div>
 
                 {/* Track Info */}
@@ -222,7 +190,7 @@ export const RadioSection: React.FC<RadioSectionProps> = ({
                   <div className="inline-flex items-center gap-2 bg-zinc-900 border border-zinc-800 px-3 py-1 font-mono text-[10px] text-[#DC2626] uppercase tracking-widest mb-3">
                     <Radio className="w-3.5 h-3.5" /> PROGRAMA ACTUAL: LA HORA DE LAS BESTIAS
                   </div>
-                  <h2 className="font-display font-black text-3xl sm:text-4xl uppercase tracking-tight text-white leading-none mb-2">
+                  <h2 className="font-display font-black text-2xl sm:text-3xl uppercase tracking-tight text-white leading-none mb-2">
                     {currentTrack.title}
                   </h2>
                   <div className="font-display font-bold text-lg text-[#DC2626] uppercase tracking-wide mb-1">
@@ -308,24 +276,6 @@ export const RadioSection: React.FC<RadioSectionProps> = ({
                     </span>
                   </div>
                 </div>
-
-                {/* External Players Links */}
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={handleCopyStreamUrl}
-                    className="bg-[#070709] hover:bg-zinc-900 border border-zinc-800 px-3 py-2.5 font-mono text-[10px] uppercase tracking-wider text-zinc-300 flex items-center gap-1.5 transition-colors cursor-pointer"
-                  >
-                    {copiedUrl ? (
-                      <>
-                        <Check className="w-3.5 h-3.5 text-emerald-400" /> URL COPIADA
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-3.5 h-3.5 text-zinc-500" /> URL STREAM (.M3U)
-                      </>
-                    )}
-                  </button>
-                </div>
               </div>
             </div>
 
@@ -334,7 +284,6 @@ export const RadioSection: React.FC<RadioSectionProps> = ({
               <div>
                 <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-zinc-500 pb-3 mb-4 border-b border-zinc-800">
                   <span>EN CABINA AHORA (16:00 - 19:00 CET)</span>
-                  <span className="text-[#DC2626] font-bold">● MICRÓFONO ABIERTO</span>
                 </div>
 
                 <div className="flex items-center gap-4 mb-6">
@@ -345,10 +294,10 @@ export const RadioSection: React.FC<RadioSectionProps> = ({
                   />
                   <div>
                     <h3 className="font-display font-black text-2xl uppercase text-white">
-                      DJ RAVN
+                      DJ MANRO
                     </h3>
                     <div className="font-mono text-xs text-[#DC2626] font-bold uppercase mb-1">
-                      LA HORA DE LAS BESTIAS // ESPECIAL VINILOS NÓRDICOS
+                      BRUTAL ZONE
                     </div>
                     <p className="text-zinc-400 text-xs leading-relaxed">
                       Seleccionando prensas originales de Osmose Productions, Deathlike Silence y Earache Records (1988–1995).
@@ -357,7 +306,7 @@ export const RadioSection: React.FC<RadioSectionProps> = ({
                 </div>
               </div>
 
-              {/* Request Track Form */}
+              {/* Request Track Form
               <div className="bg-[#070709] border border-zinc-800 p-5">
                 <div className="font-mono text-xs font-bold uppercase tracking-wider text-white mb-2 flex items-center gap-2">
                   <Flame className="w-4 h-4 text-[#DC2626]" /> SOLICITAR TEMA A CABINA
@@ -385,7 +334,7 @@ export const RadioSection: React.FC<RadioSectionProps> = ({
                     ✓ PETICIÓN RECIBIDA EN LA CONSOLA DE DJ RAVN.
                   </p>
                 )}
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
@@ -395,11 +344,11 @@ export const RadioSection: React.FC<RadioSectionProps> = ({
       <section className="max-w-[1440px] mx-auto px-4 lg:px-8 pb-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Left 7 Cols: Recently Played History */}
-          <div className="lg:col-span-7 border border-zinc-800 bg-[#0E0E12] p-6 sm:p-8">
+          {/* <div className="lg:col-span-7 border border-zinc-800 bg-[#0E0E12] p-6 sm:p-8">
             <div className="flex items-center justify-between pb-4 mb-6 border-b border-zinc-800">
               <div>
                 <span className="font-mono text-[10px] text-[#DC2626] uppercase tracking-widest block">
-                  // BITÁCORA DE TRANSMISIÓN
+                  BITÁCORA DE TRANSMISIÓN
                 </span>
                 <h3 className="font-display font-black text-2xl uppercase text-white">
                   HISTORIAL DE ROTACIÓN RECIENTE
@@ -450,15 +399,15 @@ export const RadioSection: React.FC<RadioSectionProps> = ({
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
 
           {/* Right 5 Cols: Live Listeners Chat */}
-          <div className="lg:col-span-5 border border-zinc-800 bg-[#0E0E12] p-6 sm:p-8 flex flex-col justify-between">
+          {/* <div className="lg:col-span-5 border border-zinc-800 bg-[#0E0E12] p-6 sm:p-8 flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between pb-4 mb-5 border-b border-zinc-800">
                 <div>
                   <span className="font-mono text-[10px] text-[#DC2626] uppercase tracking-widest block">
-                    // COMUNIDAD EN DIRECTO
+                    COMUNIDAD EN DIRECTO
                   </span>
                   <h3 className="font-display font-black text-2xl uppercase text-white">
                     TRINCHERA DE OYENTES
@@ -523,12 +472,12 @@ export const RadioSection: React.FC<RadioSectionProps> = ({
                 </button>
               </div>
             </form>
-          </div>
+          </div> */}
         </div>
       </section>
 
       {/* 24-HOUR PROGRAMMING SCHEDULE */}
-      <section className="max-w-[1440px] mx-auto px-4 lg:px-8 pb-12">
+      {/* <section className="max-w-[1440px] mx-auto px-4 lg:px-8 pb-12">
         <div className="border border-zinc-800 bg-[#0E0E12] p-6 sm:p-8">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-6 mb-6 border-b border-zinc-800">
             <div>
@@ -592,10 +541,10 @@ export const RadioSection: React.FC<RadioSectionProps> = ({
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* RESIDENT DJS / LOCUTORES */}
-      <section className="max-w-[1440px] mx-auto px-4 lg:px-8 pb-16">
+      {/* <section className="max-w-[1440px] mx-auto px-4 lg:px-8 pb-16">
         <div className="mb-6">
           <span className="font-mono text-[10px] text-[#DC2626] uppercase tracking-widest block mb-1">
             // CURADORES DEL SONIDO PESADO
@@ -630,7 +579,7 @@ export const RadioSection: React.FC<RadioSectionProps> = ({
             </div>
           ))}
         </div>
-      </section>
+      </section> */}
     </div>
   );
 };
