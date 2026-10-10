@@ -1,0 +1,6 @@
+{
+  "name": "Time of Metal — Portal Pesado & Radio 24/7",
+  "description": "El bastión definitivo de la música extrema. Crítica mordaz de discos, videopodcast en 4K, fotoperiodismo desde el foso y radio online de metal extremo 24/7 en FLAC.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
