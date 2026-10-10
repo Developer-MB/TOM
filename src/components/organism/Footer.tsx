@@ -1,6 +1,6 @@
 import React from 'react';
 import { Radio, Youtube, Disc, Rss } from 'lucide-react';
-import { SectionId } from '../data/mockData';
+import { SectionId } from '../../data/mockData';
 
 interface FooterProps {
   onSelectSection: (section: SectionId) => void;

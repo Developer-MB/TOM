@@ -1,6 +1,6 @@
 import React from 'react';
 import { Search, Shield, Play } from 'lucide-react';
-import { SectionId, ASSETS } from '../data/mockData';
+import { SectionId, ASSETS } from '../../data/mockData';
 
 interface NavbarProps {
   activeSection: SectionId;

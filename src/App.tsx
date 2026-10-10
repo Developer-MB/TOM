@@ -4,8 +4,8 @@ import {
   DEFAULT_RADIO_STREAM,
   SectionId,
 } from './data/mockData';
-import { Navbar } from './components/Navbar';
-import { Footer } from './components/Footer';
+import { Navbar } from './components/organism/Navbar';
+import { Footer } from './components/organism/Footer';
 import { HomeSection } from './sections/HomeSection';
 import { ReviewsSection } from './sections/ReviewsSection';
 import { GallerySection } from './sections/GallerySection';
