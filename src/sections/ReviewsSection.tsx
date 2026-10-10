@@ -90,35 +90,24 @@ export const ReviewsSection: React.FC<ReviewsSectionProps> = ({
         <div className="flex items-center gap-2 text-[#71717a]">
           <span>TIME OF METAL</span>
           <span>/</span>
-          <span className="text-[#f4f4f5] font-semibold">RESEÑAS DE DISCOS &amp; DEMOS</span>
-          <span className="text-[#dc2626]">#CRITIC-VAULT</span>
-        </div>
-        <div className="px-3 py-1 bg-[#121214] border border-[#27272a] rounded-full flex items-center gap-2 text-[#e4e4e7]">
-          <span className="w-2 h-2 rounded-full bg-[#dc2626]" />
-          <span>1,482 ÁLBUMES DICTAMINADOS</span>
+          <span className="text-[#f4f4f5] font-semibold">RECOMENDACION DE DISCOS &amp; DEMOS</span>
         </div>
       </div>
 
       {/* HERO HEADER + METRICS BOX */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
         <div className="lg:col-span-8 space-y-4">
-          <div className="flex items-center gap-2.5 font-mono text-[10px] uppercase">
-            <span className="px-2 py-0.5 bg-[#dc2626] text-white font-bold rounded-sm">
-              AUTOPSIAS SONORAS
-            </span>
-            <span className="text-[#71717a]">VOL. XXIV // 2024-2025</span>
-          </div>
-          <h1 className="font-display font-extrabold text-5xl sm:text-6xl tracking-tight uppercase leading-none">
+          <h1 className="font-display font-extrabold text-3xl sm:text-4xl tracking-tight uppercase leading-none">
             <span className="text-white">JUICIO </span>
             <span className="text-[#dc2626]">CRÍTICO</span>
           </h1>
-          <p className="text-sm sm:text-base text-[#a1a1aa] max-w-2xl leading-relaxed">
-            Sin concesiones ni alianzas comerciales. Desmenuzamos la arquitectura sonora, fidelidad de estudio, podredumbre lírica y contundencia técnica de la vanguardia extrema y el underground internacional.
+          <p className="text-sm sm:text-base text-[#a1a1aa] max-w-xl leading-relaxed">
+            Desmenuzamos la arquitectura sonora y contundencia técnica de la música extrema y el underground internacional.
           </p>
         </div>
 
         {/* Right Stats Box */}
-        <div className="lg:col-span-4 bg-[#121214] border border-[#27272a] rounded-sm p-5 grid grid-cols-3 divide-x divide-[#27272a] text-center">
+        {/* <div className="lg:col-span-4 bg-[#121214] border border-[#27272a] rounded-sm p-5 grid grid-cols-3 divide-x divide-[#27272a] text-center">
           <div className="px-2">
             <span className="font-mono text-[9px] text-[#71717a] uppercase block">PROMEDIO MES</span>
             <span className="font-display font-extrabold text-2xl text-white mt-1 block">8.6</span>
@@ -131,7 +120,7 @@ export const ReviewsSection: React.FC<ReviewsSectionProps> = ({
             <span className="font-mono text-[9px] text-[#71717a] uppercase block">NEFASTOS (&lt;4.0)</span>
             <span className="font-display font-extrabold text-2xl text-white mt-1 block">12</span>
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* SEARCH & GENRE FILTER BAR */}
@@ -182,11 +171,10 @@ export const ReviewsSection: React.FC<ReviewsSectionProps> = ({
             <button
               key={g}
               onClick={() => setActiveGenre(g)}
-              className={`px-2.5 py-1 rounded-sm uppercase transition-colors cursor-pointer ${
-                activeGenre === g
-                  ? 'bg-[#dc2626] text-white font-bold'
-                  : 'bg-[#18181b] border border-[#27272a] text-[#a1a1aa] hover:text-white'
-              }`}
+              className={`px-2.5 py-1 rounded-sm uppercase transition-colors cursor-pointer ${activeGenre === g
+                ? 'bg-[#dc2626] text-white font-bold'
+                : 'bg-[#18181b] border border-[#27272a] text-[#a1a1aa] hover:text-white'
+                }`}
             >
               {g}
             </button>
@@ -199,7 +187,7 @@ export const ReviewsSection: React.FC<ReviewsSectionProps> = ({
         <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-wider">
           <span className="flex items-center gap-2 text-white font-bold">
             <span className="w-2 h-2 rounded-full bg-[#dc2626]" />
-            DISCO DEL MES // HIGHLIGHT EDITORIAL
+            DISCO DEL MES
           </span>
           <span className="text-[#a1a1aa] flex items-center gap-1.5">
             <ShieldCheck className="w-3.5 h-3.5 text-[#dc2626]" />
@@ -218,9 +206,6 @@ export const ReviewsSection: React.FC<ReviewsSectionProps> = ({
                   referrerPolicy="no-referrer"
                   className="w-full h-full object-cover"
                 />
-                <span className="absolute top-3 left-3 px-2.5 py-1 bg-[#09090b]/90 border border-[#3f3f46] font-mono text-[10px] text-[#ef4444] font-bold uppercase rounded-sm">
-                  ★ MASTERPIECE
-                </span>
                 <div className="absolute bottom-3 right-3 bg-[#09090b]/95 border border-[#dc2626] px-3.5 py-2 rounded-sm flex items-center gap-2">
                   <div>
                     <span className="font-mono text-[9px] text-[#a1a1aa] uppercase block">VEREDICTO</span>
@@ -239,7 +224,7 @@ export const ReviewsSection: React.FC<ReviewsSectionProps> = ({
                 <span className="px-2 py-0.5 bg-[#dc2626]/20 border border-[#991b1b] text-[#ef4444] font-semibold rounded-sm">
                   DEATH METAL CAVERNOSO
                 </span>
-                <span>• 🇲🇽 MÉXICO / 🇸🇪 SUECIA • 2025 • DARK DESCENT RECORDS • 44:12 MIN</span>
+                <span>• 🇸🇪 SUECIA • 2025 • DARK DESCENT RECORDS • 44:12 MIN</span>
               </div>
 
               <div>
@@ -259,67 +244,9 @@ export const ReviewsSection: React.FC<ReviewsSectionProps> = ({
                 Grabado en cinta de dos pulgadas y mezclado en los legendarios Sunlight Studios, este opus despliega riffs cromáticos pantanosos, dobles bombos cavernosos y un gutural cavernoso que trasciende la mera técnica para convertirse en una liturgia funesta. Cada transición entre el doom claustrofóbico y ráfagas a 240 BPM está milimétricamente cincelada con odio puro.
               </p>
 
-              {/* Single Audio Preview + Action Buttons */}
-              <div className="pt-2 flex flex-wrap items-center gap-3">
-                <div className="flex-1 min-w-[240px] bg-[#09090b] border border-[#27272a] rounded-sm px-3.5 py-2 flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <button
-                      onClick={() =>
-                        onPlayCustomTrack({
-                          title: '03. Liturgy of Decaying Flesh',
-                          artist: 'Mortuary Veil',
-                          album: 'Catacombs of Eternal Agony',
-                          cover: ASSETS.albumCatacombs,
-                        })
-                      }
-                      className="w-8 h-8 rounded-full bg-[#dc2626] hover:bg-[#ef4444] text-white flex items-center justify-center shrink-0 cursor-pointer"
-                    >
-                      <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
-                    </button>
-                    <div>
-                      <span className="font-mono text-[9px] text-[#ef4444] uppercase block">
-                        SINGLE OFICIAL
-                      </span>
-                      <span className="font-mono text-xs text-white font-semibold">
-                        03. Liturgy of Decaying Flesh
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex items-end gap-0.5 h-5">
-                    {[40, 80, 60, 95, 50, 75, 90, 45, 65].map((h, i) => (
-                      <span
-                        key={i}
-                        className="w-1 bg-[#dc2626] rounded-t-[1px]"
-                        style={{ height: `${h}%` }}
-                      />
-                    ))}
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => setSelectedReviewModal('Catacombs of Eternal Agony — Ficha Técnica')}
-                  className="px-4 py-3 bg-[#18181b] hover:bg-[#27272a] border border-[#3f3f46] font-mono text-[10px] text-[#e4e4e7] uppercase rounded-sm cursor-pointer"
-                >
-                  FICHA TÉCNICA
-                </button>
-
-                <button
-                  onClick={() => setSelectedReviewModal('Catacombs of Eternal Agony — Reseña Completa')}
-                  className="px-5 py-3 bg-[#dc2626] hover:bg-[#ef4444] text-white font-mono text-xs font-bold uppercase rounded-sm flex items-center gap-2 cursor-pointer crimson-glow-sm"
-                >
-                  <span>LEER RESEÑA COMPLETA</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
             </div>
           </div>
 
-          {/* Embedded Live Stream Player Bar as seen in Image 9 */}
-          <LiveStreamPlayerBar
-            currentTrack={currentTrack}
-            isPlaying={isPlaying}
-            onTogglePlay={onTogglePlay}
-          />
         </div>
       </div>
 
@@ -345,9 +272,6 @@ export const ReviewsSection: React.FC<ReviewsSectionProps> = ({
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
-            <span className="font-mono text-[10px] text-[#ef4444] uppercase tracking-widest block">
-              CRÍTICA RIGUROSA // COBERTURA MUNDIAL
-            </span>
             <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-white uppercase mt-1">
               ÚLTIMOS LANZAMIENTOS EVALUADOS
             </h2>
@@ -407,20 +331,6 @@ export const ReviewsSection: React.FC<ReviewsSectionProps> = ({
                   </span>
                   <span className="text-[#71717a]">Por: <strong className="text-[#a1a1aa]">{rev.author}</strong></span>
                 </div>
-                <button
-                  onClick={() =>
-                    onPlayCustomTrack({
-                      title: rev.title,
-                      artist: rev.band,
-                      album: `${rev.label} (${rev.year})`,
-                      cover: rev.cover,
-                    })
-                  }
-                  className="px-2.5 py-1 bg-[#18181b] hover:bg-[#dc2626] text-[#e4e4e7] hover:text-white border border-[#27272a] rounded-sm flex items-center gap-1 transition-colors cursor-pointer"
-                >
-                  <Play className="w-2.5 h-2.5 fill-current" />
-                  <span>MUESTRA</span>
-                </button>
               </div>
             </article>
           ))}
@@ -443,11 +353,10 @@ export const ReviewsSection: React.FC<ReviewsSectionProps> = ({
               <button
                 key={p}
                 onClick={() => setActivePage(p)}
-                className={`w-8 h-8 rounded-sm font-mono text-xs cursor-pointer ${
-                  activePage === p
-                    ? 'bg-[#dc2626] text-white font-bold'
-                    : 'bg-[#121214] border border-[#27272a] text-[#a1a1aa] hover:text-white'
-                }`}
+                className={`w-8 h-8 rounded-sm font-mono text-xs cursor-pointer ${activePage === p
+                  ? 'bg-[#dc2626] text-white font-bold'
+                  : 'bg-[#121214] border border-[#27272a] text-[#a1a1aa] hover:text-white'
+                  }`}
               >
                 {p}
               </button>
@@ -467,168 +376,9 @@ export const ReviewsSection: React.FC<ReviewsSectionProps> = ({
             </button>
           </div>
 
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setActiveGenre('TODOS')}
-              className="px-3 py-1.5 bg-[#121214] border border-[#27272a] hover:border-[#dc2626] rounded-sm text-[10px] text-[#a1a1aa] hover:text-white flex items-center gap-1.5 uppercase cursor-pointer"
-            >
-              <Skull className="w-3.5 h-3.5 text-[#ef4444]" />
-              <span>MURO DE LA INFAMIA (&lt;4.0)</span>
-            </button>
-            <button
-              onClick={() => setActiveGenre('TODOS')}
-              className="px-3 py-1.5 bg-[#121214] border border-[#27272a] hover:border-[#dc2626] rounded-sm text-[10px] text-[#a1a1aa] hover:text-white flex items-center gap-1.5 uppercase cursor-pointer"
-            >
-              <Star className="w-3.5 h-3.5 text-[#ef4444]" />
-              <span>INTOCABLES (10/10)</span>
-            </button>
-          </div>
         </div>
       </div>
 
-      {/* BOTTOM SPLIT: TOP 5 MÁS ESCUCHADOS + ENVÍO DE PROMOS */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-4">
-        {/* Left: Top 5 */}
-        <div className="lg:col-span-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Flame className="w-5 h-5 text-[#dc2626]" />
-              <h3 className="font-display font-extrabold text-xl text-white uppercase">
-                TOP 5 MÁS ESCUCHADOS DE LA SEMANA
-              </h3>
-            </div>
-            <span className="font-mono text-[10px] text-[#71717a] uppercase">
-              ACTUALIZADO HACE 2H
-            </span>
-          </div>
-
-          <div className="space-y-2.5">
-            {top5Listened.map((item) => (
-              <div
-                key={item.rank}
-                className="bg-[#121214] border border-[#27272a] hover:border-[#3f3f46] rounded-sm p-3 flex items-center justify-between gap-4"
-              >
-                <div className="flex items-center gap-3.5">
-                  <span className="font-mono font-bold text-lg text-[#71717a] w-6">
-                    {item.rank}
-                  </span>
-                  <img
-                    src={item.cover}
-                    alt={item.band}
-                    referrerPolicy="no-referrer"
-                    className="w-10 h-10 rounded-sm object-cover border border-[#27272a]"
-                  />
-                  <div>
-                    <h4 className="font-display font-bold text-sm text-white">
-                      {item.band}
-                    </h4>
-                    <p className="font-mono text-[11px] text-[#71717a]">{item.album}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <span className="px-2 py-0.5 bg-[#18181b] border border-[#3f3f46] font-mono text-[11px] text-[#ef4444] font-bold rounded-sm">
-                    {item.score}
-                  </span>
-                  <button
-                    onClick={() =>
-                      onPlayCustomTrack({
-                        title: item.album,
-                        artist: item.band,
-                        cover: item.cover,
-                      })
-                    }
-                    className="w-8 h-8 bg-[#18181b] hover:bg-[#dc2626] text-white rounded-sm flex items-center justify-center transition-colors cursor-pointer"
-                  >
-                    <Play className="w-3.5 h-3.5 fill-current" />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Right: Envío de Promos & Disqueras */}
-        <div className="lg:col-span-6 space-y-4">
-          <div className="bg-[#121214] border border-[#27272a] rounded-sm p-6 space-y-5">
-            <div className="flex items-center gap-2.5">
-              <Mail className="w-5 h-5 text-[#dc2626]" />
-              <h3 className="font-display font-extrabold text-xl text-white uppercase">
-                ENVÍO DE PROMOS &amp; DISQUERAS
-              </h3>
-            </div>
-            <p className="text-xs text-[#a1a1aa] leading-relaxed">
-              ¿Representas a un sello discográfico independiente o eres una banda underground con nuevo material en cassette, vinilo o master digital WAV/FLAC?
-            </p>
-
-            <div className="bg-[#09090b] border border-[#27272a] rounded-sm p-3.5 space-y-2 font-mono text-[11px]">
-              <div className="flex justify-between">
-                <span className="text-[#71717a]">FORMATOS ACEPTADOS:</span>
-                <span className="text-white font-semibold">WAV / FLAC 24-bit / Vinilo</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-[#71717a]">TIEMPO DE EVALUACIÓN:</span>
-                <span className="text-white font-semibold">7 a 14 Días Laborales</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-[#71717a]">CRITERIO EDITORIAL:</span>
-                <span className="text-[#ef4444] font-semibold">Sin Paga / 100% Imparcial</span>
-              </div>
-            </div>
-
-            <form onSubmit={handlePromoSubmit} className="space-y-3">
-              <input
-                type="text"
-                value={promoBand}
-                onChange={(e) => setPromoBand(e.target.value)}
-                placeholder="Banda // Enlace de escucha previa (Bandcamp / Haulix)"
-                className="w-full bg-[#09090b] border border-[#27272a] focus:border-[#dc2626] rounded-sm px-3.5 py-2.5 text-xs font-mono text-white placeholder-[#71717a] outline-none"
-              />
-              <input
-                type="email"
-                value={promoEmail}
-                onChange={(e) => setPromoEmail(e.target.value)}
-                placeholder="Email de contacto de la banda / disquera"
-                className="w-full bg-[#09090b] border border-[#27272a] focus:border-[#dc2626] rounded-sm px-3.5 py-2.5 text-xs font-mono text-white placeholder-[#71717a] outline-none"
-              />
-              <button
-                type="submit"
-                className="w-full py-3 bg-[#dc2626] hover:bg-[#ef4444] text-white font-mono text-xs font-bold uppercase tracking-wider rounded-sm flex items-center justify-center gap-2 transition-colors cursor-pointer"
-              >
-                <span>ENVIAR MATERIAL A REDACCIÓN</span>
-                <Send className="w-3.5 h-3.5" />
-              </button>
-            </form>
-
-            {promoSent && (
-              <p className="font-mono text-xs text-emerald-400 text-center">
-                ✓ Promo registrado en la bóveda editorial para dictamen.
-              </p>
-            )}
-
-            <p className="font-mono text-[10px] text-center text-[#71717a]">
-              O envía correo a: <strong className="text-[#e4e4e7]">promos@timeofmetal.com</strong>
-            </p>
-          </div>
-
-          <div className="bg-[#121214] border border-[#27272a] rounded-sm p-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-[#09090b] border border-[#dc2626] rounded-sm flex items-center justify-center font-display font-bold text-[10px] text-[#ef4444]">
-                ToM
-              </div>
-              <div>
-                <h4 className="font-display font-bold text-sm text-white uppercase">
-                  MANIFIESTO TIME OF METAL
-                </h4>
-                <p className="font-mono text-[11px] text-[#71717a]">
-                  Defendiendo la llama del underground desde el abismo.
-                </p>
-              </div>
-            </div>
-            <ShieldCheck className="w-5 h-5 text-[#71717a]" />
-          </div>
-        </div>
-      </div>
     </div>
   );
 };

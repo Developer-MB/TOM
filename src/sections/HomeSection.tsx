@@ -59,15 +59,7 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
             {/* Left Column (7 cols) */}
             <div className="lg:col-span-7 space-y-6">
-              <div className="inline-flex items-center gap-2 font-mono text-[10px] tracking-[0.12em] uppercase">
-                <span className="px-2.5 py-1 bg-[#18181b] border border-[#3f3f46] text-[#ef4444] rounded-sm flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#dc2626]" />
-                  SOBERANÍA SUBTERRÁNEA
-                </span>
-                <span className="text-[#71717a]">// EDICIÓN CRÍTICA GLOBAL</span>
-              </div>
-
-              <h1 className="font-display font-extrabold text-4xl sm:text-6xl lg:text-[62px] leading-[0.96] tracking-tight uppercase">
+              <h1 className="font-display font-extrabold text-xl sm:text-4xl lg:text-[48px] leading-[0.96] tracking-tight uppercase">
                 <span className="text-white block">EL BASTIÓN</span>
                 <span className="text-white block">DEL </span>
                 <span className="text-[#dc2626]">METAL EXTREMO</span>{' '}
@@ -103,9 +95,9 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
               <div className="pt-2 flex flex-wrap items-center gap-6 font-mono text-[11px] text-[#71717a]">
                 <span className="flex items-center gap-1.5">
                   <span className="text-[#ef4444]">((•))</span>
-                  <strong className="text-[#e4e4e7]">1,842</strong> Oyentes Activos
+                  <strong className="text-[#e4e4e7]">666</strong> Oyentes Activos
                 </span>
-                <span>• Latencia: <strong className="text-[#e4e4e7]">18ms</strong></span>
+                <span>• Latencia: <strong className="text-[#e4e4e7]">666ms</strong></span>
                 <span>• Codec: <strong className="text-[#e4e4e7]">Direct Stream FLAC/Opus</strong></span>
               </div>
             </div>
@@ -117,9 +109,8 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
                 <div className="flex items-center justify-between border-b border-[#27272a] pb-3 font-mono text-[10px] uppercase tracking-wider">
                   <span className="flex items-center gap-2 text-[#f4f4f5] font-semibold">
                     <span className="w-2 h-2 rounded-full bg-[#dc2626] animate-pulse" />
-                    CABINA CENTRAL EN DIRECTO
+                    RADIO EN DIRECTO
                   </span>
-                  <span className="text-[#71717a]">STUDIO B // OSLO</span>
                 </div>
 
                 {/* Host & Show Info */}
@@ -132,7 +123,7 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
                       className="w-full h-full object-cover"
                     />
                     <span className="absolute bottom-0 inset-x-0 bg-[#dc2626] text-white font-mono text-[9px] font-bold text-center py-0.5">
-                      DJ RAVN
+                      DJ ERIK
                     </span>
                   </div>
                   <div className="space-y-1">
@@ -166,18 +157,6 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
                     ))}
                   </div>
                 </div>
-
-                {/* Bottom Link */}
-                <div className="flex items-center justify-between pt-1 font-mono text-[11px]">
-                  <span className="text-[#71717a]">Peticiones de tema: Abiertas</span>
-                  <button
-                    onClick={() => onSelectSection('radio')}
-                    className="text-[#f4f4f5] hover:text-[#ef4444] font-semibold flex items-center gap-1 transition-colors cursor-pointer"
-                  >
-                    <span>ENVIAR SALUDO AL MOSHPIT</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
-                </div>
               </div>
             </div>
           </div>
@@ -188,12 +167,8 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
       <section id="noticias-section" className="max-w-[1280px] mx-auto px-4 lg:px-8 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-[#ef4444]">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#dc2626]" />
-              <span>DESPACHOS &amp; TRINCHERA</span>
-            </div>
             <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-white uppercase tracking-tight mt-1">
-              ÚLTIMA HORA DEL METAL
+              RESEÑAS DE DISCOS DESTACADAS
             </h2>
           </div>
           <button
@@ -204,145 +179,12 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
-
-        {/* Dual Deck Strip + 4 News Grid matching Image 11 */}
-        <div className="space-y-4">
-          {/* Upper Deck: Bloodthirst Awakening */}
-          <div className="bg-[#121214] border border-[#27272a] rounded-sm p-3 flex flex-wrap items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <img
-                src={ASSETS.albumCatacombs}
-                alt="Bloodthirst Awakening"
-                referrerPolicy="no-referrer"
-                className="w-10 h-10 rounded-sm object-cover border border-[#3f3f46]"
-              />
-              <div>
-                <div className="flex items-center gap-1.5">
-                  <span className="font-display font-bold text-sm text-white">
-                    Bloodthirst Awakening
-                  </span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#dc2626]" />
-                </div>
-                <p className="font-mono text-[11px] text-[#a1a1aa]">
-                  Morbid Carnage • Death Metal / Suecia
-                </p>
-              </div>
-            </div>
-
-            {/* Center Transport Controls */}
-            <div className="flex-1 max-w-md flex flex-col items-center gap-1.5">
-              <div className="flex items-center gap-4 text-[#a1a1aa]">
-                <Shuffle className="w-3.5 h-3.5 hover:text-white cursor-pointer" />
-                <SkipBack className="w-4 h-4 hover:text-white cursor-pointer" />
-                <button
-                  onClick={onTogglePlay}
-                  className="w-8 h-8 rounded-full bg-[#dc2626] hover:bg-[#ef4444] text-white flex items-center justify-center cursor-pointer"
-                >
-                  {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 ml-0.5" />}
-                </button>
-                <SkipForward className="w-4 h-4 hover:text-white cursor-pointer" />
-                <Repeat className="w-3.5 h-3.5 hover:text-white cursor-pointer" />
-              </div>
-              <div className="w-full flex items-center gap-2 font-mono text-[10px] text-[#71717a]">
-                <span>02:44</span>
-                <div className="flex-1 h-1 bg-[#27272a] rounded-full overflow-hidden">
-                  <div className="w-3/5 h-full bg-[#dc2626]" />
-                </div>
-                <span>04:38</span>
-              </div>
-            </div>
-
-            {/* Right Controls */}
-            <div className="flex items-center gap-2.5">
-              <button
-                onClick={() => onSelectSection('radio')}
-                className="px-2.5 py-1 bg-[#dc2626] text-white font-mono text-[10px] font-bold uppercase rounded-sm cursor-pointer"
-              >
-                ((•)) RADIO 24/7
-              </button>
-              <button
-                onClick={() => onSelectSection('radio')}
-                className="px-2.5 py-1 bg-[#18181b] border border-[#3f3f46] text-[#a1a1aa] hover:text-white font-mono text-[10px] uppercase rounded-sm flex items-center gap-1 cursor-pointer"
-              >
-                <ListMusic className="w-3 h-3" />
-                <span>PLAYLIST OFICIAL</span>
-              </button>
-              <div className="hidden xl:flex items-center gap-2 pl-2">
-                <Volume2 className="w-4 h-4 text-[#a1a1aa]" />
-                <div className="w-16 h-1 bg-[#27272a] rounded-full overflow-hidden">
-                  <div className="w-4/5 h-full bg-[#dc2626]" />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Lower Live Stream Strip */}
-          <LiveStreamPlayerBar
-            currentTrack={currentTrack}
-            isPlaying={isPlaying}
-            onTogglePlay={onTogglePlay}
-          />
-
-          {/* 4 News Cards Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 pt-2">
-            {BREAKING_NEWS.map((item) => (
-              <article
-                key={item.id}
-                className="bg-[#121214] border border-[#27272a] hover:border-[#3f3f46] rounded-sm overflow-hidden flex flex-col justify-between group transition-colors"
-              >
-                <div>
-                  <div className="relative h-36 overflow-hidden bg-[#18181b]">
-                    <img
-                      src={item.image}
-                      alt={item.title}
-                      referrerPolicy="no-referrer"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-85"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#121214] via-transparent to-transparent" />
-                    <span className="absolute top-3 left-3 px-2 py-0.5 bg-[#dc2626] text-white font-mono text-[9px] font-bold uppercase tracking-wider rounded-sm">
-                      {item.tag}
-                    </span>
-                  </div>
-                  <div className="p-4 space-y-2">
-                    <h3 className="font-display font-bold text-base text-white group-hover:text-[#ef4444] transition-colors leading-snug line-clamp-2">
-                      {item.title}
-                    </h3>
-                    <p className="text-xs text-[#a1a1aa] leading-relaxed line-clamp-3">
-                      {item.excerpt}
-                    </p>
-                  </div>
-                </div>
-                <div className="px-4 pb-4 pt-2 border-t border-[#18181b] flex items-center justify-between font-mono text-[11px]">
-                  <span className="text-[#71717a]">
-                    Por <strong className="text-[#e4e4e7]">{item.author}</strong>
-                  </span>
-                  <button
-                    onClick={() => onSelectSection('resenas')}
-                    className="text-[#ef4444] hover:text-white flex items-center gap-1 cursor-pointer"
-                  >
-                    <span>Leer</span>
-                    <ArrowRight className="w-3 h-3" />
-                  </button>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
       </section>
 
       {/* RESEÑAS DE DISCOS DESTACADAS */}
       <section className="max-w-[1280px] mx-auto px-4 lg:px-8 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-[#ef4444]">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#dc2626]" />
-              <span>JUICIO CRÍTICO EDITORIAL</span>
-            </div>
-            <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-white uppercase tracking-tight mt-1">
-              RESEÑAS DE DISCOS DESTACADAS
-            </h2>
-          </div>
-
+          <div></div>
           {/* Filter Buttons */}
           <div className="flex items-center gap-2 font-mono text-[10px]">
             <span className="text-[#71717a] uppercase mr-1">FILTRAR:</span>
@@ -350,11 +192,10 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
               <button
                 key={cat}
                 onClick={() => setReviewFilter(cat)}
-                className={`px-2.5 py-1 rounded-sm uppercase transition-colors cursor-pointer ${
-                  reviewFilter === cat
-                    ? 'bg-[#dc2626] text-white font-bold'
-                    : 'bg-[#121214] border border-[#27272a] text-[#a1a1aa] hover:text-white'
-                }`}
+                className={`px-2.5 py-1 rounded-sm uppercase transition-colors cursor-pointer ${reviewFilter === cat
+                  ? 'bg-[#dc2626] text-white font-bold'
+                  : 'bg-[#121214] border border-[#27272a] text-[#a1a1aa] hover:text-white'
+                  }`}
               >
                 {cat}
               </button>
@@ -409,20 +250,6 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
               {/* Footer Actions */}
               <div className="px-5 pb-5 pt-3 border-t border-[#18181b] flex items-center justify-between font-mono text-[11px]">
                 <button
-                  onClick={() =>
-                    onPlayCustomTrack({
-                      title: rev.title,
-                      artist: rev.band,
-                      album: `${rev.label} (${rev.year})`,
-                      cover: rev.cover,
-                    })
-                  }
-                  className="px-3 py-1.5 bg-[#18181b] hover:bg-[#27272a] border border-[#27272a] text-[#e4e4e7] rounded-sm flex items-center gap-1.5 transition-colors cursor-pointer"
-                >
-                  <Play className="w-3 h-3 fill-current text-[#ef4444]" />
-                  <span>ESCUCHAR MUESTRA</span>
-                </button>
-                <button
                   onClick={() => onSelectSection('resenas')}
                   className="text-[#a1a1aa] hover:text-white uppercase tracking-wider cursor-pointer"
                 >
@@ -466,17 +293,6 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
                   4K ULTRA HD
                 </span>
               </div>
-              {podcastPlaying && (
-                <div className="absolute bottom-3 inset-x-3 bg-[#09090b]/90 border border-[#27272a] px-3 py-1.5 font-mono text-[11px] text-[#ef4444] flex items-center justify-between">
-                  <span>▶ REPRODUCIENDO STREAM 4K EN DIRECTO...</span>
-                  <button
-                    onClick={() => onSelectSection('videopodcast')}
-                    className="underline text-white cursor-pointer"
-                  >
-                    Ir a Trinchera Completa
-                  </button>
-                </div>
-              )}
             </div>
             <div className="flex items-center justify-between font-mono text-[11px] text-[#71717a]">
               <span className="flex items-center gap-1.5">
@@ -543,7 +359,7 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
               <span>DESDE EL FOSO DEL MOSHPIT</span>
             </div>
             <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-white uppercase tracking-tight mt-1">
-              GALERÍA DE CONCIERTOS RECIENTES
+              GALERÍA DE CONCIERTOS
             </h2>
           </div>
           <button
@@ -611,17 +427,10 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
       <section id="eventos-section" className="max-w-[1280px] mx-auto px-4 lg:px-8 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-[#ef4444]">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#dc2626]" />
-              <span>CARTELERA EN VIVO</span>
-            </div>
             <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-white uppercase tracking-tight mt-1">
               PRÓXIMOS EVENTOS &amp; GIRAS
             </h2>
           </div>
-          <span className="font-mono text-[11px] text-[#71717a] uppercase tracking-wider">
-            ZONA: CIUDAD DE MÉXICO / INTERNACIONAL
-          </span>
         </div>
 
         <div className="space-y-3">
@@ -660,26 +469,25 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
 
               <div className="flex items-center gap-3 self-end sm:self-center">
                 <span
-                  className={`font-mono text-[10px] px-2.5 py-1 rounded-sm border uppercase ${
-                    tour.statusUrgent
-                      ? 'bg-[#dc2626]/15 border-[#991b1b] text-[#ef4444]'
-                      : 'bg-[#18181b] border-[#27272a] text-[#a1a1aa]'
-                  }`}
+                  className={`font-mono text-[10px] px-2.5 py-1 rounded-sm border uppercase ${tour.statusUrgent
+                    ? 'bg-[#dc2626]/15 border-[#991b1b] text-[#ef4444]'
+                    : 'bg-[#18181b] border-[#27272a] text-[#a1a1aa]'
+                    }`}
                 >
                   {tour.status}
                 </span>
-                <button
+                {/* <button
                   onClick={() => setTicketModal(tour.title)}
                   className="px-4 py-2 bg-[#dc2626] hover:bg-[#ef4444] text-white font-mono text-[11px] font-bold uppercase tracking-wider rounded-sm transition-colors cursor-pointer"
                 >
                   COMPRAR TICKETS
-                </button>
+                </button> */}
               </div>
             </div>
           ))}
         </div>
 
-        {ticketModal && (
+        {/* {ticketModal && (
           <div className="bg-[#18181b] border border-[#dc2626] rounded-sm p-4 flex items-center justify-between font-mono text-xs text-white">
             <span>
               Reserva de acceso directo iniciada para: <strong>{ticketModal}</strong> (Sin cargos corporativos ocultos).
@@ -691,7 +499,7 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
               Cerrar
             </button>
           </div>
-        )}
+        )} */}
       </section>
     </div>
   );

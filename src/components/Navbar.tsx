@@ -1,8 +1,7 @@
 import React from 'react';
 import { Search, Shield, Play } from 'lucide-react';
-import { SectionId } from '../data/mockData';
-import LogoWhite from '../assets/images/TOM_white.png';
-import LogoRed from '../assets/images/TOM_red.png';
+import { SectionId, ASSETS } from '../data/mockData';
+
 interface NavbarProps {
   activeSection: SectionId;
   onSelectSection: (section: SectionId) => void;
@@ -23,11 +22,11 @@ export const Navbar: React.FC<NavbarProps> = ({
   const navItems: { id: SectionId; label: string; sub?: string }[] = [
     { id: 'inicio', label: 'INICIO' },
     { id: 'inicio', label: 'NOTICIAS', sub: 'noticias' },
-    { id: 'resenas', label: 'RESEÑAS DE DISCOS' },
-    { id: 'galeria', label: 'GALERÍA DE FOTOS' },
-    { id: 'videopodcast', label: 'VIDEOPODCAST' },
+    { id: 'resenas', label: 'RECOMENDACIONES' },
+    { id: 'galeria', label: 'GALERÍA' },
+    { id: 'videopodcast', label: 'VIDEOS' },
     { id: 'inicio', label: 'PRÓXIMOS EVENTOS', sub: 'eventos' },
-    { id: 'radio', label: 'RADIO EN VIVO' },
+    { id: 'radio', label: 'RADIO' },
   ];
 
   const handleNavClick = (item: { id: SectionId; label: string; sub?: string }) => {
@@ -57,7 +56,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             }}
             className="text-left group flex flex-col leading-none"
           >
-            <img src={LogoWhite} alt="Time of Metal" className="h-20 w-auto" />
+            <img src={ASSETS.logoWhite} alt="Time of Metal" className="h-20 w-auto" />
           </button>
 
           {/* Widget RADIO*/}

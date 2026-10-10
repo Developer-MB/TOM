@@ -79,43 +79,13 @@ export const GallerySection: React.FC<GallerySectionProps> = ({
       <section className="max-w-[1440px] mx-auto px-4 lg:px-8 pt-8 pb-6">
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-8 border-b border-zinc-800/80">
           <div>
-            <div className="flex items-center gap-3 mb-3">
-              <span className="bg-[#DC2626] text-white font-mono text-[10px] font-bold tracking-[0.2em] uppercase px-2.5 py-1 flex items-center gap-1.5">
-                <Camera className="w-3 h-3" /> ARCHIVO VISUAL DE DIRECTOS
-              </span>
-              <span className="font-mono text-[11px] text-zinc-500 uppercase tracking-widest">
-                // FOTOPERIODISMO DESDE EL FOSO
-              </span>
-            </div>
-            <h1 className="font-display font-black text-4xl sm:text-6xl lg:text-7xl uppercase tracking-tight leading-[0.92] text-white">
+            <h1 className="font-display font-black text-2xl sm:text-4xl lg:text-5xl uppercase tracking-tight leading-[0.92] text-white">
               CRÓNICAS DE{' '}
               <span className="text-[#DC2626]">FUEGO Y SANGRE</span>
             </h1>
             <p className="text-zinc-400 text-sm sm:text-base max-w-2xl mt-3 leading-relaxed">
               Fotografía documental en alta resolución capturada sin flash desde la primera línea de fuego. El sudor, la pirotecnia y la catarsis ritual de los escenarios más extremos del planeta.
             </p>
-          </div>
-
-          {/* Stats Box */}
-          <div className="grid grid-cols-3 border border-zinc-800 bg-[#0E0E12] divide-x divide-zinc-800 self-start lg:self-end shrink-0">
-            <div className="px-5 py-3.5 text-center">
-              <div className="font-display font-black text-2xl text-white">148</div>
-              <div className="font-mono text-[9px] uppercase tracking-widest text-zinc-500 mt-0.5">
-                COBERTURAS
-              </div>
-            </div>
-            <div className="px-5 py-3.5 text-center">
-              <div className="font-display font-black text-2xl text-[#DC2626]">6.4K</div>
-              <div className="font-mono text-[9px] uppercase tracking-widest text-zinc-500 mt-0.5">
-                NEGATIVOS RAW
-              </div>
-            </div>
-            <div className="px-5 py-3.5 text-center">
-              <div className="font-display font-black text-2xl text-white">18</div>
-              <div className="font-mono text-[9px] uppercase tracking-widest text-zinc-500 mt-0.5">
-                PAÍSES
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -136,39 +106,8 @@ export const GallerySection: React.FC<GallerySectionProps> = ({
               {/* Top Overlay Badges */}
               <div className="absolute top-4 left-4 flex flex-wrap items-center gap-2">
                 <span className="bg-[#DC2626] text-white font-mono text-[10px] font-bold uppercase tracking-widest px-3 py-1">
-                  COBERTURA ESTELAR // EXCLUSIVA
+                  COBERTURA ESTELAR
                 </span>
-                <span className="bg-black/80 backdrop-blur-sm border border-zinc-700 text-zinc-200 font-mono text-[10px] uppercase tracking-widest px-3 py-1">
-                  64 FOTOS RAW SIN CENSURA
-                </span>
-              </div>
-
-              {/* Camera EXIF Overlay Bar */}
-              <div className="absolute bottom-4 left-4 right-4 flex flex-wrap items-center justify-between gap-2 bg-black/85 backdrop-blur-md border border-zinc-800 px-4 py-2.5">
-                <div className="flex items-center gap-4 font-mono text-[11px] text-zinc-300">
-                  <span className="flex items-center gap-1.5 text-[#DC2626] font-bold">
-                    <Aperture className="w-3.5 h-3.5" /> LEICA SL2-S
-                  </span>
-                  <span className="hidden sm:inline text-zinc-600">|</span>
-                  <span className="hidden sm:inline">35MM SUMMILUX f/1.4</span>
-                  <span className="text-zinc-600">|</span>
-                  <span>ISO 3200 · 1/500s</span>
-                </div>
-                <button
-                  onClick={() =>
-                    setLightboxItem({
-                      title: 'BEHEMOTH: LA LITURGIA DEL FUEGO EN WACKEN OPEN AIR',
-                      venue: 'WACKEN, ALEMANIA (MAIN STAGE)',
-                      date: '03 AGOSTO 2024',
-                      photographer: 'M. LINDQVIST',
-                      image: ASSETS.concertPyro,
-                      exif: 'LEICA SL2-S · 35MM f/1.4 · ISO 3200 · 1/500s',
-                    })
-                  }
-                  className="font-mono text-[10px] uppercase tracking-widest text-white hover:text-[#DC2626] flex items-center gap-1.5 transition-colors cursor-pointer"
-                >
-                  <Maximize2 className="w-3.5 h-3.5" /> PANTALLA COMPLETA
-                </button>
               </div>
             </div>
 
@@ -255,16 +194,6 @@ export const GallerySection: React.FC<GallerySectionProps> = ({
             </div>
           </div>
         </div>
-      </section>
-
-      {/* INLINE STREAM PLAYER BAR */}
-      <section className="max-w-[1440px] mx-auto px-4 lg:px-8 pb-8">
-        <LiveStreamPlayerBar
-          currentTrack={currentTrack}
-          isPlaying={isPlaying}
-          onTogglePlay={onTogglePlay}
-          onOpenRadioSection={() => onSelectSection('radio')}
-        />
       </section>
 
       {/* FILTER BAR & SEARCH */}
@@ -383,107 +312,10 @@ export const GallerySection: React.FC<GallerySectionProps> = ({
         </div>
       </section>
 
-      {/* PIT PHOTOGRAPHY MANIFESTO & PRESS ACCREDITATION */}
-      <section className="max-w-[1440px] mx-auto px-4 lg:px-8 pb-16">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Left: Technical Gear & Pit Rules */}
-          <div className="lg:col-span-7 border border-zinc-800 bg-[#0E0E12] p-6 sm:p-8 flex flex-col justify-between">
-            <div>
-              <div className="flex items-center gap-2 font-mono text-[11px] text-[#DC2626] uppercase tracking-widest mb-3">
-                <ShieldCheck className="w-4 h-4" /> PROTOCOLO DE FOSO // REGLA DE LAS 3 CANCIONES
-              </div>
-              <h3 className="font-display font-black text-2xl sm:text-3xl uppercase text-white tracking-tight mb-4">
-                SIN FLASH. SIN FILTROS DIGITALES. PURO GRANO ÓPTICO.
-              </h3>
-              <p className="text-zinc-400 text-sm leading-relaxed mb-6">
-                Todos los reportajes gráficos de Time of Metal son capturados por fotógrafos acreditados en formato RAW sin compresión, respetando estrictamente la atmósfera lumínica del escenario. Prohibido el uso de inteligencia artificial generativa o retoque plástico.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-zinc-800">
-              <div className="bg-[#070709] border border-zinc-800/80 p-4">
-                <div className="font-mono text-[10px] text-zinc-500 uppercase mb-1">
-                  ÓPTICA ESTÁNDAR
-                </div>
-                <div className="font-mono text-xs font-bold text-white">
-                  FIJOS LUMINOSOS f/1.2 - f/1.4
-                </div>
-              </div>
-              <div className="bg-[#070709] border border-zinc-800/80 p-4">
-                <div className="font-mono text-[10px] text-zinc-500 uppercase mb-1">
-                  LICENCIA ARCHIVO
-                </div>
-                <div className="font-mono text-xs font-bold text-white">
-                  EDITORIAL & PRENSA OFICIAL
-                </div>
-              </div>
-              <div className="bg-[#070709] border border-zinc-800/80 p-4">
-                <div className="font-mono text-[10px] text-zinc-500 uppercase mb-1">
-                  ENTREGA PRENSA
-                </div>
-                <div className="font-mono text-xs font-bold text-[#DC2626]">
-                  &lt; 12 HORAS POST-SHOW
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Right: Press Pass / Promoter Contact */}
-          <div className="lg:col-span-5 border border-zinc-800 bg-[#0E0E12] p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden">
-            <div className="absolute -right-8 -top-8 w-32 h-32 bg-[#DC2626]/10 rounded-full blur-2xl pointer-events-none" />
-            <div>
-              <div className="flex items-center gap-2 font-mono text-[11px] text-amber-500 uppercase tracking-widest mb-3">
-                <Mail className="w-4 h-4" /> ACREDITACIONES DE PRENSA & PROMOTORAS
-              </div>
-              <h3 className="font-display font-black text-2xl uppercase text-white tracking-tight mb-3">
-                ¿ORGANIZAS UN RITUAL O GIRA EXTREMA?
-              </h3>
-              <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed mb-5">
-                Solicita cobertura fotográfica oficial de nuestro equipo en Europa y Latinoamérica o adquiere licencias de alta resolución para carpetas de prensa y vinilos en directo.
-              </p>
-            </div>
-
-            <form onSubmit={handlePressRequest} className="space-y-3">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <input
-                  type="text"
-                  required
-                  placeholder="Promotora / Sello / Banda"
-                  className="bg-[#070709] border border-zinc-800 focus:border-[#DC2626] px-3.5 py-2.5 text-xs font-mono text-white outline-none"
-                />
-                <input
-                  type="email"
-                  required
-                  placeholder="Correo de Prensa Oficial"
-                  className="bg-[#070709] border border-zinc-800 focus:border-[#DC2626] px-3.5 py-2.5 text-xs font-mono text-white outline-none"
-                />
-              </div>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  required
-                  placeholder="Ciudad, Fecha y Recinto del Evento"
-                  className="flex-1 bg-[#070709] border border-zinc-800 focus:border-[#DC2626] px-3.5 py-2.5 text-xs font-mono text-white outline-none"
-                />
-                <button
-                  type="submit"
-                  className="bg-[#DC2626] hover:bg-red-700 text-white font-mono text-xs font-bold uppercase tracking-wider px-5 py-2.5 flex items-center gap-2 transition-colors cursor-pointer shrink-0"
-                >
-                  <Send className="w-3.5 h-3.5" /> ENVIAR
-                </button>
-              </div>
-              {pressStatus && (
-                <p className="font-mono text-[11px] text-emerald-400 pt-1">{pressStatus}</p>
-              )}
-            </form>
-          </div>
-        </div>
-      </section>
-
       {/* LIGHTBOX MODAL */}
       {lightboxItem && (
         <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="max-w-5xl w-full border border-zinc-800 bg-[#0B0B0E] overflow-hidden">
+          <div className="max-w-3xl w-full border border-zinc-800 bg-[#0B0B0E] overflow-hidden">
             <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800">
               <div>
                 <span className="font-mono text-[10px] text-[#DC2626] uppercase tracking-widest block">
@@ -512,8 +344,6 @@ export const GallerySection: React.FC<GallerySectionProps> = ({
             <div className="px-6 py-4 border-t border-zinc-800 flex flex-wrap items-center justify-between gap-4 font-mono text-xs">
               <div className="text-zinc-400">
                 FOTÓGRAFO: <span className="text-white font-bold">{lightboxItem.photographer}</span>{' '}
-                <span className="mx-2 text-zinc-700">|</span> EXIF:{' '}
-                <span className="text-zinc-300">{lightboxItem.exif}</span>
               </div>
               <button
                 onClick={() => setLightboxItem(null)}

@@ -6,6 +6,8 @@ export const ASSETS = {
   albumCatacombs: '/src/assets/images/album_catacombs_cover_1791593139425.jpg',
   albumBlackMetal: '/src/assets/images/album_black_metal_cover_1791593147308.jpg',
   djRavn: '/src/assets/images/dj_ravn_portrait_1791593164383.jpg',
+  logoWhite: '/src/assets/images/TOM_white.png',
+  logoRed: '/src/assets/images/TOM_red.png',
 };
 
 export interface AudioTrack {

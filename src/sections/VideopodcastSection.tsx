@@ -87,16 +87,8 @@ export const VideopodcastSection: React.FC<VideopodcastSectionProps> = ({
       <section className="max-w-[1440px] mx-auto px-4 lg:px-8 pt-8 pb-6">
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-8 border-b border-zinc-800/80">
           <div>
-            <div className="flex items-center gap-3 mb-3">
-              <span className="bg-[#DC2626] text-white font-mono text-[10px] font-bold tracking-[0.2em] uppercase px-2.5 py-1 flex items-center gap-1.5">
-                <Mic className="w-3 h-3" /> VIDEOPODCAST OFICIAL // 4K STUDIO
-              </span>
-              <span className="font-mono text-[11px] text-zinc-500 uppercase tracking-widest">
-                // TEMPORADA 04 · SIN CORTES COMERCIALES
-              </span>
-            </div>
-            <h1 className="font-display font-black text-4xl sm:text-6xl lg:text-7xl uppercase tracking-tight leading-[0.92] text-white">
-              VOCES DESDE EL <span className="text-[#DC2626]">BÚNKER</span>
+            <h1 className="font-display font-black text-2xl sm:text-4xl lg:text-5xl uppercase tracking-tight leading-[0.92] text-white">
+              VIDEO <span className="text-[#DC2626]">PODCAST</span> OFICIAL
             </h1>
             <p className="text-zinc-400 text-sm sm:text-base max-w-2xl mt-3 leading-relaxed">
               Conversaciones profundas sin censura, disección de ingeniería acústica y charlas cara a cara con los arquitectos del metal extremo mundial. Grabado en cinta multipista y video 4K.
@@ -125,13 +117,6 @@ export const VideopodcastSection: React.FC<VideopodcastSectionProps> = ({
             >
               <Disc className="w-4 h-4 text-emerald-500" /> SPOTIFY LOSSLESS
             </a>
-            <a
-              href="#rss"
-              onClick={(e) => e.preventDefault()}
-              className="bg-[#0E0E12] hover:bg-zinc-900 border border-zinc-800 hover:border-[#DC2626] px-4 py-2.5 font-mono text-xs uppercase tracking-wider text-zinc-300 flex items-center gap-2 transition-colors"
-            >
-              <Rss className="w-4 h-4 text-amber-500" /> FEED RSS FLAC
-            </a>
           </div>
         </div>
       </section>
@@ -139,16 +124,15 @@ export const VideopodcastSection: React.FC<VideopodcastSectionProps> = ({
       {/* FEATURED PREMIERE EPISODE #48 */}
       <section className="max-w-[1440px] mx-auto px-4 lg:px-8 pb-8">
         <div className="border border-zinc-800 bg-[#0E0E12]">
-          <div className="grid grid-cols-1 lg:grid-cols-12">
+          <div className="grid grid-cols-1 lg:grid-cols-8">
             {/* Left 8 Cols: 4K Video Cinema Player */}
             <div className="lg:col-span-8 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-zinc-800">
               <div className="relative aspect-video bg-black overflow-hidden group">
                 <img
                   src={ASSETS.studioPodcast}
                   alt="Bunker Studio Podcast"
-                  className={`w-full h-full object-cover transition-transform duration-700 ${
-                    isVideoPlaying ? 'scale-105 opacity-75' : 'opacity-85 group-hover:scale-102'
-                  }`}
+                  className={`w-full h-full object-cover transition-transform duration-700 ${isVideoPlaying ? 'scale-105 opacity-75' : 'opacity-85 group-hover:scale-102'
+                    }`}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#070709] via-black/30 to-black/50" />
 
@@ -158,13 +142,7 @@ export const VideopodcastSection: React.FC<VideopodcastSectionProps> = ({
                     <span className="bg-[#DC2626] text-white font-mono text-[10px] font-bold uppercase tracking-widest px-3 py-1 flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-white animate-pulse" /> ESTRENO DE TEMPORADA
                     </span>
-                    <span className="bg-black/80 border border-zinc-700 text-zinc-200 font-mono text-[10px] uppercase tracking-widest px-2.5 py-1">
-                      4K UHD · MASTER ANALÓGICO 24-BIT
-                    </span>
                   </div>
-                  <span className="bg-black/80 border border-zinc-800 text-zinc-300 font-mono text-xs px-3 py-1">
-                    02H 14M
-                  </span>
                 </div>
 
                 {/* Center Play Trigger */}
@@ -218,7 +196,7 @@ export const VideopodcastSection: React.FC<VideopodcastSectionProps> = ({
                         onClick={onTogglePlay}
                         className="font-mono text-xs uppercase tracking-wider text-zinc-400 hover:text-white flex items-center gap-1.5 cursor-pointer"
                       >
-                        <Volume2 className="w-4 h-4 text-zinc-400" /> SOLO AUDIO FLAC
+                        <Volume2 className="w-4 h-4 text-zinc-400" />
                       </button>
                     </div>
                     <div className="flex items-center gap-3 font-mono text-[11px] text-zinc-400">
@@ -243,90 +221,8 @@ export const VideopodcastSection: React.FC<VideopodcastSectionProps> = ({
                 </p>
               </div>
             </div>
-
-            {/* Right 4 Cols: Chapter Markers & Technical Specs */}
-            <div className="lg:col-span-4 p-6 sm:p-8 flex flex-col justify-between bg-[#0E0E12]">
-              <div>
-                <div className="flex items-center justify-between pb-4 mb-5 border-b border-zinc-800">
-                  <span className="font-mono text-xs font-bold uppercase tracking-widest text-white flex items-center gap-2">
-                    <Sliders className="w-4 h-4 text-[#DC2626]" /> MARCADORES DEL EPISODIO
-                  </span>
-                  <span className="font-mono text-[10px] text-zinc-500 uppercase">
-                    5 CAPÍTULOS
-                  </span>
-                </div>
-
-                <div className="space-y-2.5 mb-8">
-                  {CHAPTER_MARKERS.map((chap, idx) => {
-                    const isCurrent = activeChapter === idx;
-                    return (
-                      <button
-                        key={chap.time}
-                        onClick={() => {
-                          setActiveChapter(idx);
-                          setIsVideoPlaying(true);
-                        }}
-                        className={`w-full text-left p-3.5 border transition-all cursor-pointer flex items-start gap-3 ${
-                          isCurrent
-                            ? 'bg-[#16161D] border-[#DC2626] text-white'
-                            : 'bg-[#070709] border-zinc-800/90 text-zinc-400 hover:border-zinc-700 hover:text-zinc-200'
-                        }`}
-                      >
-                        <span
-                          className={`font-mono text-xs font-bold px-2 py-0.5 shrink-0 ${
-                            isCurrent
-                              ? 'bg-[#DC2626] text-white'
-                              : 'bg-zinc-900 text-zinc-400'
-                          }`}
-                        >
-                          {chap.time}
-                        </span>
-                        <span className="text-xs font-medium leading-snug">
-                          {chap.title}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Studio Chain Card */}
-              <div className="border border-zinc-800 bg-[#070709] p-5 space-y-3">
-                <div className="font-mono text-[10px] uppercase tracking-widest text-[#DC2626] font-bold">
-                  // CADENA DE AUDIO DEL BÚNKER
-                </div>
-                <div className="grid grid-cols-2 gap-3 font-mono text-[11px]">
-                  <div>
-                    <span className="text-zinc-500 block text-[10px]">MICRÓFONOS VOCALES</span>
-                    <span className="text-zinc-200 font-bold">SHURE SM7B + NEUMANN U87</span>
-                  </div>
-                  <div>
-                    <span className="text-zinc-500 block text-[10px]">CONSOLA CENTRAL</span>
-                    <span className="text-zinc-200 font-bold">NEVE 1073 PREAMPS</span>
-                  </div>
-                  <div>
-                    <span className="text-zinc-500 block text-[10px]">CÁMARAS DE ESTUDIO</span>
-                    <span className="text-zinc-200 font-bold">3x SONY FX6 CINEMA LINE</span>
-                  </div>
-                  <div>
-                    <span className="text-zinc-500 block text-[10px]">FORMATO DESCARGA</span>
-                    <span className="text-emerald-400 font-bold">WAV / FLAC 96kHz</span>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
-      </section>
-
-      {/* INLINE STREAM PLAYER BAR */}
-      <section className="max-w-[1440px] mx-auto px-4 lg:px-8 pb-8">
-        <LiveStreamPlayerBar
-          currentTrack={currentTrack}
-          isPlaying={isPlaying}
-          onTogglePlay={onTogglePlay}
-          onOpenRadioSection={() => onSelectSection('radio')}
-        />
       </section>
 
       {/* CATEGORY TABS & SEARCH */}
@@ -339,11 +235,10 @@ export const VideopodcastSection: React.FC<VideopodcastSectionProps> = ({
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-3.5 py-2 font-mono text-[11px] uppercase tracking-wider border transition-colors cursor-pointer ${
-                    active
+                  className={`px-3.5 py-2 font-mono text-[11px] uppercase tracking-wider border transition-colors cursor-pointer ${active
                       ? 'bg-[#DC2626] text-white border-[#DC2626] font-bold'
                       : 'bg-[#070709] text-zinc-400 border-zinc-800 hover:text-white hover:border-zinc-700'
-                  }`}
+                    }`}
                 >
                   {cat}
                 </button>
