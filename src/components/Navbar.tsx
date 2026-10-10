@@ -1,7 +1,8 @@
 import React from 'react';
 import { Search, Shield, Play } from 'lucide-react';
 import { SectionId } from '../data/mockData';
-
+import LogoWhite from '../assets/images/TOM_white.png';
+import LogoRed from '../assets/images/TOM_red.png';
 interface NavbarProps {
   activeSection: SectionId;
   onSelectSection: (section: SectionId) => void;
@@ -56,16 +57,11 @@ export const Navbar: React.FC<NavbarProps> = ({
             }}
             className="text-left group flex flex-col leading-none"
           >
-            <span className="font-display font-extrabold text-lg tracking-tight text-white group-hover:text-[#ef4444] transition-colors">
-              OF METAL
-            </span>
-            <span className="font-mono text-[9px] tracking-[0.15em] text-[#71717a] uppercase mt-0.5">
-              PORTAL PESADO & RADIO
-            </span>
+            <img src={LogoWhite} alt="Time of Metal" className="h-20 w-auto" />
           </button>
 
-          {/* ON AIR Widget */}
-          <div className="hidden xl:flex items-center gap-2.5 bg-[#121214] border border-[#27272a] rounded px-2.5 py-1">
+          {/* Widget RADIO*/}
+          {/* <div className="hidden xl:flex items-center gap-2.5 bg-[#121214] border border-[#27272a] rounded px-2.5 py-1">
             <div className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-[#dc2626] animate-pulse" />
               <span className="font-mono text-[10px] font-bold text-[#f4f4f5] leading-tight uppercase">
@@ -86,7 +82,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <Play className="w-2.5 h-2.5 fill-current" />
               <span>{isPlaying ? 'EN VIVO' : 'SINTONIZAR'}</span>
             </button>
-          </div>
+          </div> */}
         </div>
 
         {/* Center: Navigation Links */}
@@ -98,11 +94,10 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 key={idx}
                 onClick={() => handleNavClick(item)}
-                className={`font-mono text-[11px] tracking-[0.08em] uppercase transition-colors cursor-pointer py-1 border-b-2 whitespace-nowrap ${
-                  isActive
+                className={`font-mono text-[11px] tracking-[0.08em] uppercase transition-colors cursor-pointer py-1 border-b-2 whitespace-nowrap ${isActive
                     ? 'text-white border-[#dc2626] font-semibold'
                     : 'text-[#a1a1aa] border-transparent hover:text-white'
-                }`}
+                  }`}
               >
                 {item.label}
               </button>
@@ -128,11 +123,10 @@ export const Navbar: React.FC<NavbarProps> = ({
               onSelectSection('cms');
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-sm border font-mono text-[10px] tracking-wider uppercase transition-colors cursor-pointer ${
-              activeSection === 'cms'
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-sm border font-mono text-[10px] tracking-wider uppercase transition-colors cursor-pointer ${activeSection === 'cms'
                 ? 'bg-[#dc2626] border-[#ef4444] text-white'
                 : 'bg-[#18181b] border-[#3f3f46] text-[#e4e4e7] hover:border-[#71717a]'
-            }`}
+              }`}
           >
             <Shield className="w-3.5 h-3.5 text-[#dc2626]" />
             <span>CMS / ADMIN</span>
@@ -156,11 +150,10 @@ export const Navbar: React.FC<NavbarProps> = ({
               onSelectSection(tab.id as SectionId);
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
-            className={`px-2.5 py-1 rounded-sm font-mono text-[10px] whitespace-nowrap uppercase ${
-              activeSection === tab.id
+            className={`px-2.5 py-1 rounded-sm font-mono text-[10px] whitespace-nowrap uppercase ${activeSection === tab.id
                 ? 'bg-[#dc2626] text-white font-semibold'
                 : 'bg-[#18181b] text-[#a1a1aa] border border-[#27272a]'
-            }`}
+              }`}
           >
             {tab.label}
           </button>
