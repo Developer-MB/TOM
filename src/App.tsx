@@ -17,6 +17,7 @@ export default function App() {
   const [activeSection, setActiveSection] = useState<SectionId>('inicio');
   const [currentTrack, setCurrentTrack] = useState<AudioTrack>(DEFAULT_RADIO_STREAM);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   // Web Audio API synthesizer for authentic heavy drone/riff preview feedback when user toggles radio stream
   const audioCtxRef = useRef<AudioContext | null>(null);
@@ -104,7 +105,9 @@ export default function App() {
         activeSection={activeSection}
         onSelectSection={handleSelectSection}
         onToggleRadioPlay={handleTogglePlay}
-        isRadioPlaying={isPlaying}
+        isPlaying={isPlaying}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
       />
 
       <main className="flex-1">
@@ -114,7 +117,7 @@ export default function App() {
             isPlaying={isPlaying}
             onTogglePlay={handleTogglePlay}
             onSelectSection={handleSelectSection}
-            onSelectTrack={handleSelectTrack}
+            onPlayCustomTrack={handleSelectTrack}
           />
         )}
 
@@ -124,7 +127,7 @@ export default function App() {
             isPlaying={isPlaying}
             onTogglePlay={handleTogglePlay}
             onSelectSection={handleSelectSection}
-            onSelectTrack={handleSelectTrack}
+            onPlayCustomTrack={handleSelectTrack}
           />
         )}
 
