@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { MapPin } from 'lucide-react';
 import { AudioTrack, SectionId, UPCOMING_TOURS } from '../data/mockData';
 import HeadHome from '../components/organism/HeadHome';
 import HeadResenias from '../components/organism/HeadResenias';
