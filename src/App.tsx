@@ -1,9 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import {
-  AudioTrack,
-  DEFAULT_RADIO_STREAM,
-  SectionId,
-} from './data/mockData';
+import { AudioTrack, SectionId } from './data/mockData';
 import { Navbar } from './components/organism/Navbar';
 import { Footer } from './components/organism/Footer';
 import { HomeSection } from './sections/HomeSection';
@@ -12,87 +8,118 @@ import { GallerySection } from './sections/GallerySection';
 import { VideopodcastSection } from './sections/VideopodcastSection';
 import { RadioSection } from './sections/RadioSection';
 import { CmsSection } from './sections/CmsSection';
+import { AUDIO_ASSETS } from './data/Assets';
+
+const toAudioTrack = (track: (typeof AUDIO_ASSETS)[number]): AudioTrack => ({
+  id: track.id,
+  title: track.title,
+  artist: track.band,
+  album: track.disc,
+  src: track.src,
+  cover: track.cover,
+  duration: '',
+  currentTime: '',
+  bitrate: '192 kbps',
+});
 
 export default function App() {
   const [activeSection, setActiveSection] = useState<SectionId>('inicio');
-  const [currentTrack, setCurrentTrack] = useState<AudioTrack>(DEFAULT_RADIO_STREAM);
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [currentTrack, setCurrentTrack] = useState<AudioTrack>(() => toAudioTrack(AUDIO_ASSETS[0]));
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  // Web Audio API synthesizer for authentic heavy drone/riff preview feedback when user toggles radio stream
-  const audioCtxRef = useRef<AudioContext | null>(null);
-  const gainNodeRef = useRef<GainNode | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const currentTrackIndexRef = useRef(0);
 
-  const stopAudioEngine = () => {
-    if (audioCtxRef.current) {
-      audioCtxRef.current.close().catch(() => {});
-      audioCtxRef.current = null;
-      gainNodeRef.current = null;
+  const handleTogglePlay = async () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (isPlaying) {
+      audio.pause();
+      setIsPlaying(false);
+      return;
     }
-  };
 
-  const startAudioEngine = () => {
     try {
-      stopAudioEngine();
-      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      const ctx = new AudioCtx();
-      const osc1 = ctx.createOscillator();
-      const osc2 = ctx.createOscillator();
-      const filter = ctx.createBiquadFilter();
-      const gain = ctx.createGain();
-
-      // Deep dark sub-bass analog console hum / dark ambient drone
-      osc1.type = 'sawtooth';
-      osc1.frequency.setValueAtTime(55, ctx.currentTime); // A1
-      osc2.type = 'triangle';
-      osc2.frequency.setValueAtTime(82.41, ctx.currentTime); // E2 power fifth
-
-      filter.type = 'lowpass';
-      filter.frequency.setValueAtTime(160, ctx.currentTime);
-
-      gain.gain.setValueAtTime(0.015, ctx.currentTime);
-
-      osc1.connect(filter);
-      osc2.connect(filter);
-      filter.connect(gain);
-      gain.connect(ctx.destination);
-
-      osc1.start();
-      osc2.start();
-
-      audioCtxRef.current = ctx;
-      gainNodeRef.current = gain;
-    } catch {
-      // Ignore if browser blocks audio context
+      audio.volume = 0.8;
+      await audio.play();
+      setIsPlaying(true);
+    } catch (err) {
+      console.error('Error al reproducir el audio:', err);
+      setIsPlaying(false);
     }
-  };
-
-  useEffect(() => {
-    return () => stopAudioEngine();
-  }, []);
-
-  const handleTogglePlay = () => {
-    setIsPlaying((prev) => {
-      const next = !prev;
-      if (next) {
-        startAudioEngine();
-      } else {
-        stopAudioEngine();
-      }
-      return next;
-    });
   };
 
   const handleSelectTrack = (trackUpdate: Partial<AudioTrack>) => {
-    setCurrentTrack((prev) => ({
-      ...prev,
-      ...trackUpdate,
-    }));
-    if (!isPlaying) {
+    const selectedAsset = AUDIO_ASSETS.find((track) => track.id === trackUpdate.id);
+    if (selectedAsset) {
+      void playAssetTrack(selectedAsset);
+      return;
+    }
+
+    setCurrentTrack((prev) => ({ ...prev, ...trackUpdate }));
+    const audio = audioRef.current;
+    if (!audio || !trackUpdate.src) return;
+
+    audio.src = trackUpdate.src;
+    audio.load();
+    audio.volume = 0.8;
+    void audio.play()
+      .then(() => setIsPlaying(true))
+      .catch((error: unknown) => {
+        console.error('Error al reproducir la canción seleccionada:', error);
+        setIsPlaying(false);
+      });
+  };
+
+  const playAssetTrack = async (track: (typeof AUDIO_ASSETS)[number]) => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    currentTrackIndexRef.current = AUDIO_ASSETS.findIndex((asset) => asset.id === track.id);
+    setCurrentTrack(toAudioTrack(track));
+    audio.src = track.src;
+    audio.load();
+    audio.volume = 0.8;
+
+    try {
+      await audio.play();
       setIsPlaying(true);
-      startAudioEngine();
+    } catch (error) {
+      console.error(`No se pudo reproducir "${track.title}":`, error);
+      setIsPlaying(false);
     }
   };
+
+  const handleTrackEnded = () => {
+    if (AUDIO_ASSETS.length === 0) return;
+
+    const nextIndex = (currentTrackIndexRef.current + 1) % AUDIO_ASSETS.length;
+    const nextTrack = AUDIO_ASSETS[nextIndex];
+    if (nextTrack) void playAssetTrack(nextTrack);
+  };
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    audio.volume = 0.8;
+    void audio.play()
+      .then(() => setIsPlaying(true))
+      .catch((error: unknown) => {
+        setIsPlaying(false);
+        if (error instanceof DOMException && error.name === 'NotAllowedError') {
+          console.info('El navegador bloqueó la reproducción automática. Presiona Sintonizar para iniciar.');
+          return;
+        }
+        console.error('No se pudo iniciar la reproducción automática:', error);
+      });
+
+    return () => {
+      audio.pause();
+    };
+  }, []);
 
   const handleSelectSection = (section: SectionId) => {
     setActiveSection(section);
@@ -100,7 +127,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#070709] text-[#F4F4F6] flex flex-col selection:bg-[#DC2626] selection:text-white">
+    <div className="min-h-screen bg-[#000] text-[#F4F4F6] flex flex-col selection:bg-[#DC2626] selection:text-white">
       <Navbar
         activeSection={activeSection}
         onSelectSection={handleSelectSection}
@@ -108,6 +135,18 @@ export default function App() {
         isPlaying={isPlaying}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
+      />
+
+      <audio
+        ref={audioRef}
+        src={currentTrack.src}
+        preload="auto"
+        onEnded={handleTrackEnded}
+        onError={() => {
+          console.error(`No se pudo cargar el audio: ${currentTrack.src}`);
+          // setIsPlaying(false);
+        }}
+        style={{ display: 'none' }}
       />
 
       <main className="flex-1">

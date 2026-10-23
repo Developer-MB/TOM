@@ -1,6 +1,8 @@
 import React from 'react'
 import { ArrowRight } from 'lucide-react'
 import { SectionId } from '../../data/mockData';
+import { ASSETS } from '@/src/data/Assets';
+
 
 interface HeadResniasProps {
     onSelectSection: (section: SectionId) => void;
@@ -8,11 +10,12 @@ interface HeadResniasProps {
 
 export const HeadResenias: React.FC<HeadResniasProps> = ({ onSelectSection }) => {
     return (
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between">
             <div>
-                <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-white uppercase tracking-tight mt-1">
-                    RESEÑAS DE DISCOS DESTACADAS
-                </h2>
+                <img src={ASSETS.logoTONM}
+                    alt="Time of New Music Logo"
+                    className="w-48 sm:w-64 lg:w-80"
+                />
             </div>
             <button
                 onClick={() => onSelectSection('cms')}

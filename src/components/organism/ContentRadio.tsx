@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { ASSETS, AudioTrack } from '@/src/data/mockData';
+import { AudioTrack } from '@/src/data/mockData';
+import { ASSETS, AUDIO_ASSETS } from '@/src/data/Assets';
 import { Pause, Play, Radio, Volume2, VolumeX } from 'lucide-react';
 
 interface RadioSectionProps {
@@ -155,6 +156,43 @@ const ContentRadio = ({ currentTrack, isPlaying, onTogglePlay, onSelectTrack }: 
                                 <p className="text-zinc-400 text-xs leading-relaxed">
                                     Seleccionando prensas originales de Osmose Productions, Deathlike Silence y Earache Records (1988–1995).
                                 </p>
+                            </div>
+                        </div>
+
+                        <div className="border-t border-zinc-800 pt-4">
+                            <h3 className="font-mono text-[10px] uppercase tracking-widest text-zinc-500 mb-3">
+                                Lista de reproducción
+                            </h3>
+                            <div className="space-y-2">
+                                {AUDIO_ASSETS.map((track) => (
+                                    <button
+                                        key={track.id}
+                                        type="button"
+                                        onClick={() => onSelectTrack({
+                                            id: track.id,
+                                            title: track.title,
+                                            artist: track.band,
+                                            album: track.disc,
+                                            src: track.src,
+                                            cover: track.cover,
+                                            duration: '',
+                                            currentTime: '',
+                                            bitrate: '192 kbps',
+                                        })}
+                                        className={`w-full text-left border px-3 py-2 transition-colors cursor-pointer ${
+                                            currentTrack.id === track.id
+                                                ? 'border-[#DC2626] bg-[#DC2626]/10'
+                                                : 'border-zinc-800 bg-[#070709] hover:border-zinc-600'
+                                        }`}
+                                    >
+                                        <span className="block font-mono text-xs text-white">
+                                            {track.title}
+                                        </span>
+                                        <span className="block font-mono text-[10px] text-zinc-500 mt-1">
+                                            {track.band} · {track.disc}
+                                        </span>
+                                    </button>
+                                ))}
                             </div>
                         </div>
                     </div>

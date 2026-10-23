@@ -9,7 +9,7 @@
 
   body {
     font-family: var(--font-sans);
-    background-color: #09090b;
+    background-color: #000;
     color: #f4f4f5;
     overflow-x: hidden;
   }

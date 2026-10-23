@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { AudioTrack, SectionId, UPCOMING_TOURS } from '../data/mockData';
-import HeadHome from '../components/organism/HeadHome';
-import HeadResenias from '../components/organism/HeadResenias';
+import HeadHome from '../components/Home/HeadHome';
+import HeadResenias from '../components/Home/HeadResenias';
 import ContentResenia from '../components/organism/ContentResenia';
 import ContentVideo from '../components/organism/ContentVideo';
 import ContentGallery from '../components/organism/ContentGallery';
@@ -25,9 +25,9 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
   const [podcastPlaying, setPodcastPlaying] = useState(false);
 
   return (
-    <div className="space-y-16 pb-20">
+    <div className="space-y-16">
       {/* HERO SECTION */}
-      <section className="relative pt-10 pb-12 border-b border-[#27272a] overflow-hidden">
+      <section className="relative pb-12 border-b border-[#27272a] overflow-hidden">
         <HeadHome
           currentTrack={currentTrack}
           isPlaying={isPlaying}

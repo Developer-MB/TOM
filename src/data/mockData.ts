@@ -1,20 +1,13 @@
+import { ASSETS } from "./Assets";
+export { ASSETS } from "./Assets";
+
 export type SectionId = 'inicio' | 'resenas' | 'galeria' | 'videopodcast' | 'radio' | 'cms';
-
-export const ASSETS = {
-  studioPodcast: '/src/assets/images/metal_studio_podcast_1791593120127.jpg',
-  concertPyro: '/src/assets/images/metal_concert_pyro_1791593129897.jpg',
-  albumCatacombs: '/src/assets/images/album_catacombs_cover_1791593139425.jpg',
-  albumBlackMetal: '/src/assets/images/album_black_metal_cover_1791593147308.jpg',
-  djRavn: '/src/assets/images/dj_ravn_portrait_1791593164383.jpg',
-  logoWhite: '/src/assets/images/TOM_white.png',
-  logoRed: '/src/assets/images/TOM_red.png',
-};
-
 export interface AudioTrack {
   id: string;
   title: string;
   artist: string;
   album: string;
+  src?: string;
   duration: string;
   currentTime: string;
   isLive?: boolean;
@@ -66,51 +59,6 @@ export const BREAKING_NEWS = [
     excerpt: 'Dieciocho fechas imperdibles donde ambas leyendas interpretarán discos íntegros de su época clásica de los 80.',
     author: 'Redacción',
     image: ASSETS.concertPyro,
-  },
-];
-
-export const HOME_REVIEWS = [
-  {
-    id: 'rev-home-1',
-    country: 'NOR',
-    flag: '🇳🇴',
-    year: '2025',
-    score: '9.5 / 10',
-    genre: 'BLACKENED DEATH METAL',
-    label: 'Dark Descent Records',
-    title: 'Echoes of Damnation',
-    band: 'CRYPTIC DESOLATION',
-    quote: '"Una obra maestra de arquitectura tonal asfixiante. Las guitarras disonantes se entrelazan con una batería ritualista que no da tregua. Disco fundamental de la década."',
-    cover: ASSETS.albumBlackMetal,
-    category: 'BLACK',
-  },
-  {
-    id: 'rev-home-2',
-    country: 'SWE',
-    flag: '🇸🇪',
-    year: '2025',
-    score: '9.1 / 10',
-    genre: 'OLD SCHOOL DEATH METAL',
-    label: 'Century Media',
-    title: 'Void of Putrefaction',
-    band: 'NECROHARMONIC RITES',
-    quote: '"Fieles al tono \'buzzsaw\' del pedal HM-2 pero con una producción contemporánea quirúrgica y líneas de bajo podridas que retumban en el pecho."',
-    cover: ASSETS.albumCatacombs,
-    category: 'DEATH',
-  },
-  {
-    id: 'rev-home-3',
-    country: 'GER',
-    flag: '🇩🇪',
-    year: '2025',
-    score: '8.8 / 10',
-    genre: 'TEUTONIC THRASH METAL',
-    label: 'Noise Records Legacy',
-    title: 'Nuclear Iron Storm',
-    band: 'IRON VENGEANCE',
-    quote: '"Riffs afilados como navajas y una velocidad frenética que rinde tributo directo al sonido de Kreator y Sodom en 1986. Pura adrenalina sin frenos."',
-    cover: ASSETS.concertPyro,
-    category: 'THRASH',
   },
 ];
 

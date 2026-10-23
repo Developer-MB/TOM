@@ -1,6 +1,7 @@
 import React from 'react'
-import { ASSETS, AudioTrack, SectionId } from '../../data/mockData';
+import { AudioTrack, SectionId } from '../../data/mockData';
 import { Disc, Radio } from 'lucide-react';
+import { ASSETS } from '@/src/data/Assets'
 
 interface HeadSectionProps {
     currentTrack: AudioTrack;
@@ -15,7 +16,6 @@ export const HeadHome: React.FC<HeadSectionProps> = ({
     isPlaying,
     onTogglePlay,
     onSelectSection,
-    onPlayCustomTrack,
 }) => {
     const spectrumBars = [45, 72, 60, 88, 95, 70, 55, 82, 92, 64, 78, 85, 50, 90, 68, 42];
 
@@ -23,16 +23,13 @@ export const HeadHome: React.FC<HeadSectionProps> = ({
         <div className="max-w-[1280px] mx-auto px-4 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
                 {/* Left Column (7 cols) */}
-                <div className="lg:col-span-7 space-y-6">
+                <div className="lg:col-span-7">
                     <h1 className="font-display font-extrabold text-xl sm:text-4xl lg:text-[48px] leading-[0.96] tracking-tight uppercase">
-                        <span className="text-white block">EL BASTIÓN</span>
-                        <span className="text-white block">DEL </span>
-                        <span className="text-[#dc2626]">METAL EXTREMO</span>{' '}
-                        <span className="text-white">&amp; UNDERGROUND</span>
+                        <img src={ASSETS.logoRed2} alt="TOM Logo" className="w-48 sm:w-64 lg:w-80" />
                     </h1>
 
                     <p className="text-[#a1a1aa] text-sm sm:text-base max-w-2xl leading-relaxed">
-                        Crítica sonora visceral, periodismo sin censura del moshpit, transmisiones de alta fidelidad sin comerciales y archivo fidedigno de los rituales más devastadores del orbe.
+                        "Un espacio hecho por y para fans del metal"
                     </p>
 
                     {/* CTA Buttons */}
@@ -80,27 +77,20 @@ export const HeadHome: React.FC<HeadSectionProps> = ({
 
                         {/* Host & Show Info */}
                         <div className="flex items-center gap-4">
-                            <div className="relative w-16 h-16 rounded-sm overflow-hidden border border-[#3f3f46] shrink-0">
+                            <div className="relative w-20 h-20 rounded-sm overflow-hidden border border-[#3f3f46] shrink-0">
                                 <img
-                                    src={ASSETS.djRavn}
-                                    alt="DJ Ravn"
-                                    referrerPolicy="no-referrer"
+                                    src={currentTrack.cover}
+                                    alt={`${currentTrack.artist} - ${currentTrack.title}`}
                                     className="w-full h-full object-cover"
                                 />
-                                <span className="absolute bottom-0 inset-x-0 bg-[#dc2626] text-white font-mono text-[9px] font-bold text-center py-0.5">
-                                    DJ ERIK
-                                </span>
                             </div>
                             <div className="space-y-1">
-                                <span className="font-mono text-[10px] text-[#ef4444] uppercase tracking-wider block">
-                                    PROGRAMA ESTELAR
+                                <span className="font-mono text-[14px] text-[#ef4444] uppercase tracking-wider block">
+                                    {currentTrack.artist}
                                 </span>
                                 <h3 className="font-display font-bold text-lg text-white leading-tight">
-                                    La Hora de las Bestias
+                                    {currentTrack.title}
                                 </h3>
-                                <p className="text-xs text-[#a1a1aa] leading-snug">
-                                    Especial monográfico: Raíces del Black Metal nórdico 1991-1995 y primicias exclusivas en cinta demo.
-                                </p>
                             </div>
                         </div>
 

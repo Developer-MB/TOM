@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { HOME_REVIEWS, SectionId } from '../../data/mockData';
+import { SectionId } from '../../data/mockData';
+import { HOME_REVIEWS } from '@/src/data/HomeReviews';
 
 interface ContentResniaProps {
     setReviewFilter: (filter: 'TODOS' | 'DEATH' | 'BLACK' | 'THRASH') => void;
