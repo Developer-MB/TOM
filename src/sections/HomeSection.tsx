@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { AudioTrack, SectionId, UPCOMING_TOURS } from '../data/mockData';
 import HeadHome from '../components/Home/HeadHome';
 import HeadResenias from '../components/Home/HeadResenias';
-import ContentResenia from '../components/organism/ContentResenia';
+import ContentResenia from '../components/Home/ContentResenia';
 import ContentVideo from '../components/organism/ContentVideo';
 import ContentGallery from '../components/organism/ContentGallery';
 import NextTour from '../components/organism/NextTour';

@@ -22,8 +22,8 @@ export const ContentResenia: React.FC<ContentResniaProps> = ({
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
                 <div></div>
                 {/* Filter Buttons */}
-                <div className="flex items-center gap-2 font-mono text-[10px]">
-                    <span className="text-[#71717a] uppercase mr-1">FILTRAR:</span>
+                <div className="flex w-full flex-wrap items-center justify-start gap-2 font-mono text-[10px] sm:w-auto sm:justify-end">
+                    <span className="w-full text-[#71717a] uppercase sm:w-auto sm:mr-1">FILTRAR:</span>
                     {(['TODOS', 'BLACK', 'DEATH', 'DOOM', 'GHOTIC', 'GRINDCORE', 'HEAVY', 'POWER', 'PROGRESIVE', 'SPEED', 'STONER', 'THRASH'] as const).map((cat) => (
                         <button
                             key={cat}
