@@ -4,10 +4,10 @@ export const ASSETS = {
     albumCatacombs: '/src/assets/images/album_catacombs_cover_1791593139425.jpg',
     albumBlackMetal: '/src/assets/images/album_black_metal_cover_1791593147308.jpg',
     djRavn: '/src/assets/images/dj_ravn_portrait_1791593164383.jpg',
-    logoWhite: '/src/assets/images/logos/TOM_white.png',
-    logoRed: '/src/assets/images/logos/TOM_red.png',
-    logoRed2: '/src/assets/images/logos/TOM_red_2.png',
-    logoTONM: '/src/assets/images/logos/TONM_white.jpg',
+    logoWhite: '/image/logos/TOM_white.png',
+    logoRed: '/image/logos/TOM_red.png',
+    logoRed2: '/image/logos/TOM_red_2.png',
+    logoTONM: '/image/logos/TONM_white.jpg',
 };
 
 export const AUDIO_ASSETS = [
@@ -17,7 +17,7 @@ export const AUDIO_ASSETS = [
         band: 'Black Sabbath',
         title: 'Black Sabbath',
         disc: 'Black Sabbath',
-        cover: '/image/482.jpg',
+        cover: '/image/covers/482.jpg',
     },
     {
         id: '2',
@@ -25,7 +25,7 @@ export const AUDIO_ASSETS = [
         band: 'At The Gates',
         title: 'Blinded by Fear',
         disc: 'Slaughter of the Soul',
-        cover: '/image/298.jpeg',
+        cover: '/image/covers/298.jpeg',
     },
     {
         id: '3',
@@ -33,7 +33,7 @@ export const AUDIO_ASSETS = [
         band: 'Black Sabbath',
         title: "Luke\'s Wall - War Pigs",
         disc: 'Paranoid',
-        cover: '/image/485.jpg',
+        cover: '/image/covers/485.jpg',
     },
     {
         id: '4',
@@ -41,7 +41,7 @@ export const AUDIO_ASSETS = [
         band: 'Satyricon',
         title: 'Now, Diabolical',
         disc: 'Now, Diabolical',
-        cover: '/image/108134.jpg',
+        cover: '/image/covers/108134.jpg',
     },
     {
         id: '5',
@@ -49,7 +49,7 @@ export const AUDIO_ASSETS = [
         band: 'Black Sabbath',
         title: 'Sweet Leaf',
         disc: 'Master of Reality',
-        cover: '/image/487.jpg',
+        cover: '/image/covers/487.jpg',
     },
     {
         id: '6',
@@ -57,7 +57,7 @@ export const AUDIO_ASSETS = [
         band: 'Black Sabbath',
         title: 'After Forever',
         disc: 'Master of Reality',
-        cover: '/image/487.jpg',
+        cover: '/image/covers/487.jpg',
     },
     {
         id: '7',
@@ -65,7 +65,7 @@ export const AUDIO_ASSETS = [
         band: 'Nargaroth',
         title: 'Frühling',
         disc: 'Jahreszeiten',
-        cover: '/image/234612.jpg',
+        cover: '/image/covers/234612.jpg',
     },
     {
         id: '8',
@@ -73,7 +73,7 @@ export const AUDIO_ASSETS = [
         band: 'Melechesh',
         title: "Genies, Sorcerers and Mesopotamian Nights",
         disc: 'Djinn',
-        cover: '/image/1948.jpg',
+        cover: '/image/covers/1948.jpg',
     },
     {
         id: '9',
@@ -81,7 +81,7 @@ export const AUDIO_ASSETS = [
         band: 'Black Sabbath',
         title: 'Paranoid',
         disc: 'Paranoid',
-        cover: '/image/485.jpg',
+        cover: '/image/covers/485.jpg',
     },
     {
         id: '10',
@@ -89,7 +89,7 @@ export const AUDIO_ASSETS = [
         band: 'At The Gates',
         title: 'Slaughter of the Soul',
         disc: 'Slaughter of the Soul',
-        cover: '/image/298.jpeg',
+        cover: '/image/covers/298.jpeg',
     },
     {
         id: '11',
@@ -97,7 +97,7 @@ export const AUDIO_ASSETS = [
         band: 'Arch Enemy',
         title: 'Nemesis',
         disc: 'Doomsday Machine',
-        cover: '/image/85305.jpg',
+        cover: '/image/covers/85305.jpg',
     },
     {
         id: '12',
@@ -105,7 +105,7 @@ export const AUDIO_ASSETS = [
         band: 'Black Sabbath',
         title: 'Planet Caravan',
         disc: 'Paranoid',
-        cover: '/image/485.jpg',
+        cover: '/image/covers/485.jpg',
     },
     {
         id: '13',
@@ -113,7 +113,7 @@ export const AUDIO_ASSETS = [
         band: 'Black Sabbath',
         title: "Children Of The Grave",
         disc: 'Master of Reality',
-        cover: '/image/487.jpg',
+        cover: '/image/covers/487.jpg',
     },
     {
         id: '14',
@@ -121,7 +121,7 @@ export const AUDIO_ASSETS = [
         band: 'Black Sabbath',
         title: 'Iron Man',
         disc: 'Paranoid',
-        cover: '/image/485.jpg',
+        cover: '/image/covers/485.jpg',
     },
     {
         id: '15',
@@ -129,7 +129,7 @@ export const AUDIO_ASSETS = [
         band: 'Black Sabbath',
         title: 'N.I.B.',
         disc: 'Black Sabbath',
-        cover: '/image/482.jpg',
+        cover: '/image/covers/482.jpg',
     },
     {
         id: '16',
@@ -137,7 +137,7 @@ export const AUDIO_ASSETS = [
         band: 'Arch Enemy',
         title: "Ravenous",
         disc: 'Wages of Sin',
-        cover: '/image/450396.jpg',
+        cover: '/image/covers/450396.jpg',
     },
     {
         id: '17',
@@ -145,7 +145,7 @@ export const AUDIO_ASSETS = [
         band: 'Amon Amarth',
         title: 'The Pursuit Of Vikings',
         disc: 'Fate of Norns',
-        cover: '/image/49215.jpg',
+        cover: '/image/covers/49215.jpg',
     },
     {
         id: '18',
@@ -153,7 +153,7 @@ export const AUDIO_ASSETS = [
         band: 'Cradle of Filth',
         title: 'Nymphetamine (Overdose)',
         disc: 'Nymphetamine',
-        cover: '/image/52863.jpg',
+        cover: '/image/covers/52863.jpg',
     },
     {
         id: '19',
@@ -161,7 +161,7 @@ export const AUDIO_ASSETS = [
         band: 'Dimmu Borgir',
         title: "Puritania",
         disc: 'Puritanical Euphoric Misanthropia',
-        cover: '/image/479639.jpg',
+        cover: '/image/covers/479639.jpg',
     },
     {
         id: '20',
@@ -169,7 +169,7 @@ export const AUDIO_ASSETS = [
         band: 'Dimmu Borgir',
         title: 'The Insight and the Catharsis',
         disc: 'Spiritual Black Dimensions',
-        cover: '/image/342.jpg',
+        cover: '/image/covers/342.jpg',
     },
     {
         id: '21',
@@ -177,6 +177,6 @@ export const AUDIO_ASSETS = [
         band: 'Cradle of Filth',
         title: 'Nymphetamine (Fix)',
         disc: 'Nymphetamine',
-        cover: '/image/52863.jpg',
+        cover: '/image/covers/52863.jpg',
     },
 ]

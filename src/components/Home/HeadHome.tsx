@@ -77,7 +77,7 @@ export const HeadHome: React.FC<HeadSectionProps> = ({
 
                         {/* Host & Show Info */}
                         <div className="flex items-center gap-4">
-                            <div className="relative w-20 h-20 rounded-sm overflow-hidden border border-[#3f3f46] shrink-0">
+                            <div className="relative w-40 h-40 rounded-sm overflow-hidden border border-[#3f3f46] shrink-0">
                                 <img
                                     src={currentTrack.cover}
                                     alt={`${currentTrack.artist} - ${currentTrack.title}`}
