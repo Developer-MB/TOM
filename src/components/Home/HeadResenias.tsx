@@ -14,7 +14,7 @@ export const HeadResenias: React.FC<HeadResniasProps> = ({ onSelectSection }) =>
             <div>
                 <img src={ASSETS.logoTONM}
                     alt="Time of New Music Logo"
-                    className="w-48 sm:w-64 lg:w-80"
+                    className="w-100 pb-10 sm:w-64 lg:w-80"
                 />
             </div>
             <button

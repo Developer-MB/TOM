@@ -3,7 +3,7 @@ import { SectionId } from '../../data/mockData';
 import { HOME_REVIEWS } from '@/src/data/HomeReviews';
 
 interface ContentResniaProps {
-    setReviewFilter: (filter: 'TODOS' | 'DEATH' | 'BLACK' | 'THRASH') => void;
+    setReviewFilter: (filter: 'TODOS' | 'BLACK'| 'DEATH' | 'DOOM' | 'GHOTIC' | 'GRINDCORE' | 'HEAVY' | 'POWER' | 'PROGRESIVE' | 'SPEED' | 'STONER' | 'THRASH') => void;
 
     onSelectSection: (section: SectionId) => void;
 }
@@ -11,7 +11,7 @@ interface ContentResniaProps {
 export const ContentResenia: React.FC<ContentResniaProps> = ({
     onSelectSection
 }) => {
-    const [reviewFilter, setReviewFilter] = useState<'TODOS' | 'DEATH' | 'BLACK' | 'THRASH'>('TODOS');
+    const [reviewFilter, setReviewFilter] = useState<'TODOS' | 'BLACK'| 'DEATH' | 'DOOM' | 'GHOTIC' | 'GRINDCORE' | 'HEAVY' | 'POWER' | 'PROGRESIVE' | 'SPEED' | 'STONER' | 'THRASH'>('TODOS');
     const filteredReviews =
         reviewFilter === 'TODOS'
             ? HOME_REVIEWS
@@ -24,7 +24,7 @@ export const ContentResenia: React.FC<ContentResniaProps> = ({
                 {/* Filter Buttons */}
                 <div className="flex items-center gap-2 font-mono text-[10px]">
                     <span className="text-[#71717a] uppercase mr-1">FILTRAR:</span>
-                    {(['TODOS', 'DEATH', 'BLACK', 'THRASH'] as const).map((cat) => (
+                    {(['TODOS', 'BLACK', 'DEATH', 'DOOM', 'GHOTIC', 'GRINDCORE', 'HEAVY', 'POWER', 'PROGRESIVE', 'SPEED', 'STONER', 'THRASH'] as const).map((cat) => (
                         <button
                             key={cat}
                             onClick={() => setReviewFilter(cat)}

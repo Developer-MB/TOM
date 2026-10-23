@@ -37,22 +37,22 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
         />
       </section>
 
-      {/* ÚLTIMA HORA DEL METAL + DOUBLE AUDIO DOCK OVERLAY */}
+      {/* SECCION MUSICA*/}
       <section id="noticias-section" className="max-w-[1280px] mx-auto px-4 lg:px-8 space-y-6">
         <HeadResenias onSelectSection={onSelectSection} />
       </section>
 
-      {/* RESEÑAS DE DISCOS DESTACADAS */}
+      {/* TIME OF NEW MUSIC */}
       <section className="max-w-[1280px] mx-auto px-4 lg:px-8 space-y-6">
         <ContentResenia
           onSelectSection={onSelectSection}
-          setReviewFilter={(filter: 'TODOS' | 'DEATH' | 'BLACK' | 'THRASH') => {
+          setReviewFilter={(filter: 'TODOS' | 'BLACK'| 'DEATH' | 'DOOM' | 'GHOTIC' | 'GRINDCORE' | 'HEAVY' | 'POWER' | 'PROGRESIVE' | 'SPEED' | 'STONER' | 'THRASH') => {
             void filter;
           }}
         />
       </section>
 
-      {/* VIDEOPODCAST OFICIAL FEATURE MODULE */}
+      {/* VIDEOPODCAST */}
       <section className="max-w-[1280px] mx-auto px-4 lg:px-8">
         <ContentVideo podcastPlaying={podcastPlaying} setPodcastPlaying={setPodcastPlaying} />
       </section>

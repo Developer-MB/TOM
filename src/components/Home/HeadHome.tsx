@@ -96,10 +96,6 @@ export const HeadHome: React.FC<HeadSectionProps> = ({
 
                         {/* Frequency Monitor Box */}
                         <div className="bg-[#09090b] border border-[#27272a] rounded-sm p-3.5 space-y-3">
-                            <div className="flex items-center justify-between font-mono text-[10px] text-[#a1a1aa]">
-                                <span>((•)) MONITOREO DE FRECUENCIA</span>
-                                <span className="text-[#f4f4f5] font-bold">96.4 dB / PEAK</span>
-                            </div>
                             <div className="h-10 flex items-end gap-1.5 pt-2">
                                 {spectrumBars.map((val, idx) => (
                                     <div
