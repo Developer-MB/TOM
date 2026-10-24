@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { AudioTrack } from '@/src/data/mockData';
 import { ASSETS, AUDIO_ASSETS } from '@/src/data/Assets';
 import { Pause, Play, Radio, Volume2, VolumeX } from 'lucide-react';
@@ -7,12 +7,23 @@ interface RadioSectionProps {
     currentTrack: AudioTrack;
     isPlaying: boolean;
     onTogglePlay: () => void;
+    isMuted: boolean;
+    onToggleMute: () => void;
+    volume: number;
+    onVolumeChange: (volume: number) => void;
     onSelectTrack: (track: Partial<AudioTrack>) => void;
 }
 
-const ContentRadio = ({ currentTrack, isPlaying, onTogglePlay, onSelectTrack }: RadioSectionProps) => {
-    const [volume, setVolume] = useState(88);
-    const [isMuted, setIsMuted] = useState(false);
+const ContentRadio = ({
+    currentTrack,
+    isPlaying,
+    onTogglePlay,
+    isMuted,
+    onToggleMute,
+    volume,
+    onVolumeChange,
+    onSelectTrack,
+}: RadioSectionProps) => {
     return (
         <div className="border-2 border-zinc-800 bg-[#0E0E12] relative overflow-hidden">
             {/* Top Technical Bar */}
@@ -105,8 +116,9 @@ const ContentRadio = ({ currentTrack, isPlaying, onTogglePlay, onSelectTrack }: 
                             {/* Volume Control */}
                             <div className="flex items-center gap-2.5 bg-[#070709] border border-zinc-800 px-3.5 py-2.5">
                                 <button
-                                    onClick={() => setIsMuted(!isMuted)}
+                                    onClick={onToggleMute}
                                     className="text-zinc-400 hover:text-white cursor-pointer"
+                                    aria-label={isMuted ? 'Activar sonido' : 'Silenciar'}
                                 >
                                     {isMuted ? (
                                         <VolumeX className="w-4 h-4 text-[#DC2626]" />
@@ -119,10 +131,7 @@ const ContentRadio = ({ currentTrack, isPlaying, onTogglePlay, onSelectTrack }: 
                                     min={0}
                                     max={100}
                                     value={isMuted ? 0 : volume}
-                                    onChange={(e) => {
-                                        setVolume(Number(e.target.value));
-                                        setIsMuted(false);
-                                    }}
+                                    onChange={(e) => onVolumeChange(Number(e.target.value))}
                                     className="w-24 accent-[#DC2626] cursor-pointer"
                                 />
                                 <span className="font-mono text-[11px] text-zinc-300 w-8 text-right">

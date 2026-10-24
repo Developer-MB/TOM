@@ -3,15 +3,13 @@ import { SectionId } from '../../data/mockData';
 import { HOME_REVIEWS } from '@/src/data/HomeReviews';
 
 interface ContentResniaProps {
-    setReviewFilter: (filter: 'TODOS' | 'BLACK'| 'DEATH' | 'DOOM' | 'GHOTIC' | 'GRINDCORE' | 'HEAVY' | 'POWER' | 'PROGRESIVE' | 'SPEED' | 'STONER' | 'THRASH') => void;
+    setReviewFilter: (filter: 'TODOS' | 'BLACK' | 'DEATH' | 'DOOM' | 'GOTHIC' | 'GRINDCORE' | 'HEAVY' | 'POWER' | 'PROGRESIVE' | 'SPEED' | 'STONER' | 'THRASH') => void;
 
     onSelectSection: (section: SectionId) => void;
 }
 
-export const ContentResenia: React.FC<ContentResniaProps> = ({
-    onSelectSection
-}) => {
-    const [reviewFilter, setReviewFilter] = useState<'TODOS' | 'BLACK'| 'DEATH' | 'DOOM' | 'GHOTIC' | 'GRINDCORE' | 'HEAVY' | 'POWER' | 'PROGRESIVE' | 'SPEED' | 'STONER' | 'THRASH'>('TODOS');
+export const ContentResenia: React.FC<ContentResniaProps> = () => {
+    const [reviewFilter, setReviewFilter] = useState<'TODOS' | 'BLACK' | 'DEATH' | 'DOOM' | 'GOTHIC' | 'GRINDCORE' | 'HEAVY' | 'POWER' | 'PROGRESIVE' | 'SPEED' | 'STONER' | 'THRASH'>('TODOS');
     const filteredReviews =
         reviewFilter === 'TODOS'
             ? HOME_REVIEWS
@@ -24,7 +22,7 @@ export const ContentResenia: React.FC<ContentResniaProps> = ({
                 {/* Filter Buttons */}
                 <div className="flex w-full flex-wrap items-center justify-start gap-2 font-mono text-[10px] sm:w-auto sm:justify-end">
                     <span className="w-full text-[#71717a] uppercase sm:w-auto sm:mr-1">FILTRAR:</span>
-                    {(['TODOS', 'BLACK', 'DEATH', 'DOOM', 'GHOTIC', 'GRINDCORE', 'HEAVY', 'POWER', 'PROGRESIVE', 'SPEED', 'STONER', 'THRASH'] as const).map((cat) => (
+                    {(['TODOS', 'BLACK', 'DEATH', 'DOOM', 'GOTHIC', 'GRINDCORE', 'HEAVY', 'POWER', 'PROGRESIVE', 'SPEED', 'STONER', 'THRASH'] as const).map((cat) => (
                         <button
                             key={cat}
                             onClick={() => setReviewFilter(cat)}
@@ -58,16 +56,12 @@ export const ContentResenia: React.FC<ContentResniaProps> = ({
                                 <span className="absolute top-3 left-3 px-2.5 py-1 bg-[#09090b]/90 border border-[#27272a] font-mono text-[10px] text-[#e4e4e7] rounded-sm">
                                     {rev.flag} {rev.country} • {rev.year}
                                 </span>
-                                <span className="absolute bottom-3 right-3 px-2.5 py-1 bg-[#dc2626] text-white font-mono text-xs font-bold rounded-sm shadow-lg">
-                                    ★ {rev.score}
-                                </span>
                             </div>
 
                             {/* Content */}
                             <div className="p-5 space-y-3">
                                 <div className="flex items-center justify-between font-mono text-[10px] uppercase">
                                     <span className="text-[#ef4444] font-semibold">{rev.genre}</span>
-                                    <span className="text-[#71717a]">{rev.label}</span>
                                 </div>
                                 <div>
                                     <h3 className="font-display font-bold text-xl text-white leading-tight">
@@ -81,16 +75,6 @@ export const ContentResenia: React.FC<ContentResniaProps> = ({
                                     {rev.quote}
                                 </p>
                             </div>
-                        </div>
-
-                        {/* Footer Actions */}
-                        <div className="px-5 pb-5 pt-3 border-t border-[#18181b] flex items-center justify-between font-mono text-[11px]">
-                            <button
-                                onClick={() => onSelectSection('resenas')}
-                                className="text-[#a1a1aa] hover:text-white uppercase tracking-wider cursor-pointer"
-                            >
-                                LEER RESEÑA
-                            </button>
                         </div>
                     </div>
                 ))}

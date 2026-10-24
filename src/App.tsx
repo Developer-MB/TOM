@@ -6,7 +6,6 @@ import { HomeSection } from './sections/HomeSection';
 import { ReviewsSection } from './sections/ReviewsSection';
 import { GallerySection } from './sections/GallerySection';
 import { VideopodcastSection } from './sections/VideopodcastSection';
-import { RadioSection } from './sections/RadioSection';
 import { CmsSection } from './sections/CmsSection';
 import { AUDIO_ASSETS } from './data/Assets';
 
@@ -28,6 +27,7 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   const [isPlaying, setIsPlaying] = useState(false);
+  const [volume, setVolume] = useState(80);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const currentTrackIndexRef = useRef(0);
 
@@ -42,7 +42,6 @@ export default function App() {
     }
 
     try {
-      audio.volume = 0.8;
       await audio.play();
       setIsPlaying(true);
     } catch (err) {
@@ -64,7 +63,6 @@ export default function App() {
 
     audio.src = trackUpdate.src;
     audio.load();
-    audio.volume = 0.8;
     void audio.play()
       .then(() => setIsPlaying(true))
       .catch((error: unknown) => {
@@ -81,7 +79,6 @@ export default function App() {
     setCurrentTrack(toAudioTrack(track));
     audio.src = track.src;
     audio.load();
-    audio.volume = 0.8;
 
     try {
       await audio.play();
@@ -104,13 +101,12 @@ export default function App() {
     const audio = audioRef.current;
     if (!audio) return;
 
-    audio.volume = 0.8;
     void audio.play()
       .then(() => setIsPlaying(true))
       .catch((error: unknown) => {
         setIsPlaying(false);
         if (error instanceof DOMException && error.name === 'NotAllowedError') {
-          console.info('El navegador bloqueó la reproducción automática. Presiona Sintonizar para iniciar.');
+          console.info('El navegador bloqueó la reproducción automática; usa el control de reproducción de la radio.');
           return;
         }
         console.error('No se pudo iniciar la reproducción automática:', error);
@@ -120,6 +116,13 @@ export default function App() {
       audio.pause();
     };
   }, []);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    audio.volume = volume / 100;
+  }, [volume]);
 
   const handleSelectSection = (section: SectionId) => {
     setActiveSection(section);
@@ -140,6 +143,7 @@ export default function App() {
       <audio
         ref={audioRef}
         src={currentTrack.src}
+        autoPlay
         preload="auto"
         onEnded={handleTrackEnded}
         onError={() => {
@@ -185,15 +189,6 @@ export default function App() {
             isPlaying={isPlaying}
             onTogglePlay={handleTogglePlay}
             onSelectSection={handleSelectSection}
-          />
-        )}
-
-        {activeSection === 'radio' && (
-          <RadioSection
-            currentTrack={currentTrack}
-            isPlaying={isPlaying}
-            onTogglePlay={handleTogglePlay}
-            onSelectTrack={handleSelectTrack}
           />
         )}
 

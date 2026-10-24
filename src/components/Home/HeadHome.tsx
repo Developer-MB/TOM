@@ -35,16 +35,6 @@ export const HeadHome: React.FC<HeadSectionProps> = ({
                     {/* CTA Buttons */}
                     <div className="flex flex-wrap items-center gap-4 pt-2">
                         <button
-                            onClick={() => {
-                                onTogglePlay();
-                            }}
-                            className="flex items-center gap-2.5 px-5 py-3 bg-[#dc2626] hover:bg-[#ef4444] text-white font-mono text-xs font-bold uppercase tracking-wider rounded-sm crimson-glow transition-all cursor-pointer"
-                        >
-                            <Radio className="w-4 h-4" />
-                            <span>{isPlaying ? 'PAUSAR RADIO [192 KBPS]' : 'SINTONIZAR RADIO [192 KBPS]'}</span>
-                        </button>
-
-                        <button
                             onClick={() => onSelectSection('resenas')}
                             className="flex items-center gap-2 px-5 py-3 bg-[#121214] hover:bg-[#18181b] text-[#f4f4f5] border border-[#3f3f46] hover:border-[#71717a] font-mono text-xs font-semibold uppercase tracking-wider rounded-sm transition-colors cursor-pointer"
                         >

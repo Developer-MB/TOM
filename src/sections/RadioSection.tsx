@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import { AudioTrack } from '../data/mockData';
 import HeadRadio from '../components/organism/HeadRadio';
-import ContentRadio from '../components/organism/ContentRadio';
+import ContentRadio from '../components/Home/ContentRadio';
 
 interface RadioSectionProps {
   currentTrack: AudioTrack;
   isPlaying: boolean;
   onTogglePlay: () => void;
+  isMuted: boolean;
+  onToggleMute: () => void;
+  volume: number;
+  onVolumeChange: (volume: number) => void;
   onSelectTrack: (track: Partial<AudioTrack>) => void;
 }
 
@@ -45,11 +49,13 @@ export const RadioSection: React.FC<RadioSectionProps> = ({
   currentTrack,
   isPlaying,
   onTogglePlay,
+  isMuted,
+  onToggleMute,
+  volume,
+  onVolumeChange,
   onSelectTrack,
 }) => {
   const [streamFormat, setStreamFormat] = useState<'FLAC' | 'MP3_320' | 'AAC_128'>('FLAC');
-  const [volume, setVolume] = useState(88);
-  const [isMuted, setIsMuted] = useState(false);
   const [chatMessages, setChatMessages] = useState(INITIAL_CHAT);
   const [newChatMsg, setNewChatMsg] = useState('');
   const [aliasInput, setAliasInput] = useState('Acolito_Metal');
@@ -102,6 +108,10 @@ export const RadioSection: React.FC<RadioSectionProps> = ({
           currentTrack={currentTrack}
           isPlaying={isPlaying}
           onTogglePlay={onTogglePlay}
+          isMuted={isMuted}
+          onToggleMute={onToggleMute}
+          volume={volume}
+          onVolumeChange={onVolumeChange}
           onSelectTrack={onSelectTrack}
         />
       </section>

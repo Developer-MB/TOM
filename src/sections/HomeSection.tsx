@@ -3,8 +3,8 @@ import { AudioTrack, SectionId, UPCOMING_TOURS } from '../data/mockData';
 import HeadHome from '../components/Home/HeadHome';
 import HeadResenias from '../components/Home/HeadResenias';
 import ContentResenia from '../components/Home/ContentResenia';
-import ContentVideo from '../components/organism/ContentVideo';
-import ContentGallery from '../components/organism/ContentGallery';
+import ContentVideo from '../components/Home/ContentVideo';
+import ContentGallery from '../components/Home/ContentGallery';
 import NextTour from '../components/organism/NextTour';
 
 interface HomeSectionProps {
@@ -46,7 +46,7 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
       <section className="max-w-[1280px] mx-auto px-4 lg:px-8 space-y-6">
         <ContentResenia
           onSelectSection={onSelectSection}
-          setReviewFilter={(filter: 'TODOS' | 'BLACK'| 'DEATH' | 'DOOM' | 'GHOTIC' | 'GRINDCORE' | 'HEAVY' | 'POWER' | 'PROGRESIVE' | 'SPEED' | 'STONER' | 'THRASH') => {
+          setReviewFilter={(filter: 'TODOS' | 'BLACK'| 'DEATH' | 'DOOM' | 'GOTHIC' | 'GRINDCORE' | 'HEAVY' | 'POWER' | 'PROGRESIVE' | 'SPEED' | 'STONER' | 'THRASH') => {
             void filter;
           }}
         />
