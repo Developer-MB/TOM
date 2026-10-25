@@ -1,6 +1,8 @@
 import React from 'react'
 import type { ReviewFilters } from './Filter';
-import { CRITIC_VAULT_REVIEWS } from '@/src/data/HomeReviews';
+import { CRITIC_VAULT_REVIEWS } from '../../data/HomeReviews';
+
+
 
 interface LastDiscProps {
     filters: ReviewFilters;
