@@ -5,8 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite --port=3000",
-    "build": "vite build",
+    "build": "tsc --noEmit && vite build --mode production",
+    "build:local": "vite build --mode local --sourcemap",
     "preview": "vite preview",
+    "test:preview": "npm run build:local && vite preview --port=4173",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit"
   },
