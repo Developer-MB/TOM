@@ -12,9 +12,9 @@ export const HeadResenias: React.FC<HeadResniasProps> = ({ onSelectSection }) =>
     return (
         <div className="flex flex-col sm:flex-row sm:items-end justify-between">
             <div>
-                <img src={ASSETS.logoTONM}
+                <img src={ASSETS.logoTONM2}
                     alt="Time of New Music Logo"
-                    className="w-100 pb-10 sm:w-64 lg:w-80"
+                    className="w-100 sm:w-64 lg:w-64"
                 />
             </div>
             <button
