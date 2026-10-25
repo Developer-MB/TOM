@@ -4,7 +4,7 @@ import {
   SectionId,
 } from '../data/mockData';
 import HeadRec from '../components/Cabeceras/HeadRec';
-import LastDisc from '../components/organism/LastDisc';
+import LastDisc from '../components/Reviews/LastDisc';
 import type { ReviewFilters } from '../components/Reviews/Filter';
 
 interface ReviewsSectionProps {
@@ -27,13 +27,10 @@ export const ReviewsSection: React.FC<ReviewsSectionProps> = () => {
   return (
     <div className="max-w-[1440px] mx-auto px-4 lg:px-8 pt-6 pb-20 space-y-12">
       <HeadRec filters={filters} onFiltersChange={setFilters} />
-
       {/* DISCO DEL MES // HIGHLIGHT EDITORIAL */}
       {/* <MonthDisc /> */}
-
       {/* ÚLTIMOS LANZAMIENTOS EVALUADOS (6 CARDS) */}
       <LastDisc filters={filters} />
-
     </div>
   );
 };

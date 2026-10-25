@@ -14,8 +14,6 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({
   activeSection,
   onSelectSection,
-  onToggleRadioPlay,
-  isPlaying,
   searchQuery,
   onSearchChange,
 }) => {

@@ -1,5 +1,5 @@
 import React from 'react'
-import type { ReviewFilters } from '../Reviews/Filter';
+import type { ReviewFilters } from './Filter';
 import { CRITIC_VAULT_REVIEWS } from '@/src/data/HomeReviews';
 
 interface LastDiscProps {
@@ -37,7 +37,7 @@ const LastDisc: React.FC<LastDiscProps> = ({ filters }) => {
                     </h2>
                 </div>
                 <span className="font-mono text-[11px] text-[#71717a] uppercase">
-                    RESULTADOS: <strong className="text-white">{filteredReviews.length}</strong> DE {CRITIC_VAULT_REVIEWS.length} RESEÑAS
+                    RESULTADOS: <strong className="text-white">{filteredReviews.length}</strong> DE {CRITIC_VAULT_REVIEWS.length} LANZAMIENTOS
                 </span>
             </div>
 
