@@ -3,7 +3,7 @@ import {
   AudioTrack,
   SectionId,
 } from '../data/mockData';
-import HeadRec from '../components/Cabeceras/HeadRec';
+import HeadRec from '../components/Reviews/HeadRec';
 import LastDisc from '../components/Reviews/LastDisc';
 import type { ReviewFilters } from '../components/Reviews/Filter';
 

@@ -1,4 +1,13 @@
 import { ASSETS } from '@/src/data/Assets';
+
+export const GALLERY_FILTERS = [
+    { id: 'TODOS LOS EVENTOS', count: 24 },
+    { id: 'FESTIVALES', count: 9 },
+    { id: 'GIRAS MUNDIALES', count: 8 },
+    { id: 'CLUBES & UNDERGROUND', count: 5 },
+    { id: 'EXCLUSIVAS PIT', count: 2 },
+];
+
 export const HOME_PICS = [
     {
         id: 'gal-1',

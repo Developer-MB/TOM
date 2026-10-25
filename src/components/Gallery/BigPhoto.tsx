@@ -1,42 +1,45 @@
 import React, { useEffect, useState } from 'react'
-import { Calendar, ChevronLeft, ChevronRight, Download, Eye, MapPin, X } from 'lucide-react'
+import { Calendar, Eye, MapPin } from 'lucide-react'
 import { HOME_PICS } from '@/src/data/HomePics'
+import ModalGal from './ModalGal'
+
+type HomePhotoGallery = {
+    id: string;
+    img: { id: number; pic: string }[];
+    concert: string;
+    date: string;
+    city: string;
+    title: string;
+    desc: string;
+    credit: string;
+    venue: string;
+};
 
 const BigPhoto = () => {
-    const fotoGallery = HOME_PICS[0]
+    const fotoGallery = HOME_PICS.find(
+        (gallery): gallery is HomePhotoGallery =>
+            Array.isArray(gallery.img) &&
+            typeof gallery.concert === 'string' &&
+            typeof gallery.credit === 'string',
+    )
     const photos = fotoGallery?.img ?? []
     const featuredPhoto = photos[0]
     const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0)
-    const [lightboxItem, setLightboxItem] = useState<{
-        title: string;
-        date: string;
-        venue: string;
-        photographer: string;
-        image: string;
-        exif: string;
-    } | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false)
 
     const openPhoto = (index: number) => {
-        const photo = photos[index]
-        if (!fotoGallery || !photo) return
+        if (!fotoGallery || !photos[index]) return
 
         setCurrentPhotoIndex(index)
-        setLightboxItem({
-            title: fotoGallery.title ?? '',
-            venue: fotoGallery.concert ?? '',
-            date: fotoGallery.date ?? '',
-            photographer: fotoGallery.credit ?? '',
-            image: photo.pic,
-            exif: 'DATOS EXIF NO DISPONIBLES',
-        })
+        setIsModalOpen(true)
     }
 
     useEffect(() => {
-        if (!lightboxItem) return
+        if (!isModalOpen) return
 
         const handleKeyDown = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
-                setLightboxItem(null)
+                setIsModalOpen(false)
             } else if (event.key === 'ArrowRight' && photos.length > 1) {
                 setCurrentPhotoIndex((index) => (index + 1) % photos.length)
             } else if (event.key === 'ArrowLeft' && photos.length > 1) {
@@ -46,9 +49,7 @@ const BigPhoto = () => {
 
         window.addEventListener('keydown', handleKeyDown)
         return () => window.removeEventListener('keydown', handleKeyDown)
-    }, [lightboxItem, photos.length])
-
-    const currentPhoto = photos[currentPhotoIndex]
+    }, [isModalOpen, photos.length])
 
     return (
         <div className="border border-zinc-800 bg-[#0E0E12] relative overflow-hidden group">
@@ -109,7 +110,7 @@ const BigPhoto = () => {
                                     >
                                         <img
                                             src={photo.pic}
-                                            alt={`${fotoGallery.title} - foto ${idx + 1}`}
+                                            alt={`${fotoGallery?.title ?? 'Galería'} - foto ${idx + 1}`}
                                             className="w-full h-full object-cover group-hover/thumb:scale-110 transition-transform"
                                         />
                                         <div className="absolute inset-0 bg-black/30 group-hover/thumb:bg-transparent transition-colors" />
@@ -137,75 +138,20 @@ const BigPhoto = () => {
                     </div>
                 </div>
             </div>
+            
             {/* LIGHTBOX MODAL */}
-            {lightboxItem && (
-                <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-4">
-                    <div className="max-w-3xl w-full border border-zinc-800 bg-[#0B0B0E] overflow-hidden">
-                        <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800">
-                            <div>
-                                <span className="font-black text-[12px] text-[#DC2626] uppercase tracking-widest block">
-                                    {lightboxItem.venue} ({lightboxItem.date})
-                                </span>
-                                <h4 className="font-display font-black text-lg uppercase text-white">
-                                    {lightboxItem.title}
-                                </h4>
-                            </div>
-                            <button
-                                onClick={() => setLightboxItem(null)}
-                                className="p-2 text-zinc-400 hover:text-white border border-zinc-800 hover:border-zinc-600 cursor-pointer"
-                            >
-                                <X className="w-5 h-5" />
-                            </button>
-                        </div>
-
-                        <div className="relative aspect-[16/9] bg-black flex items-center justify-center overflow-hidden">
-                            <img
-                                src={currentPhoto?.pic ?? lightboxItem.image}
-                                alt={lightboxItem.title}
-                                className="w-full h-full object-cover"
-                            />
-                            {photos.length > 1 && (
-                                <>
-                                    <button
-                                        type="button"
-                                        aria-label="Foto anterior"
-                                        onClick={() =>
-                                            setCurrentPhotoIndex((index) => (index - 1 + photos.length) % photos.length)
-                                        }
-                                        className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full border border-white/30 bg-black/70 p-2 text-white hover:bg-[#DC2626] cursor-pointer"
-                                    >
-                                        <ChevronLeft className="w-5 h-5" />
-                                    </button>
-                                    <button
-                                        type="button"
-                                        aria-label="Foto siguiente"
-                                        onClick={() =>
-                                            setCurrentPhotoIndex((index) => (index + 1) % photos.length)
-                                        }
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full border border-white/30 bg-black/70 p-2 text-white hover:bg-[#DC2626] cursor-pointer"
-                                    >
-                                        <ChevronRight className="w-5 h-5" />
-                                    </button>
-                                    <span className="absolute bottom-3 right-3 bg-black/75 px-3 py-1 font-mono text-xs text-white">
-                                        {currentPhotoIndex + 1} / {photos.length}
-                                    </span>
-                                </>
-                            )}
-                        </div>
-
-                        <div className="px-6 py-4 border-t border-zinc-800 flex flex-wrap items-center justify-between gap-4 font-mono text-xs">
-                            <div className="text-zinc-400">
-                                FOTOGRAFÍA: <span className="text-blue-700 font-light text-[12px] uppercase">{lightboxItem.photographer}</span>{' '}
-                            </div>
-                            <button
-                                onClick={() => setLightboxItem(null)}
-                                className="bg-zinc-900 hover:bg-[#DC2626] text-white border border-zinc-700 px-4 py-2 uppercase tracking-wider text-[11px] flex items-center gap-2 transition-colors cursor-pointer"
-                            >
-                                <Download className="w-3.5 h-3.5" /> CERRAR VISOR
-                            </button>
-                        </div>
-                    </div>
-                </div>
+            {isModalOpen && fotoGallery && (
+                <ModalGal
+                    gallery={fotoGallery}
+                    photoIndex={currentPhotoIndex}
+                    onClose={() => setIsModalOpen(false)}
+                    onPrevious={() => setCurrentPhotoIndex((index) =>
+                        (index - 1 + photos.length) % photos.length
+                    )}
+                    onNext={() => setCurrentPhotoIndex((index) =>
+                        (index + 1) % photos.length
+                    )}
+                />
             )}
         </div>
     )

@@ -1,19 +1,36 @@
 import React, { useState } from 'react'
-import { PHOTO_GALLERIES } from '@/src/data/mockData';
+import { GALLERY_FILTERS, HOME_PICS } from '@/src/data/HomePics';
 import { Camera, MapPin, Maximize2, Search } from 'lucide-react';
 
-const GALLERY_FILTERS = [
-    { id: 'TODOS LOS EVENTOS', count: 24 },
-    { id: 'FESTIVALES', count: 9 },
-    { id: 'GIRAS MUNDIALES', count: 8 },
-    { id: 'CLUBES & UNDERGROUND', count: 5 },
-    { id: 'EXCLUSIVAS PIT', count: 2 },
-];
+type EditorialGallery = (typeof HOME_PICS)[number] & {
+    id: string;
+    date: string;
+    venue: string;
+    photosCount: string;
+    title: string;
+    desc: string;
+    photographer: string;
+    category: string;
+    image: string;
+};
+
+const editorialGalleries = HOME_PICS.filter(
+    (gallery): gallery is EditorialGallery =>
+        typeof gallery.id === 'string' &&
+        typeof gallery.date === 'string' &&
+        typeof gallery.venue === 'string' &&
+        typeof gallery.photosCount === 'string' &&
+        typeof gallery.title === 'string' &&
+        typeof gallery.desc === 'string' &&
+        typeof gallery.photographer === 'string' &&
+        typeof gallery.category === 'string' &&
+        typeof gallery.image === 'string',
+);
 
 const FilterGallery = () => {
     const [activeFilter, setActiveFilter] = useState('TODOS LOS EVENTOS');
     const [searchQuery, setSearchQuery] = useState('');
-    const filteredGalleries = PHOTO_GALLERIES.filter((g) => {
+    const filteredGalleries = editorialGalleries.filter((g) => {
         const matchesCategory =
             activeFilter === 'TODOS LOS EVENTOS' || g.category === activeFilter;
         const matchesSearch =
