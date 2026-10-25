@@ -7,7 +7,7 @@ import {
   AudioTrack,
   SectionId,
 } from '../data/mockData';
-import HeadGallery from '../components/organism/HeadGallery';
+import HeadGallery from '../components/Cabeceras/HeadGallery';
 import BigPhoto from '../components/organism/BigPhoto';
 import FilterGallery from '../components/organism/FilterGallery';
 

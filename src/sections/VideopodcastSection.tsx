@@ -13,7 +13,7 @@ import {
   PODCAST_EPISODES,
   SectionId,
 } from '../data/mockData';
-import HeadVideo from '../components/organism/HeadVideo';
+import HeadVideo from '../components/Cabeceras/HeadVideo';
 import PremierEpisode from '../components/organism/PremierEpisode';
 
 interface VideopodcastSectionProps {

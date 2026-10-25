@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AudioTrack } from '../data/mockData';
-import HeadRadio from '../components/organism/HeadRadio';
+import HeadRadio from '../components/Cabeceras/HeadRadio';
 import ContentRadio from '../components/Home/ContentRadio';
 
 interface RadioSectionProps {

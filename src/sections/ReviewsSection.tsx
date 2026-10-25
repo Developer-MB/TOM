@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   AudioTrack,
   SectionId,
 } from '../data/mockData';
-import HeadRec from '../components/organism/HeadRec';
+import HeadRec from '../components/Cabeceras/HeadRec';
 import MonthDisc from '../components/organism/MonthDisc';
 import LastDisc from '../components/organism/LastDisc';
+import type { ReviewFilters } from '../components/Reviews/Filter';
 
 interface ReviewsSectionProps {
   currentTrack: AudioTrack;
@@ -16,15 +17,23 @@ interface ReviewsSectionProps {
 }
 
 export const ReviewsSection: React.FC<ReviewsSectionProps> = () => {
+  const [filters, setFilters] = useState<ReviewFilters>({
+    searchTerm: '',
+    sortOrder: 'recent',
+    year: 'TODOS',
+    country: 'TODOS',
+    genre: 'TODOS',
+  });
+
   return (
     <div className="max-w-[1440px] mx-auto px-4 lg:px-8 pt-6 pb-20 space-y-12">
-      <HeadRec />
+      <HeadRec filters={filters} onFiltersChange={setFilters} />
 
       {/* DISCO DEL MES // HIGHLIGHT EDITORIAL */}
-      <MonthDisc />
+      {/* <MonthDisc /> */}
 
       {/* ÚLTIMOS LANZAMIENTOS EVALUADOS (6 CARDS) */}
-      <LastDisc />
+      <LastDisc filters={filters} />
 
     </div>
   );

@@ -1,22 +1,31 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { CRITIC_VAULT_REVIEWS } from '@/src/data/mockData';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import type { ReviewFilters } from '../Reviews/Filter';
 
-const LastDisc = () => {
-    const [searchTerm, setSearchTerm] = useState('');
-    const [activeGenre, setActiveGenre] = useState('TODOS');
-    const [sortOrder, setSortOrder] = useState('MÁS RECIENTES PRIMERO');
-    const [selectedYear, setSelectedYear] = useState('2025');
-    const [activePage, setActivePage] = useState(1);
-    const filteredReviews = CRITIC_VAULT_REVIEWS.filter((rev) => {
-        const matchesGenre = activeGenre === 'TODOS' || rev.genreKey === activeGenre;
-        const matchesSearch =
-            !searchTerm ||
-            rev.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            rev.band.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            rev.label.toLowerCase().includes(searchTerm.toLowerCase());
-        return matchesGenre && matchesSearch;
-    });
+interface LastDiscProps {
+    filters: ReviewFilters;
+}
+
+const LastDisc: React.FC<LastDiscProps> = ({ filters }) => {
+    const normalizedSearch = filters.searchTerm.trim().toLocaleLowerCase();
+    const filteredReviews = CRITIC_VAULT_REVIEWS
+        .filter((rev) => {
+            const matchesGenre = filters.genre === 'TODOS' || rev.genre.toLocaleLowerCase().includes(filters.genre.toLocaleLowerCase());
+            const matchesYear = filters.year === 'TODOS' || rev.year === filters.year;
+            const matchesCountry = filters.country === 'TODOS' || rev.country === filters.country;
+            const searchableContent = [rev.title, rev.band, rev.label, rev.genre, rev.country, rev.author, rev.excerpt]
+                .join(' ')
+                .toLocaleLowerCase();
+            const matchesSearch = !normalizedSearch || searchableContent.includes(normalizedSearch);
+
+            return matchesGenre && matchesYear && matchesCountry && matchesSearch;
+        })
+        .sort((a, b) => {
+            if (filters.sortOrder === 'rating') return Number(b.score) - Number(a.score);
+            if (filters.sortOrder === 'alphabetical') return a.title.localeCompare(b.title);
+            return Number(b.year) - Number(a.year);
+        });
+
     return (
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
@@ -26,12 +35,13 @@ const LastDisc = () => {
                     </h2>
                 </div>
                 <span className="font-mono text-[11px] text-[#71717a] uppercase">
-                    MOSTRANDO: <strong className="text-white">1 - {filteredReviews.length}</strong> DE 248 RESEÑAS
+                    RESULTADOS: <strong className="text-white">{filteredReviews.length}</strong> DE {CRITIC_VAULT_REVIEWS.length} RESEÑAS
                 </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredReviews.map((rev) => (
+            {filteredReviews.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredReviews.map((rev) => (
                     <article
                         key={rev.id}
                         className="bg-[#121214] border border-[#27272a] hover:border-[#3f3f46] rounded-sm overflow-hidden flex flex-col justify-between group transition-all"
@@ -82,50 +92,13 @@ const LastDisc = () => {
                             </div>
                         </div>
                     </article>
-                ))}
-            </div>
-
-            {/* Pagination Strip */}
-            <div className="pt-4 border-t border-[#18181b] flex flex-wrap items-center justify-between gap-4 font-mono text-xs">
-                <span className="text-[#71717a] text-[11px]">
-                    PÁGINA <strong className="text-white">{activePage}</strong> DE <strong className="text-white">48</strong> (1,482 ÁLBUMES DOCUMENTADOS)
-                </span>
-
-                <div className="flex items-center gap-1.5">
-                    <button
-                        onClick={() => setActivePage(Math.max(1, activePage - 1))}
-                        className="w-8 h-8 bg-[#121214] border border-[#27272a] rounded-sm flex items-center justify-center text-[#a1a1aa] hover:text-white cursor-pointer"
-                    >
-                        <ChevronLeft className="w-4 h-4" />
-                    </button>
-                    {[1, 2, 3, 4].map((p) => (
-                        <button
-                            key={p}
-                            onClick={() => setActivePage(p)}
-                            className={`w-8 h-8 rounded-sm font-mono text-xs cursor-pointer ${activePage === p
-                                ? 'bg-[#dc2626] text-white font-bold'
-                                : 'bg-[#121214] border border-[#27272a] text-[#a1a1aa] hover:text-white'
-                                }`}
-                        >
-                            {p}
-                        </button>
                     ))}
-                    <span className="px-2 text-[#71717a]">...</span>
-                    <button
-                        onClick={() => setActivePage(48)}
-                        className="w-8 h-8 bg-[#121214] border border-[#27272a] rounded-sm text-[#a1a1aa] hover:text-white cursor-pointer"
-                    >
-                        48
-                    </button>
-                    <button
-                        onClick={() => setActivePage(Math.min(48, activePage + 1))}
-                        className="w-8 h-8 bg-[#121214] border border-[#27272a] rounded-sm flex items-center justify-center text-[#a1a1aa] hover:text-white cursor-pointer"
-                    >
-                        <ChevronRight className="w-4 h-4" />
-                    </button>
                 </div>
-
-            </div>
+            ) : (
+                <p className="border border-[#27272a] bg-[#121214] p-6 text-center font-mono text-sm text-[#a1a1aa]">
+                    No se encontraron reseñas con esos filtros.
+                </p>
+            )}
         </div>
     )
 }

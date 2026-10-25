@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { AudioTrack, SectionId, UPCOMING_TOURS } from '../data/mockData';
-import HeadHome from '../components/Home/HeadHome';
-import HeadResenias from '../components/Home/HeadResenias';
+import { AudioTrack, SectionId } from '../data/mockData';
+import HeadHome from '../components/Cabeceras/HeadHome';
+import HeadResenias from '../components/Cabeceras/HeadResenias';
 import ContentResenia from '../components/Home/ContentResenia';
 import ContentVideo from '../components/Home/ContentVideo';
 import ContentGallery from '../components/Home/ContentGallery';
@@ -44,12 +44,7 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
 
       {/* TIME OF NEW MUSIC */}
       <section className="max-w-[1280px] mx-auto px-4 lg:px-8 space-y-6">
-        <ContentResenia
-          onSelectSection={onSelectSection}
-          setReviewFilter={(filter: 'TODOS' | 'BLACK'| 'DEATH' | 'DOOM' | 'GOTHIC' | 'GRINDCORE' | 'HEAVY' | 'POWER' | 'PROGRESIVE' | 'SPEED' | 'STONER' | 'THRASH') => {
-            void filter;
-          }}
-        />
+        <ContentResenia />
       </section>
 
       {/* VIDEOPODCAST */}

@@ -1,10 +1,10 @@
 import React from 'react'
-import { UPCOMING_TOURS } from '@/src/data/mockData'
 import { MapPin } from 'lucide-react'
+import { UPCOMING_TOURS } from '@/src/data/HomeTours'
 
 const NextTour = () => {
     return (
-        <div className="max-w-[1440px] mx-auto px-4 lg:px-8 space-y-6">
+        <div className="max-w-[1440px] mx-auto px-8 lg:px-8 space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
                 <div>
                     <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-white uppercase tracking-tight mt-1">
@@ -13,7 +13,7 @@ const NextTour = () => {
                 </div>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-3 pb-20">
                 {UPCOMING_TOURS.map((tour) => (
                     <div
                         key={tour.id}
@@ -41,7 +41,7 @@ const NextTour = () => {
                                 <p className="font-mono text-xs text-[#a1a1aa] flex items-center gap-1.5">
                                     <MapPin className="w-3.5 h-3.5 text-[#71717a]" />
                                     <span>
-                                        {tour.venue} • {tour.doors}
+                                        {tour.venue} • {tour.info}
                                     </span>
                                 </p>
                             </div>

@@ -18,10 +18,10 @@ export const HeadResenias: React.FC<HeadResniasProps> = ({ onSelectSection }) =>
                 />
             </div>
             <button
-                onClick={() => onSelectSection('cms')}
+                onClick={() => onSelectSection('resenas')}
                 className="font-mono text-xs text-[#a1a1aa] hover:text-white flex items-center gap-1.5 uppercase tracking-wider cursor-pointer"
             >
-                <span>ARCHIVO PERIODÍSTICO COMPLETO</span>
+                <span>RECOMENDACIONES COMPLETAS</span>
                 <ArrowRight className="w-3.5 h-3.5" />
             </button>
         </div>

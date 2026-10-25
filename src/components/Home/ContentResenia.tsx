@@ -1,44 +1,11 @@
-import React, { useState } from 'react'
-import { SectionId } from '../../data/mockData';
-import { HOME_REVIEWS } from '@/src/data/HomeReviews';
+import React from 'react'
+import { CRITIC_VAULT_REVIEWS } from '@/src/data/HomeReviews';
 
-interface ContentResniaProps {
-    setReviewFilter: (filter: 'TODOS' | 'BLACK' | 'DEATH' | 'DOOM' | 'GOTHIC' | 'GRINDCORE' | 'HEAVY' | 'POWER' | 'PROGRESIVE' | 'SPEED' | 'STONER' | 'THRASH') => void;
-
-    onSelectSection: (section: SectionId) => void;
-}
-
-export const ContentResenia: React.FC<ContentResniaProps> = () => {
-    const [reviewFilter, setReviewFilter] = useState<'TODOS' | 'BLACK' | 'DEATH' | 'DOOM' | 'GOTHIC' | 'GRINDCORE' | 'HEAVY' | 'POWER' | 'PROGRESIVE' | 'SPEED' | 'STONER' | 'THRASH'>('TODOS');
-    const filteredReviews =
-        reviewFilter === 'TODOS'
-            ? HOME_REVIEWS
-            : HOME_REVIEWS.filter((r) => r.category === reviewFilter);
-
+export const ContentResenia: React.FC = () => {
     return (
         <div className="max-w-[1440px] mx-auto px-4 lg:px-8 space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-                <div></div>
-                {/* Filter Buttons */}
-                <div className="flex w-full flex-wrap items-center justify-start gap-2 font-mono text-[10px] sm:w-auto sm:justify-end">
-                    <span className="w-full text-[#71717a] uppercase sm:w-auto sm:mr-1">FILTRAR:</span>
-                    {(['TODOS', 'BLACK', 'DEATH', 'DOOM', 'GOTHIC', 'GRINDCORE', 'HEAVY', 'POWER', 'PROGRESIVE', 'SPEED', 'STONER', 'THRASH'] as const).map((cat) => (
-                        <button
-                            key={cat}
-                            onClick={() => setReviewFilter(cat)}
-                            className={`px-2.5 py-1 rounded-sm uppercase transition-colors cursor-pointer ${reviewFilter === cat
-                                ? 'bg-[#dc2626] text-white font-bold'
-                                : 'bg-[#121214] border border-[#27272a] text-[#a1a1aa] hover:text-white'
-                                }`}
-                        >
-                            {cat}
-                        </button>
-                    ))}
-                </div>
-            </div>
-
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {filteredReviews.map((rev) => (
+                {CRITIC_VAULT_REVIEWS.slice(0, 3).map((rev) => (
                     <div
                         key={rev.id}
                         className="bg-[#121214] border border-[#27272a] hover:border-[#3f3f46] rounded-sm overflow-hidden flex flex-col justify-between group transition-all"
@@ -72,7 +39,7 @@ export const ContentResenia: React.FC<ContentResniaProps> = () => {
                                     </p>
                                 </div>
                                 <p className="text-xs text-[#a1a1aa] italic leading-relaxed">
-                                    {rev.quote}
+                                    {rev.excerpt}
                                 </p>
                             </div>
                         </div>
