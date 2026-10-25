@@ -4,7 +4,6 @@ import {
   SectionId,
 } from '../data/mockData';
 import HeadRec from '../components/Cabeceras/HeadRec';
-import MonthDisc from '../components/organism/MonthDisc';
 import LastDisc from '../components/organism/LastDisc';
 import type { ReviewFilters } from '../components/Reviews/Filter';
 
