@@ -1,6 +1,6 @@
 import React from 'react'
-import { CRITIC_VAULT_REVIEWS } from '@/src/data/mockData';
 import type { ReviewFilters } from '../Reviews/Filter';
+import { CRITIC_VAULT_REVIEWS } from '@/src/data/HomeReviews';
 
 interface LastDiscProps {
     filters: ReviewFilters;
@@ -13,7 +13,7 @@ const LastDisc: React.FC<LastDiscProps> = ({ filters }) => {
             const matchesGenre = filters.genre === 'TODOS' || rev.genre.toLocaleLowerCase().includes(filters.genre.toLocaleLowerCase());
             const matchesYear = filters.year === 'TODOS' || rev.year === filters.year;
             const matchesCountry = filters.country === 'TODOS' || rev.country === filters.country;
-            const searchableContent = [rev.title, rev.band, rev.label, rev.genre, rev.country, rev.author, rev.excerpt]
+            const searchableContent = [rev.title, rev.band, rev.label, rev.genre, rev.country, rev.excerpt]
                 .join(' ')
                 .toLocaleLowerCase();
             const matchesSearch = !normalizedSearch || searchableContent.includes(normalizedSearch);
@@ -21,8 +21,10 @@ const LastDisc: React.FC<LastDiscProps> = ({ filters }) => {
             return matchesGenre && matchesYear && matchesCountry && matchesSearch;
         })
         .sort((a, b) => {
-            if (filters.sortOrder === 'rating') return Number(b.score) - Number(a.score);
-            if (filters.sortOrder === 'alphabetical') return a.title.localeCompare(b.title);
+            if (filters.sortOrder === 'recent') return Number(b.year) - Number(a.year);
+            if (filters.sortOrder === 'older') return Number(a.year) - Number(b.year);
+            if (filters.sortOrder === 'ascendent') return a.title.localeCompare(b.title);
+            if (filters.sortOrder === 'descendent') return b.title.localeCompare(a.title);
             return Number(b.year) - Number(a.year);
         });
 
@@ -80,15 +82,6 @@ const LastDisc: React.FC<LastDiscProps> = ({ filters }) => {
                                 <p className="text-xs text-[#a1a1aa] leading-relaxed line-clamp-3">
                                     {rev.excerpt}
                                 </p>
-                            </div>
-                        </div>
-
-                        <div className="px-5 pb-4 pt-3 border-t border-[#18181b] flex items-center justify-between font-mono text-[11px]">
-                            <div className="flex items-center gap-2">
-                                <span className="w-6 h-6 rounded-full bg-[#18181b] border border-[#3f3f46] flex items-center justify-center text-[10px] text-white font-bold">
-                                    {rev.authorInitials}
-                                </span>
-                                <span className="text-[#71717a]">Por: <strong className="text-[#a1a1aa]">{rev.author}</strong></span>
                             </div>
                         </div>
                     </article>

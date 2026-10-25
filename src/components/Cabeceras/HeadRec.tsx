@@ -23,21 +23,6 @@ const HeadRec: FC<HeadRecProps> = ({ filters, onFiltersChange }) => {
                         Desmenuzamos la arquitectura sonora y contundencia técnica de la música extrema y el underground internacional.
                     </p>
                 </div>
-
-                <div className="lg:col-span-4 bg-[#121214] border border-[#27272a] rounded-sm p-5 grid grid-cols-3 divide-x divide-[#27272a] text-center">
-                    <div className="px-2">
-                        <span className="font-mono text-[9px] text-[#71717a] uppercase block">PROMEDIO MES</span>
-                        <span className="font-display font-extrabold text-2xl text-white mt-1 block">8.6</span>
-                    </div>
-                    <div className="px-2">
-                        <span className="font-mono text-[9px] text-[#71717a] uppercase block">PERFECCIÓN (10/10)</span>
-                        <span className="font-display font-extrabold text-2xl text-[#dc2626] mt-1 block">03</span>
-                    </div>
-                    <div className="px-2">
-                        <span className="font-mono text-[9px] text-[#71717a] uppercase block">NEFASTOS (&lt;4.0)</span>
-                        <span className="font-display font-extrabold text-2xl text-white mt-1 block">12</span>
-                    </div>
-                </div>
             </div>
 
             {/* SEARCH & GENRE FILTER BAR */}

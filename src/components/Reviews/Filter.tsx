@@ -45,7 +45,7 @@ const Filter: React.FC<FilterProps> = ({ filters, onFiltersChange }) => {
                     >
                         <option value="recent">ORDENAR: MÁS RECIENTES</option>
                         <option value="older">ORDENAR: MÁS VIEJOS</option>
-                        <option value="ascedent">ORDENAR: ORDEN ALFABÉTICO ASCENDENTE</option>
+                        <option value="ascendent">ORDENAR: ORDEN ALFABÉTICO ASCENDENTE</option>
                         <option value="descendent">ORDENAR: ORDEN ALFABÉTICO DESCENDENTE</option>
                     </select>
                 </div>
