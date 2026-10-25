@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Play, Pause, Volume2, VolumeX } from 'lucide-react';
-import { AudioTrack, SectionId } from '../data/mockData';
+import { AudioTrack, SectionId } from '../../data/mockData';
 
 interface LiveStreamPlayerBarProps {
   currentTrack: AudioTrack;
