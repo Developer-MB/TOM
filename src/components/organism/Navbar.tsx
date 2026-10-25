@@ -19,7 +19,6 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const navItems: { id: SectionId; label: string; sub?: string }[] = [
     { id: 'inicio', label: 'INICIO' },
-    { id: 'inicio', label: 'NOTICIAS', sub: 'noticias' },
     { id: 'resenas', label: 'RECOMENDACIONES' },
     { id: 'galeria', label: 'GALERÍA' },
     { id: 'videopodcast', label: 'VIDEOS' },
@@ -29,11 +28,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const handleNavClick = (item: { id: SectionId; label: string; sub?: string }) => {
     onSelectSection(item.id);
-    if (item.sub === 'noticias') {
-      setTimeout(() => {
-        document.getElementById('noticias-section')?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
-    } else if (item.sub === 'eventos') {
+    if (item.sub === 'eventos') {
       setTimeout(() => {
         document.getElementById('eventos-section')?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
@@ -56,30 +51,6 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             <img src={ASSETS.logoWhite} alt="Time of Metal" className="h-20 w-auto" />
           </button>
-
-          {/* Widget RADIO*/}
-          {/* <div className="hidden xl:flex items-center gap-2.5 bg-[#121214] border border-[#27272a] rounded px-2.5 py-1">
-            <div className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-[#dc2626] animate-pulse" />
-              <span className="font-mono text-[10px] font-bold text-[#f4f4f5] leading-tight uppercase">
-                ON<br />AIR
-              </span>
-            </div>
-            <span className="h-4 w-[1px] bg-[#27272a]" />
-            <span className="font-mono text-[11px] text-[#a1a1aa] truncate max-w-[130px]">
-              Death Metal Sanc...
-            </span>
-            <button
-              onClick={() => {
-                onToggleRadioPlay();
-                onSelectSection('radio');
-              }}
-              className="flex items-center gap-1 bg-[#dc2626] hover:bg-[#ef4444] text-white font-mono text-[10px] font-semibold px-2.5 py-1 rounded-sm transition-colors cursor-pointer"
-            >
-              <Play className="w-2.5 h-2.5 fill-current" />
-              <span>{isPlaying ? 'EN VIVO' : 'SINTONIZAR'}</span>
-            </button>
-          </div> */}
         </div>
 
         {/* Center: Navigation Links */}
@@ -135,10 +106,10 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="flex lg:hidden items-center gap-2 px-4 py-2 bg-[#121214] border-t border-[#27272a] overflow-x-auto">
         {[
           { id: 'inicio', label: 'INICIO' },
-          { id: 'resenas', label: 'JUICIO CRÍTICO (RESEÑAS)' },
-          { id: 'galeria', label: 'GALERÍA DE FOTOS' },
-          { id: 'videopodcast', label: 'VIDEOPODCAST 4K' },
-          { id: 'radio', label: 'RADIO 24/7' },
+          { id: 'resenas', label: 'RECOMENDACIONES' },
+          { id: 'galeria', label: 'GALERÍA' },
+          { id: 'videopodcast', label: 'VIDEOS' },
+          { id: 'radio', label: 'RADIO' },
           { id: 'cms', label: 'CMS ADMIN' },
         ].map((tab) => (
           <button

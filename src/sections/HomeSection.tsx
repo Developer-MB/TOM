@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { AudioTrack, SectionId } from '../data/mockData';
-import HeadHome from '../components/Cabeceras/HeadHome';
-import HeadResenias from '../components/Cabeceras/HeadResenias';
+import HeadHome from '../components/Home/HeadHome';
+import HeadResenias from '../components/Home/HeadResenias';
 import ContentResenia from '../components/Home/ContentResenia';
 import ContentVideo from '../components/Home/ContentVideo';
 import ContentGallery from '../components/Home/ContentGallery';
@@ -38,7 +38,7 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
       </section>
 
       {/* SECCION MUSICA*/}
-      <section id="noticias-section" className="max-w-[1280px] mx-auto px-4 lg:px-8 space-y-6">
+      <section className="max-w-[1280px] mx-auto px-4 lg:px-8 space-y-6">
         <HeadResenias onSelectSection={onSelectSection} />
       </section>
 
@@ -58,7 +58,7 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
       </section>
 
       {/* PRÓXIMOS EVENTOS & GIRAS */}
-      <section id="eventos-section" className="max-w-[1280px] mx-auto px-4 lg:px-8 space-y-6">
+      <section className="max-w-[1280px] mx-auto px-4 lg:px-8 space-y-6">
         <NextTour />
       </section>
     </div>

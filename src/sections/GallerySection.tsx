@@ -1,14 +1,8 @@
 import React, { useState } from 'react';
-import {
-  Download,
-  X,
-} from 'lucide-react';
-import {
-  AudioTrack,
-  SectionId,
-} from '../data/mockData';
-import HeadGallery from '../components/Cabeceras/HeadGallery';
-import BigPhoto from '../components/organism/BigPhoto';
+import { Download, X } from 'lucide-react';
+import { AudioTrack, SectionId } from '../data/mockData';
+import HeadGallery from '../components/Gallery/HeadGallery';
+import BigPhoto from '../components/Gallery/BigPhoto';
 import FilterGallery from '../components/organism/FilterGallery';
 
 interface GallerySectionProps {
@@ -27,18 +21,11 @@ export const GallerySection: React.FC<GallerySectionProps> = () => {
     image: string;
     exif: string;
   } | null>(null);
-  const [pressStatus, setPressStatus] = useState<string | null>(null);
-
-  const handlePressRequest = (e: React.FormEvent) => {
-    e.preventDefault();
-    setPressStatus('SOLICITUD DE ACREDITACIÓN RECIBIDA EN MESA DE PRENSA.');
-    setTimeout(() => setPressStatus(null), 4000);
-  };
 
   return (
-    <div className="min-h-screen bg-[#070709] text-[#F4F4F6]">
+    <div className="min-h-screen bg-[#000] text-[#F4F4F6]">
       {/* SECTION HEADER */}
-      <section className="max-w-[1440px] mx-auto px-4 lg:px-8 pt-8 pb-6">
+      <section className="max-w-[1440px] mx-auto px-4 lg:px-8">
         <HeadGallery />
       </section>
 

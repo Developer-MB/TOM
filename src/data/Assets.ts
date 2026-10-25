@@ -9,6 +9,7 @@ export const ASSETS = {
     logoRed2: '/image/logos/TOM_red_2.png',
     logoTONM: '/image/logos/TONM_white.jpg',
     logoTONM2: '/image/logos/TONM_LOGO_DEATH.jpg',
+    logoRostro: '/image/logos/ROSTROS.jpg',
 };
 
 export const AUDIO_ASSETS = [
