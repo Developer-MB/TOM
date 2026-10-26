@@ -1,9 +1,15 @@
+import studioPodcast from '@/src/assets/images/metal_studio_podcast_1791593120127.jpg';
+import concertPyro from '@/src/assets/images/metal_concert_pyro_1791593129897.jpg';
+import albumCatacombs from '@/src/assets/images/album_catacombs_cover_1791593139425.jpg';
+import albumBlackMetal from '@/src/assets/images/album_black_metal_cover_1791593147308.jpg';
+import djRavn from '@/src/assets/images/dj_ravn_portrait_1791593164383.jpg';
+
 export const ASSETS = {
-    studioPodcast: '/src/assets/images/metal_studio_podcast_1791593120127.jpg',
-    concertPyro: '/src/assets/images/metal_concert_pyro_1791593129897.jpg',
-    albumCatacombs: '/src/assets/images/album_catacombs_cover_1791593139425.jpg',
-    albumBlackMetal: '/src/assets/images/album_black_metal_cover_1791593147308.jpg',
-    djRavn: '/src/assets/images/dj_ravn_portrait_1791593164383.jpg',
+    studioPodcast,
+    concertPyro,
+    albumCatacombs,
+    albumBlackMetal,
+    djRavn,
     logoWhite: '/image/logos/TOM_white.png',
     logoRed: '/image/logos/TOM_red.png',
     logoRed2: '/image/logos/TOM_red_2.png',
