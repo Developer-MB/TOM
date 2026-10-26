@@ -11,7 +11,7 @@ export const GALLERY_FILTERS = [
 export const HOME_PICS = [
     {
         id: 'gal-1',
-        concert: 'THE GATHERING',
+        concert: 'The Gathering',
         date: '10 SEP 2026',
         venue: 'Auditorio BB',
         city: 'CDMX',
