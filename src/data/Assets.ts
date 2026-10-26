@@ -16,6 +16,7 @@ export const ASSETS = {
     logoTONM: '/image/logos/TONM_white.jpg',
     logoTONM2: '/image/logos/TONM_LOGO_DEATH.jpg',
     logoRostro: '/image/logos/ROSTROS.jpg',
+    logoTOMVP: '/image/logos/TOM_PODCAST.jpg',
 };
 
 export const AUDIO_ASSETS = [

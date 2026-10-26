@@ -49,7 +49,11 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
 
       {/* VIDEOPODCAST */}
       <section className="max-w-[1280px] mx-auto px-4 lg:px-8">
-        <ContentVideo podcastPlaying={podcastPlaying} setPodcastPlaying={setPodcastPlaying} />
+        <ContentVideo
+          podcastPlaying={podcastPlaying}
+          setPodcastPlaying={setPodcastPlaying}
+          onSelectSection={onSelectSection}
+        />
       </section>
 
       {/* GALERÍA DE CONCIERTOS RECIENTES */}
