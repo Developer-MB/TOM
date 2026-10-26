@@ -1,4 +1,7 @@
-import { ASSETS } from '@/src/data/Assets';
+import albumBlackMetal from '@/src/assets/images/album_black_metal_cover_1791593147308.jpg';
+import albumCatacombs from '@/src/assets/images/album_catacombs_cover_1791593139425.jpg';
+import concertPyro from '@/src/assets/images/metal_concert_pyro_1791593129897.jpg';
+import studioPodcast from '@/src/assets/images/metal_studio_podcast_1791593120127.jpg';
 
 export const genres = [
   'TODOS', 'AVANTGARDE', 'BLACK', 'CROSSOVER', 'DEATH', 'DJENT', 
@@ -67,7 +70,7 @@ export const CRITIC_VAULT_REVIEWS = [
     title: 'HYMNS FROM THE OSSUARY',
     duration: '48:19',
     excerpt: 'La escuela de Gotemburgo y el black gélido noventero colisionan en un torbellino de armonías en cuartas menores. Destaca una producción orgánica sin baterías cuantizadas.',
-    cover: ASSETS.albumBlackMetal,
+    cover: albumBlackMetal,
   },
   {
     id: 'cv-5',
@@ -82,7 +85,7 @@ export const CRITIC_VAULT_REVIEWS = [
     title: 'TOMB OF PUTRID FLESH',
     duration: '39:40',
     excerpt: 'Frecuencias subsónicas que hacen vibrar el diafragma y afinaciones en Si bemol desquiciadas. La banda finlandesa profundiza en la estética de Demilich y Rippikoulu con un sonido abismal.',
-    cover: ASSETS.albumCatacombs,
+    cover: albumCatacombs,
   },
   {
     id: 'cv-6',
@@ -97,7 +100,7 @@ export const CRITIC_VAULT_REVIEWS = [
     title: 'NUCLEAR IRON STORM',
     duration: '37:05',
     excerpt: 'Velocidad destructiva en la senda de Kreator y Sodom del período 1986. Riffs afilados como navajas de afeitar ejecutados con púa implacable y redobles de caja analógicos.',
-    cover: ASSETS.concertPyro,
+    cover: concertPyro,
   },
   {
     id: 'cv-7',
@@ -112,7 +115,7 @@ export const CRITIC_VAULT_REVIEWS = [
     title: 'BLOOD MOON INVOCATION',
     duration: '42:15',
     excerpt: 'La mística mediterránea de Rotting Christ y Varathron revive con una majestuosidad litúrgica intachable. Teclados esotéricos sutiles sostienen un medio tiempo hipnótico.',
-    cover: ASSETS.albumBlackMetal,
+    cover: albumBlackMetal,
   },
   {
     id: 'cv-8',
@@ -127,7 +130,7 @@ export const CRITIC_VAULT_REVIEWS = [
     title: 'BILE AND RUST',
     duration: '51:30',
     excerpt: 'Guitarras con afinación en La sostenido y distorsión de válvulas al borde del incendio. Si bien la segunda mitad pierde tracción rítmica, la pesadez aplastante de los primeros cortes compensa.',
-    cover: ASSETS.studioPodcast,
+    cover: studioPodcast,
   },
   {
     id: 'cv-9',
@@ -142,6 +145,6 @@ export const CRITIC_VAULT_REVIEWS = [
     title: 'MORBID TRANSCENDENCE',
     duration: '31:02',
     excerpt: 'El poder del underground sudamericano en su máxima encarnación salvaje. Blast-beats furiosos, guitarras cargadas de feedback y un aura ritualista que deja en trance.',
-    cover: ASSETS.albumCatacombs,
+    cover: albumCatacombs,
   },
 ];
