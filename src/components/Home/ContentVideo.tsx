@@ -1,41 +1,22 @@
-import React, { useEffect, useState } from 'react'
+import React, { useMemo } from 'react'
 import { ArrowRight } from 'lucide-react';
 import { SectionId } from '@/src/data/mockData';
-import type { HomeVideosResponse, ResolvedHomeVideo } from '../../data/HomeVideo';
+import { HOME_VIDEOS, resolveHomeVideoUrl } from '../../data/HomeVideo';
+import type { ResolvedHomeVideo } from '../../data/HomeVideo';
 
 interface ContentVideoProps {
     onSelectSection: (section: SectionId) => void;
 }
 
 export const ContentVideo: React.FC<ContentVideoProps> = ({ onSelectSection }) => {
-    const [video, setVideo] = useState<ResolvedHomeVideo>();
-    const [loadError, setLoadError] = useState<string>();
-
-    useEffect(() => {
-        const controller = new AbortController();
-
-        const loadVideo = async () => {
-            try {
-                const response = await fetch('/api/home/videos', { signal: controller.signal });
-                const data = await response.json() as HomeVideosResponse & { error?: string };
-                if (!response.ok) {
-                    throw new Error(data.error ?? 'No se pudieron cargar los videos destacados.');
-                }
-                const featuredVideo = data.items[0];
-                if (!featuredVideo) {
-                    throw new Error('No hay videos configurados en HOME_VIDEOS.');
-                }
-                setVideo(featuredVideo);
-            } catch (error) {
-                if (controller.signal.aborted) return;
-                console.error('Error al cargar los videos destacados:', error);
-                setLoadError(error instanceof Error ? error.message : 'No se pudieron cargar los videos destacados.');
-            }
-        };
-
-        void loadVideo();
-        return () => controller.abort();
-    }, []);
+    const video = useMemo<ResolvedHomeVideo | undefined>(() => HOME_VIDEOS
+        .map((item) => ({
+            ...item,
+            ...resolveHomeVideoUrl(item.url),
+        }))
+        .sort((first, second) =>
+            new Date(second.fecha).getTime() - new Date(first.fecha).getTime()
+        )[0], []);
 
     return (
         <div>
@@ -49,11 +30,6 @@ export const ContentVideo: React.FC<ContentVideoProps> = ({ onSelectSection }) =
                     <ArrowRight className="w-3.5 h-3.5" />
                 </button>
             </div>
-            {loadError && (
-                <p role="alert" className="mb-4 border border-red-900 bg-[#121214] p-4 text-sm text-red-300">
-                    {loadError}
-                </p>
-            )}
             {video ? (
                 <div className="bg-[#121214] border border-[#27272a] rounded-sm p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                     <div className="lg:col-span-7 space-y-3">
@@ -87,11 +63,11 @@ export const ContentVideo: React.FC<ContentVideoProps> = ({ onSelectSection }) =
                         </p>
                     </div>
                 </div>
-            ) : !loadError ? (
+            ) : (
                 <p className="border border-[#27272a] bg-[#121214] p-6 text-sm text-[#a1a1aa]">
-                    Cargando el video destacado...
+                    No hay videos destacados configurados.
                 </p>
-            ) : null}
+            )}
         </div>
     )
 }
