@@ -17,6 +17,8 @@ El comando inicia ambos procesos. Vite sirve el frontend en el puerto `3000` y r
 
 ## Endpoint
 
+`GET /api/home/videos` devuelve los videos configurados en `HOME_VIDEOS` de `src/data/HomeVideo.ts`, incluyendo sus datos, ID de YouTube, URL de inserción y miniatura. No requiere una API key.
+
 `GET /api/youtube/videos` devuelve los videos más recientes del canal. Para solicitar otra página, envía el `nextPageToken` recibido como query param:
 
 `GET /api/youtube/videos?pageToken=<token>`

@@ -22,19 +22,13 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'resenas', label: 'RECOMENDACIONES' },
     { id: 'galeria', label: 'GALERÍA' },
     { id: 'videopodcast', label: 'VIDEOS' },
-    { id: 'inicio', label: 'PRÓXIMOS EVENTOS', sub: 'eventos' },
+    { id: 'eventos', label: 'PRÓXIMOS EVENTOS' },
     { id: 'radio', label: 'RADIO' },
   ];
 
   const handleNavClick = (item: { id: SectionId; label: string; sub?: string }) => {
     onSelectSection(item.id);
-    if (item.sub === 'eventos') {
-      setTimeout(() => {
-        document.getElementById('eventos-section')?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
-    } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -109,6 +103,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           { id: 'resenas', label: 'RECOMENDACIONES' },
           { id: 'galeria', label: 'GALERÍA' },
           { id: 'videopodcast', label: 'VIDEOS' },
+          { id: 'eventos', label: 'PRÓXIMOS EVENTOS' },
           { id: 'radio', label: 'RADIO' },
           { id: 'cms', label: 'CMS ADMIN' },
         ].map((tab) => (

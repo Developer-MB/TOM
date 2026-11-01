@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { HOME_VIDEOS, resolveHomeVideoUrl } from '../src/data/HomeVideo';
 import type { YouTubeVideo, YouTubeVideosResponse } from '../src/data/YouTube';
 
 const app = express();
@@ -33,6 +34,20 @@ type PlaylistItemResponse = {
 };
 
 let channelPromise: Promise<{ channelTitle: string; uploadsPlaylistId: string }> | undefined;
+
+app.get('/api/home/videos', (_request, response) => {
+  try {
+    const items = HOME_VIDEOS.map((video) => ({
+      ...video,
+      ...resolveHomeVideoUrl(video.url),
+    }));
+    response.setHeader('Cache-Control', 'public, max-age=300');
+    response.json({ items });
+  } catch (error) {
+    console.error('No se pudieron cargar los videos de HOME_VIDEOS:', error);
+    response.status(500).json({ error: 'No se pudieron cargar los videos destacados.' });
+  }
+});
 
 const requestYouTubeApi = async <T>(endpoint: string, params: Record<string, string>) => {
   const apiKey = process.env.YOUTUBE_API_KEY;

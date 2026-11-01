@@ -7,7 +7,9 @@ import { ReviewsSection } from './sections/ReviewsSection';
 import { GallerySection } from './sections/GallerySection';
 import { VideopodcastSection } from './sections/VideopodcastSection';
 import { CmsSection } from './sections/CmsSection';
-import { AUDIO_ASSETS } from './data/Assets';
+import { Tours } from './components/Tours/Tours';
+import { AUDIO_ASSETS } from './data/Radio';
+import { RadioSection } from './sections/RadioSection';
 
 const toAudioTrack = (track: (typeof AUDIO_ASSETS)[number]): AudioTrack => ({
   id: track.id,
@@ -18,7 +20,7 @@ const toAudioTrack = (track: (typeof AUDIO_ASSETS)[number]): AudioTrack => ({
   cover: track.cover,
   duration: '',
   currentTime: '',
-  bitrate: '192 kbps',
+  bitrate: '320 kbps',
 });
 
 export default function App() {
@@ -28,7 +30,11 @@ export default function App() {
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(80);
+  const [isMuted, setIsMuted] = useState(false);
+  const [playRequestId, setPlayRequestId] = useState(0);
+  const [audioAnalyser, setAudioAnalyser] = useState<AnalyserNode | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
   const currentTrackIndexRef = useRef(0);
 
   const handleTogglePlay = async () => {
@@ -42,6 +48,7 @@ export default function App() {
     }
 
     try {
+      await audioContextRef.current?.resume();
       await audio.play();
       setIsPlaying(true);
     } catch (err) {
@@ -53,40 +60,20 @@ export default function App() {
   const handleSelectTrack = (trackUpdate: Partial<AudioTrack>) => {
     const selectedAsset = AUDIO_ASSETS.find((track) => track.id === trackUpdate.id);
     if (selectedAsset) {
-      void playAssetTrack(selectedAsset);
+      setCurrentTrack(toAudioTrack(selectedAsset));
+      currentTrackIndexRef.current = AUDIO_ASSETS.findIndex((asset) => asset.id === selectedAsset.id);
+      setPlayRequestId((requestId) => requestId + 1);
       return;
     }
 
     setCurrentTrack((prev) => ({ ...prev, ...trackUpdate }));
-    const audio = audioRef.current;
-    if (!audio || !trackUpdate.src) return;
-
-    audio.src = trackUpdate.src;
-    audio.load();
-    void audio.play()
-      .then(() => setIsPlaying(true))
-      .catch((error: unknown) => {
-        console.error('Error al reproducir la canción seleccionada:', error);
-        setIsPlaying(false);
-      });
+    if (trackUpdate.src) setPlayRequestId((requestId) => requestId + 1);
   };
 
-  const playAssetTrack = async (track: (typeof AUDIO_ASSETS)[number]) => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
+  const playAssetTrack = (track: (typeof AUDIO_ASSETS)[number]) => {
     currentTrackIndexRef.current = AUDIO_ASSETS.findIndex((asset) => asset.id === track.id);
     setCurrentTrack(toAudioTrack(track));
-    audio.src = track.src;
-    audio.load();
-
-    try {
-      await audio.play();
-      setIsPlaying(true);
-    } catch (error) {
-      console.error(`No se pudo reproducir "${track.title}":`, error);
-      setIsPlaying(false);
-    }
+    setPlayRequestId((requestId) => requestId + 1);
   };
 
   const handleTrackEnded = () => {
@@ -101,19 +88,31 @@ export default function App() {
     const audio = audioRef.current;
     if (!audio) return;
 
-    void audio.play()
-      .then(() => setIsPlaying(true))
-      .catch((error: unknown) => {
-        setIsPlaying(false);
-        if (error instanceof DOMException && error.name === 'NotAllowedError') {
-          console.info('El navegador bloqueó la reproducción automática; usa el control de reproducción de la radio.');
-          return;
-        }
-        console.error('No se pudo iniciar la reproducción automática:', error);
-      });
+    const AudioContextConstructor = window.AudioContext;
+    if (!AudioContextConstructor) {
+      console.error('Este navegador no soporta el análisis de audio.');
+      return;
+    }
+
+    try {
+      const audioContext = new AudioContextConstructor();
+      const analyser = audioContext.createAnalyser();
+      analyser.fftSize = 256;
+      analyser.smoothingTimeConstant = 0.82;
+      const source = audioContext.createMediaElementSource(audio);
+      source.connect(analyser);
+      analyser.connect(audioContext.destination);
+      audioContextRef.current = audioContext;
+      setAudioAnalyser(analyser);
+    } catch (error) {
+      console.error('No se pudo inicializar el análisis de audio:', error);
+    }
 
     return () => {
-      audio.pause();
+      audioContextRef.current?.close().catch((error: unknown) => {
+        console.error('No se pudo cerrar el contexto de audio:', error);
+      });
+      audioContextRef.current = null;
     };
   }, []);
 
@@ -122,10 +121,47 @@ export default function App() {
     if (!audio) return;
 
     audio.volume = volume / 100;
-  }, [volume]);
+    audio.muted = isMuted;
+  }, [volume, isMuted]);
+
+  useEffect(() => {
+    if (playRequestId === 0) return;
+
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    let requestIsCurrent = true;
+    void (async () => {
+      await audioContextRef.current?.resume();
+      await audio.play();
+    })()
+      .then(() => {
+        if (requestIsCurrent) setIsPlaying(true);
+      })
+      .catch((error: unknown) => {
+        if (!requestIsCurrent) return;
+        console.error(`No se pudo reproducir "${currentTrack.title}":`, error);
+        setIsPlaying(false);
+      });
+
+    return () => {
+      requestIsCurrent = false;
+    };
+  }, [playRequestId, currentTrack.src, currentTrack.title]);
+
+  const handleVolumeChange = (nextVolume: number) => {
+    setVolume(nextVolume);
+    setIsMuted(false);
+  };
 
   const handleSelectSection = (section: SectionId) => {
     setActiveSection(section);
+    if (section === 'radio' && !isPlaying) {
+      void audioContextRef.current?.resume().catch((error: unknown) => {
+        console.error('No se pudo activar el análisis de audio:', error);
+      });
+      setPlayRequestId((requestId) => requestId + 1);
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -143,7 +179,6 @@ export default function App() {
       <audio
         ref={audioRef}
         src={currentTrack.src}
-        autoPlay
         preload="auto"
         onEnded={handleTrackEnded}
         onError={() => {
@@ -156,11 +191,7 @@ export default function App() {
       <main className="flex-1">
         {activeSection === 'inicio' && (
           <HomeSection
-            currentTrack={currentTrack}
-            isPlaying={isPlaying}
-            onTogglePlay={handleTogglePlay}
             onSelectSection={handleSelectSection}
-            onPlayCustomTrack={handleSelectTrack}
           />
         )}
 
@@ -189,6 +220,21 @@ export default function App() {
             isPlaying={isPlaying}
             onTogglePlay={handleTogglePlay}
             onSelectSection={handleSelectSection}
+          />
+        )}
+
+        {activeSection === 'eventos' && <Tours />}
+
+        {activeSection === 'radio' && (
+          <RadioSection
+            currentTrack={currentTrack}
+            isPlaying={isPlaying}
+            audioAnalyser={audioAnalyser}
+            isMuted={isMuted}
+            onToggleMute={() => setIsMuted((muted) => !muted)}
+            volume={volume}
+            onVolumeChange={handleVolumeChange}
+            onSelectTrack={handleSelectTrack}
           />
         )}
 

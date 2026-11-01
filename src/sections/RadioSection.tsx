@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { AudioTrack } from '../data/mockData';
-import HeadRadio from '../components/Cabeceras/HeadRadio';
-import ContentRadio from '../components/Home/ContentRadio';
+import HeadRadio from '../components/Radio/HeadRadio';
+import ContentRadio from '../components/Radio/ContentRadio';
 
 interface RadioSectionProps {
   currentTrack: AudioTrack;
   isPlaying: boolean;
-  onTogglePlay: () => void;
+  audioAnalyser: AnalyserNode | null;
   isMuted: boolean;
   onToggleMute: () => void;
   volume: number;
@@ -48,7 +48,7 @@ const INITIAL_CHAT = [
 export const RadioSection: React.FC<RadioSectionProps> = ({
   currentTrack,
   isPlaying,
-  onTogglePlay,
+  audioAnalyser,
   isMuted,
   onToggleMute,
   volume,
@@ -94,20 +94,20 @@ export const RadioSection: React.FC<RadioSectionProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#070709] text-[#F4F4F6]">
+    <div className="min-h-screen bg-black text-[#F4F4F6]">
       {/* SECTION HEADER */}
-      <section className="max-w-[1440px] mx-auto px-4 lg:px-8 pt-8 pb-6">
+      <section className="max-w-360 mx-auto px-4 lg:px-8 pt-8 pb-6">
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-8 border-b border-zinc-800/80">
           <HeadRadio />
         </div>
       </section>
 
       {/* MASTER BROADCAST DECK CONSOLE */}
-      <section className="max-w-[1440px] mx-auto px-4 lg:px-8 pb-10">
+      <section className="max-w-360 mx-auto px-4 lg:px-8 pb-10">
         <ContentRadio
           currentTrack={currentTrack}
           isPlaying={isPlaying}
-          onTogglePlay={onTogglePlay}
+          audioAnalyser={audioAnalyser}
           isMuted={isMuted}
           onToggleMute={onToggleMute}
           volume={volume}

@@ -13,9 +13,9 @@ const HeadRec: FC<HeadRecProps> = ({ filters, onFiltersChange }) => {
             {/* HERO HEADER + METRICS BOX */}
 
             <div className="flex flex-col lg:flex-row lg:items-end justify-center">
-                <img src={ASSETS.logoTONM}
+                <img src={ASSETS.logoTONM2}
                     alt="Time of New Music Logo"
-                    className="w-100 sm:w-64 lg:w-96"
+                    className="w-100 sm:w-64 lg:w-100"
                 />
             </div>
 

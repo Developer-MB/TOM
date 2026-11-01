@@ -1,10 +1,18 @@
 import React from 'react'
-import { MapPin } from 'lucide-react'
+import { ArrowRight, MapPin } from 'lucide-react'
 import { UPCOMING_TOURS } from '@/src/data/HomeTours'
+import type { SectionId } from '@/src/data/mockData'
 
-const NextTour = () => {
+interface NextTourProps {
+    onSelectSection?: (section: SectionId) => void;
+    showAll?: boolean;
+}
+
+const NextTour: React.FC<NextTourProps> = ({ onSelectSection, showAll = false }) => {
+    const tours = showAll ? UPCOMING_TOURS : UPCOMING_TOURS.slice(0, 3);
+
     return (
-        <div className="max-w-[1440px] mx-auto px-8 lg:px-8 space-y-6">
+        <div id={showAll ? 'eventos' : undefined} className="max-w-[1440px] mx-auto px-8 lg:px-8 space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
                 <div>
                     <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-white uppercase tracking-tight mt-1">
@@ -14,7 +22,7 @@ const NextTour = () => {
             </div>
 
             <div className="space-y-3 pb-20">
-                {UPCOMING_TOURS.map((tour) => (
+                {tours.map((tour) => (
                     <div
                         key={tour.id}
                         className="bg-[#121214] border border-[#27272a] hover:border-[#3f3f46] rounded-sm p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-colors"
@@ -59,6 +67,21 @@ const NextTour = () => {
                         </div>
                     </div>
                 ))}
+                {!showAll && onSelectSection && (
+                    <div className="flex justify-end pt-2">
+                        <a
+                            href="#eventos"
+                            onClick={(event) => {
+                                event.preventDefault();
+                                onSelectSection('eventos');
+                            }}
+                            className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-[#a1a1aa] hover:text-white transition-colors"
+                        >
+                            VER TODOS LOS EVENTOS
+                            <ArrowRight className="h-4 w-4 text-[#ef4444]" />
+                        </a>
+                    </div>
+                )}
             </div>
         </div>
     )
