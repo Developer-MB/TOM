@@ -1,3 +1,5 @@
+import cmsPosts from '../../data/post-disc.json';
+
 export type CmsPostType = 'RECOMENDACION' | 'GALERIA' | 'VIDEO' | 'GIRAS';
 export type CmsPostStatus = 'PUBLICADO' | 'PROGRAMADO' | 'BORRADOR';
 
@@ -28,4 +30,4 @@ export type CmsPostCreateInput = Omit<CmsPostItem, 'id' | 'code' | 'cover'> & {
     };
 };
 
-export const INITIAL_CMS_ITEMS: CmsPostItem[] = [];
+export const INITIAL_CMS_ITEMS = cmsPosts as CmsPostItem[];

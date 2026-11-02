@@ -1,5 +1,24 @@
 [
   {
+    "id": "50875509-9733-40e1-8bbf-9d9c70497b90",
+    "code": "TOM-REC-0011",
+    "type": "RECOMENDACION",
+    "band": "Wormrot",
+    "disc": "TNT",
+    "genre": "Grindcore",
+    "genreKey": "Grindcore",
+    "label": "Earache Records",
+    "country": "SGP",
+    "flag": "SG",
+    "year": "2025",
+    "duration": "19:22",
+    "excerpt": "Recorded live at TNT Studios, Singapore. There are no reviews for TNT yet. You can write one.",
+    "publish": "2026-11-02T05:48:00.075Z",
+    "status": "PUBLICADO",
+    "author": "Admin Redacción",
+    "cover": "/image/discos/fd366dbe-272d-4398-bce5-00e321c59a17.jpg"
+  },
+  {
     "id": "459421df-50cd-467e-9b1d-a9d7b730b2eb",
     "code": "TOM-REC-0010",
     "type": "RECOMENDACION",

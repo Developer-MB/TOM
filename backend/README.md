@@ -44,4 +44,4 @@ npm run build
 npm start
 ```
 
-El servidor sirve tanto `/api/youtube/videos` como los archivos compilados del frontend. Un hosting estático que no ejecute Node.js necesita alojar este backend por separado y enrutar `/api` hacia él.
+El servidor sirve tanto `/api/youtube/videos` como los archivos compilados del frontend. En despliegues estáticos como Vercel, las publicaciones versionadas en `data/post-disc.json` se incluyen en el build y se muestran sin depender de `/api/cms/posts`. Para crear o eliminar publicaciones desde el CMS, aloja este backend por separado y enruta `/api` hacia él; un despliegue estático por sí solo no puede escribir en el JSON.

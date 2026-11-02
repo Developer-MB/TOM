@@ -10,7 +10,8 @@ import { CmsSection } from './sections/CmsSection';
 import { Tours } from './components/Tours/Tours';
 import { AUDIO_ASSETS } from './data/Radio';
 import { RadioSection } from './sections/RadioSection';
-import type { CmsPostItem } from './data/Cms';
+import { INITIAL_CMS_ITEMS, type CmsPostItem } from './data/Cms';
+import { readJsonResponse } from './data/readJsonResponse';
 
 const toAudioTrack = (track: (typeof AUDIO_ASSETS)[number]): AudioTrack => ({
   id: track.id,
@@ -28,8 +29,8 @@ export default function App() {
   const [activeSection, setActiveSection] = useState<SectionId>('inicio');
   const [currentTrack, setCurrentTrack] = useState<AudioTrack>(() => toAudioTrack(AUDIO_ASSETS[0]));
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [cmsPosts, setCmsPosts] = useState<CmsPostItem[]>([]);
-  const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(true);
+  const [cmsPosts, setCmsPosts] = useState<CmsPostItem[]>(INITIAL_CMS_ITEMS);
+  const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(import.meta.env.DEV);
   const [recommendationsError, setRecommendationsError] = useState<string | null>(null);
 
   const [isPlaying, setIsPlaying] = useState(false);
@@ -42,6 +43,7 @@ export default function App() {
   const currentTrackIndexRef = useRef(0);
 
   useEffect(() => {
+    if (!import.meta.env.DEV) return;
     if (activeSection !== 'inicio' && activeSection !== 'resenas') return;
 
     const controller = new AbortController();
@@ -50,12 +52,10 @@ export default function App() {
     const loadRecommendations = async () => {
       try {
         const response = await fetch('/api/cms/posts', { signal: controller.signal });
-        if (!response.ok) {
-          const result = await response.json() as { error?: string };
-          throw new Error(result.error ?? 'No se pudieron cargar las recomendaciones.');
-        }
-
-        const posts: unknown = await response.json();
+        const posts = await readJsonResponse<unknown>(
+          response,
+          'No se pudieron cargar las recomendaciones.',
+        );
         if (!Array.isArray(posts)) {
           throw new Error('El servidor devolvió una lista de publicaciones no válida.');
         }

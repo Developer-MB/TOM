@@ -7,7 +7,8 @@ import Metrics from '../components/CMS/Metrics';
 import HeadPubliRegister from '../components/CMS/HeadPubliRegister';
 import FilterRegister from '../components/CMS/FilterRegister';
 import PublishDiscForm from '../components/CMS/PublishDiscForm';
-import type { CmsPostCreateInput, CmsPostItem, CmsPostType } from '../data/Cms';
+import { INITIAL_CMS_ITEMS, type CmsPostCreateInput, type CmsPostItem, type CmsPostType } from '../data/Cms';
+import { readJsonResponse } from '../data/readJsonResponse';
 
 interface CmsSectionProps {
   onSelectSection: (section: SectionId) => void;
@@ -16,24 +17,24 @@ interface CmsSectionProps {
 type CmsFilterType = CmsPostType | 'TODOS';
 
 export const CmsSection: React.FC<CmsSectionProps> = ({ onSelectSection }) => {
-  const [items, setItems] = useState<CmsPostItem[]>([]);
+  const [items, setItems] = useState<CmsPostItem[]>(INITIAL_CMS_ITEMS);
   const [filterType, setFilterType] = useState<CmsFilterType>('TODOS');
   const [searchQuery, setSearchQuery] = useState('');
-  const [isLoadingPosts, setIsLoadingPosts] = useState(true);
+  const [isLoadingPosts, setIsLoadingPosts] = useState(import.meta.env.DEV);
   const [persistenceError, setPersistenceError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!import.meta.env.DEV) return;
+
     const controller = new AbortController();
 
     const loadPosts = async () => {
       try {
         const response = await fetch('/api/cms/posts', { signal: controller.signal });
-        if (!response.ok) {
-          const result = await response.json() as { error?: string };
-          throw new Error(result.error ?? 'No se pudieron cargar las publicaciones.');
-        }
-
-        const posts: unknown = await response.json();
+        const posts = await readJsonResponse<unknown>(
+          response,
+          'No se pudieron cargar las publicaciones.',
+        );
         if (!Array.isArray(posts)) {
           throw new Error('El servidor devolvió una lista de publicaciones no válida.');
         }
@@ -72,12 +73,10 @@ export const CmsSection: React.FC<CmsSectionProps> = ({ onSelectSection }) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(post),
     });
-    const result = await response.json() as CmsPostItem | { error?: string };
-    if (!response.ok) {
-      throw new Error('error' in result && result.error ? result.error : 'No se pudo guardar la publicación.');
-    }
-
-    const created = result as CmsPostItem;
+    const created = await readJsonResponse<CmsPostItem>(
+      response,
+      'No se pudo guardar la publicación.',
+    );
     setItems((currentItems) => [created, ...currentItems]);
     setPersistenceError(null);
     return created;
@@ -91,8 +90,7 @@ export const CmsSection: React.FC<CmsSectionProps> = ({ onSelectSection }) => {
     try {
       const response = await fetch(`/api/cms/posts/${encodeURIComponent(id)}`, { method: 'DELETE' });
       if (!response.ok) {
-        const result = await response.json() as { error?: string };
-        throw new Error(result.error ?? 'No se pudo eliminar la publicación.');
+        await readJsonResponse<unknown>(response, 'No se pudo eliminar la publicación.');
       }
 
       setItems((currentItems) => currentItems.filter((item) => item.id !== id));
