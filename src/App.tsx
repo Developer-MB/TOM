@@ -10,6 +10,7 @@ import { CmsSection } from './sections/CmsSection';
 import { Tours } from './components/Tours/Tours';
 import { AUDIO_ASSETS } from './data/Radio';
 import { RadioSection } from './sections/RadioSection';
+import type { CmsPostItem } from './data/Cms';
 
 const toAudioTrack = (track: (typeof AUDIO_ASSETS)[number]): AudioTrack => ({
   id: track.id,
@@ -27,6 +28,9 @@ export default function App() {
   const [activeSection, setActiveSection] = useState<SectionId>('inicio');
   const [currentTrack, setCurrentTrack] = useState<AudioTrack>(() => toAudioTrack(AUDIO_ASSETS[0]));
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [cmsPosts, setCmsPosts] = useState<CmsPostItem[]>([]);
+  const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(true);
+  const [recommendationsError, setRecommendationsError] = useState<string | null>(null);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(80);
@@ -36,6 +40,41 @@ export default function App() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const currentTrackIndexRef = useRef(0);
+
+  useEffect(() => {
+    if (activeSection !== 'inicio' && activeSection !== 'resenas') return;
+
+    const controller = new AbortController();
+    setIsLoadingRecommendations(true);
+
+    const loadRecommendations = async () => {
+      try {
+        const response = await fetch('/api/cms/posts', { signal: controller.signal });
+        if (!response.ok) {
+          const result = await response.json() as { error?: string };
+          throw new Error(result.error ?? 'No se pudieron cargar las recomendaciones.');
+        }
+
+        const posts: unknown = await response.json();
+        if (!Array.isArray(posts)) {
+          throw new Error('El servidor devolvió una lista de publicaciones no válida.');
+        }
+
+        setCmsPosts(posts as CmsPostItem[]);
+        setRecommendationsError(null);
+      } catch (error) {
+        if (controller.signal.aborted) return;
+        setRecommendationsError(
+          error instanceof Error ? error.message : 'No se pudieron cargar las recomendaciones.',
+        );
+      } finally {
+        if (!controller.signal.aborted) setIsLoadingRecommendations(false);
+      }
+    };
+
+    void loadRecommendations();
+    return () => controller.abort();
+  }, [activeSection]);
 
   useLayoutEffect(() => {
     window.scrollTo(0, 0);
@@ -168,6 +207,10 @@ export default function App() {
     }
   };
 
+  const publishedRecommendations = cmsPosts.filter(
+    (post) => post.type === 'RECOMENDACION' && post.status === 'PUBLICADO',
+  );
+
   return (
     <div className="min-h-screen bg-[#000] text-[#F4F4F6] flex flex-col selection:bg-[#DC2626] selection:text-white">
       <Navbar
@@ -195,6 +238,9 @@ export default function App() {
         {activeSection === 'inicio' && (
           <HomeSection
             onSelectSection={handleSelectSection}
+            reviews={publishedRecommendations}
+            isLoadingReviews={isLoadingRecommendations}
+            reviewsError={recommendationsError}
           />
         )}
 
@@ -205,6 +251,9 @@ export default function App() {
             onTogglePlay={handleTogglePlay}
             onSelectSection={handleSelectSection}
             onPlayCustomTrack={handleSelectTrack}
+            reviews={publishedRecommendations}
+            isLoadingReviews={isLoadingRecommendations}
+            reviewsError={recommendationsError}
           />
         )}
 

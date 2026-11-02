@@ -1,11 +1,27 @@
 import React from 'react'
-import { CRITIC_VAULT_REVIEWS } from '@/src/data/HomeReviews';
+import type { CmsPostItem } from '@/src/data/Cms';
+import { resolveReviewCover } from '@/src/data/HomeReviews';
 
-export const ContentResenia: React.FC = () => {
+interface ContentReseniaProps {
+    reviews: CmsPostItem[];
+    isLoading: boolean;
+    error: string | null;
+}
+
+export const ContentResenia: React.FC<ContentReseniaProps> = ({ reviews, isLoading, error }) => {
     return (
         <div className="max-w-[1440px] mx-auto px-4 lg:px-8 space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {CRITIC_VAULT_REVIEWS.slice(0, 3).map((rev) => (
+            {error ? (
+                <p role="alert" className="border border-red-900 bg-red-950/40 p-5 text-sm text-red-300">
+                    No se pudieron cargar las recomendaciones: {error}
+                </p>
+            ) : isLoading ? (
+                <p className="border border-[#27272a] bg-[#121214] p-5 text-sm text-[#a1a1aa]">
+                    Cargando recomendaciones…
+                </p>
+            ) : reviews.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {reviews.slice(0, 3).map((rev) => (
                     <div
                         key={rev.id}
                         className="bg-[#121214] border border-[#27272a] hover:border-[#3f3f46] rounded-sm overflow-hidden flex flex-col justify-between group transition-all"
@@ -14,8 +30,8 @@ export const ContentResenia: React.FC = () => {
                             {/* Square Album Art with Badges */}
                             <div className="relative aspect-square bg-[#18181b] overflow-hidden">
                                 <img
-                                    src={rev.cover}
-                                    alt={rev.title}
+                                    src={resolveReviewCover(rev.cover)}
+                                    alt={rev.disc}
                                     referrerPolicy="no-referrer"
                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                 />
@@ -32,7 +48,7 @@ export const ContentResenia: React.FC = () => {
                                 </div>
                                 <div>
                                     <h3 className="font-display font-bold text-xl text-white leading-tight">
-                                        {rev.title}
+                                {rev.disc}
                                     </h3>
                                     <p className="font-mono text-xs text-[#a1a1aa] uppercase mt-0.5">
                                         {rev.band}
@@ -45,7 +61,12 @@ export const ContentResenia: React.FC = () => {
                         </div>
                     </div>
                 ))}
-            </div>
+                </div>
+            ) : (
+                <p className="border border-[#27272a] bg-[#121214] p-5 text-sm text-[#a1a1aa]">
+                    No hay recomendaciones publicadas todavía.
+                </p>
+            )}
         </div>
     )
 }

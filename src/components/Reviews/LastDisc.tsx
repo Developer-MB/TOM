@@ -1,21 +1,24 @@
 import React from 'react'
 import type { ReviewFilters } from './Filter';
-import { CRITIC_VAULT_REVIEWS } from '../../data/HomeReviews';
-
-
+import type { CmsPostItem } from '../../data/Cms';
+import { resolveReviewCover } from '../../data/HomeReviews';
 
 interface LastDiscProps {
+
+    reviews: CmsPostItem[];
     filters: ReviewFilters;
 }
 
-const LastDisc: React.FC<LastDiscProps> = ({ filters }) => {
+const LastDisc: React.FC<LastDiscProps> = ({ reviews, filters }) => {
     const normalizedSearch = filters.searchTerm.trim().toLocaleLowerCase();
-    const filteredReviews = CRITIC_VAULT_REVIEWS
+    const filteredReviews = reviews
         .filter((rev) => {
-            const matchesGenre = filters.genre === 'TODOS' || rev.genre.toLocaleLowerCase().includes(filters.genre.toLocaleLowerCase());
+            const matchesGenre = filters.genre === 'TODOS' ||
+                rev.genreKey.toLocaleLowerCase().includes(filters.genre.toLocaleLowerCase()) ||
+                rev.genre.toLocaleLowerCase().includes(filters.genre.toLocaleLowerCase());
             const matchesYear = filters.year === 'TODOS' || rev.year === filters.year;
             const matchesCountry = filters.country === 'TODOS' || rev.country === filters.country;
-            const searchableContent = [rev.title, rev.band, rev.label, rev.genre, rev.country, rev.excerpt]
+            const searchableContent = [rev.disc, rev.band, rev.label, rev.genre, rev.country, rev.excerpt]
                 .join(' ')
                 .toLocaleLowerCase();
             const matchesSearch = !normalizedSearch || searchableContent.includes(normalizedSearch);
@@ -23,10 +26,17 @@ const LastDisc: React.FC<LastDiscProps> = ({ filters }) => {
             return matchesGenre && matchesYear && matchesCountry && matchesSearch;
         })
         .sort((a, b) => {
-            if (filters.sortOrder === 'recent') return Number(b.year) - Number(a.year);
+            const aPublishedAt = Date.parse(a.publish);
+            const bPublishedAt = Date.parse(b.publish);
+            if (filters.sortOrder === 'recent' && Number.isFinite(aPublishedAt) && Number.isFinite(bPublishedAt)) {
+                return bPublishedAt - aPublishedAt;
+            }
+            if (filters.sortOrder === 'older' && Number.isFinite(aPublishedAt) && Number.isFinite(bPublishedAt)) {
+                return aPublishedAt - bPublishedAt;
+            }
+            if (filters.sortOrder === 'ascendent') return a.disc.localeCompare(b.disc);
+            if (filters.sortOrder === 'descendent') return b.disc.localeCompare(a.disc);
             if (filters.sortOrder === 'older') return Number(a.year) - Number(b.year);
-            if (filters.sortOrder === 'ascendent') return a.title.localeCompare(b.title);
-            if (filters.sortOrder === 'descendent') return b.title.localeCompare(a.title);
             return Number(b.year) - Number(a.year);
         });
 
@@ -39,7 +49,7 @@ const LastDisc: React.FC<LastDiscProps> = ({ filters }) => {
                     </h2>
                 </div>
                 <span className="font-mono text-[11px] text-[#71717a] uppercase">
-                    RESULTADOS: <strong className="text-white">{filteredReviews.length}</strong> DE {CRITIC_VAULT_REVIEWS.length} LANZAMIENTOS
+                    RESULTADOS: <strong className="text-white">{filteredReviews.length}</strong> DE {reviews.length} LANZAMIENTOS
                 </span>
             </div>
 
@@ -53,12 +63,12 @@ const LastDisc: React.FC<LastDiscProps> = ({ filters }) => {
                             <div>
                                 <div className="relative aspect-square bg-[#18181b] overflow-hidden">
                                     <img
-                                        src={rev.cover}
-                                        alt={rev.title}
+                                        src={resolveReviewCover(rev.cover)}
+                                        alt={rev.disc}
                                         referrerPolicy="no-referrer"
                                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                     />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-[#121214] via-transparent to-black/30" />
+                                    <div className="absolute inset-0 bg-linear-to-t from-[#121214] via-transparent to-black/30" />
                                     <span className="absolute top-3 left-3 px-2.5 py-1 bg-[#09090b]/90 border border-[#27272a] font-mono text-[10px] text-[#e4e4e7] rounded-sm">
                                         {rev.flag} {rev.country} • {rev.year}
                                     </span>
@@ -76,10 +86,10 @@ const LastDisc: React.FC<LastDiscProps> = ({ filters }) => {
                                 <div className="p-5 space-y-2.5">
                                     <div className="flex items-center justify-between font-mono text-[10px] text-[#71717a] uppercase">
                                         <span>{rev.band}</span>
-                                        <span className="bg-[#dc2626] font-mono text-xs font-bold rounded-sm text-[#a1a1aa] uppercase">{rev.label}</span>
+                                        <span className="bg-[#dc2626] font-mono px-2 py-0.5 text-xs font-bold rounded-sm text-[#a1a1aa] uppercase">{rev.label}</span>
                                     </div>
                                     <h3 className="font-display font-extrabold text-xl text-white uppercase leading-tight group-hover:text-[#ef4444] transition-colors">
-                                        {rev.title}
+                                        {rev.disc}
                                     </h3>
                                     <p className="text-xs text-[#a1a1aa] leading-relaxed line-clamp-3">
                                         {rev.excerpt}

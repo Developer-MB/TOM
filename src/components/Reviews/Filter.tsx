@@ -1,6 +1,6 @@
 import React from 'react'
 import { Calendar, Globe, Search } from 'lucide-react'
-import { CRITIC_VAULT_REVIEWS, genres } from '@/src/data/HomeReviews';
+import type { CmsPostItem } from '@/src/data/Cms';
 
 export interface ReviewFilters {
     searchTerm: string;
@@ -11,14 +11,19 @@ export interface ReviewFilters {
 }
 
 interface FilterProps {
+    reviews: CmsPostItem[];
     filters: ReviewFilters;
     onFiltersChange: (filters: ReviewFilters) => void;
 }
 
-const years = [...new Set(CRITIC_VAULT_REVIEWS.map((review) => review.year))].sort((a, b) => Number(b) - Number(a));
-const countries = [...new Set(CRITIC_VAULT_REVIEWS.map((review) => review.country))].sort();
+const Filter: React.FC<FilterProps> = ({ reviews, filters, onFiltersChange }) => {
+    const years = [...new Set(reviews.map((review) => review.year))].sort((a, b) => Number(b) - Number(a));
+    const countries = [...new Set(reviews.map((review) => review.country))].sort();
+    const genres = [
+        'TODOS',
+        ...new Set(reviews.flatMap((review) => review.genreKey.split('/').map((genre) => genre.trim()))),
+    ];
 
-const Filter: React.FC<FilterProps> = ({ filters, onFiltersChange }) => {
     const updateFilter = <K extends keyof ReviewFilters>(key: K, value: ReviewFilters[K]) => {
         onFiltersChange({ ...filters, [key]: value });
     };
