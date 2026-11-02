@@ -1,5 +1,5 @@
 import React from 'react';
-import { Radio, Youtube, Disc, Rss } from 'lucide-react';
+import { Youtube } from 'lucide-react';
 import { SectionId } from '../../data/mockData';
 
 interface FooterProps {
@@ -11,6 +11,9 @@ export const Footer: React.FC<FooterProps> = ({ onSelectSection }) => {
     onSelectSection(sec);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  const hoy = new Date();
+  const anioActual = hoy.getFullYear();
 
   return (
     <footer className="bg-[#09090b] border-t border-[#27272a] pt-14 pb-10 text-[#a1a1aa]">
@@ -49,23 +52,23 @@ export const Footer: React.FC<FooterProps> = ({ onSelectSection }) => {
                 </button>
               </li>
               <li>
-                <button onClick={() => navTo('inicio')} className="hover:text-white transition-colors cursor-pointer">
-                  Noticias Globales
-                </button>
-              </li>
-              <li>
                 <button onClick={() => navTo('resenas')} className="hover:text-white transition-colors cursor-pointer">
-                  Reseñas de Discos
+                  Recomendaciones
                 </button>
               </li>
               <li>
                 <button onClick={() => navTo('galeria')} className="hover:text-white transition-colors cursor-pointer">
-                  Galerías de Conciertos
+                  Galería
                 </button>
               </li>
               <li>
                 <button onClick={() => navTo('videopodcast')} className="hover:text-white transition-colors cursor-pointer">
-                  Videopodcast Oficial
+                  Videopodcast
+                </button>
+              </li>
+              <li>
+                <button onClick={() => navTo('eventos')} className="hover:text-white transition-colors cursor-pointer">
+                  Próximos Eventos
                 </button>
               </li>
             </ul>
@@ -79,22 +82,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectSection }) => {
             <ul className="space-y-2 text-xs">
               <li>
                 <button onClick={() => navTo('radio')} className="hover:text-white transition-colors cursor-pointer">
-                  Radio Online 24/7
-                </button>
-              </li>
-              <li>
-                <button onClick={() => navTo('inicio')} className="hover:text-white transition-colors cursor-pointer">
-                  Cartelera de Giras
-                </button>
-              </li>
-              <li>
-                <button onClick={() => navTo('cms')} className="hover:text-white transition-colors cursor-pointer">
-                  Acceso Redacción
-                </button>
-              </li>
-              <li>
-                <button onClick={() => navTo('resenas')} className="hover:text-white transition-colors cursor-pointer">
-                  Prensa y Promotores
+                  Radio
                 </button>
               </li>
             </ul>
@@ -108,15 +96,71 @@ export const Footer: React.FC<FooterProps> = ({ onSelectSection }) => {
             <p className="text-xs text-[#a1a1aa] leading-relaxed">
               Únete al moshpit digital y recibe el boletín semanal de lanzamientos oscuros.
             </p>
-            <div className="flex items-center gap-2 pt-2">
-              {[Radio, Youtube, Disc, Rss].map((Icon, i) => (
-                <button
-                  key={i}
-                  onClick={() => navTo('radio')}
-                  className="w-8 h-8 rounded-sm bg-[#121214] border border-[#27272a] hover:border-[#dc2626] flex items-center justify-center text-[#a1a1aa] hover:text-white transition-colors cursor-pointer"
+            <div className="flex items-center gap-2 pt-2" role="group" aria-label="Redes sociales">
+              {[
+                {
+                  label: 'YouTube',
+                  className: 'hover:text-[#FF0000] hover:border-[#FF0000]',
+                  icon: <a href="https://www.youtube.com/@TimeOfMetal-mx" target="_blank" rel="noopener noreferrer" className="text-inherit">
+                    <Youtube className="w-4 h-4" aria-hidden="true" />
+                  </a>
+                },
+                {
+                  label: 'Facebook',
+                  className: 'hover:text-[#1877F2] hover:border-[#1877F2]',
+                  icon: (
+                    <a href="https://www.facebook.com/p/Time-Of-Metal-61566383783967/" target="_blank" rel="noopener noreferrer" className="text-inherit">
+                      <svg viewBox="0 0 24 24" className="w-4 h-4" aria-hidden="true">
+                        <path fill="currentColor" d="M13.5 21v-8h2.7l.4-3.1h-3.1v-2c0-.9.3-1.5 1.6-1.5h1.7V3.6c-.3 0-1.3-.1-2.5-.1-2.5 0-4.2 1.5-4.2 4.3v2.1H7.3V13h2.8v8h3.4Z" />
+                      </svg>
+                    </a>
+                  ),
+                },
+                {
+                  label: 'TikTok',
+                  className: 'hover:text-[#25F4EE] hover:border-[#25F4EE]',
+                  icon: (
+                    <a href="https://www.tiktok.com/@timeofmetal" target="_blank" rel="noopener noreferrer" className="text-inherit">
+                      <svg viewBox="0 0 24 24" className="w-4 h-4" aria-hidden="true">
+                        <path fill="currentColor" d="M19.6 8.2a6.7 6.7 0 0 1-4-1.3v8.2a5.6 5.6 0 1 1-5.6-5.6c.4 0 .8 0 1.2.1v3.1a2.6 2.6 0 1 0 1.4 2.4V3h3.1c.2 2 1.7 3.6 3.9 3.8v1.4Z" />
+                      </svg>
+                    </a>
+                  ),
+                },
+                {
+                  label: 'Instagram',
+                  className: 'hover:text-[#E4405F] hover:border-[#E4405F]',
+                  icon: (
+                    <a href="https://www.instagram.com/timeofmetalx/" target="_blank" rel="noopener noreferrer" className="text-inherit">
+                      <svg viewBox="0 0 24 24" className="w-4 h-4" aria-hidden="true">
+                        <rect x="3.5" y="3.5" width="17" height="17" rx="5" fill="none" stroke="currentColor" strokeWidth="2" />
+                        <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" strokeWidth="2" />
+                        <circle cx="17.7" cy="6.8" r="1.1" fill="currentColor" />
+                      </svg>
+                    </a>
+                  ),
+                },
+                {
+                  label: 'Spotify',
+                  className: 'hover:text-[#1DB954] hover:border-[#1DB954]',
+                  icon: (
+                    <a href="https://open.spotify.com/show/46Lm5as6pkUglvkIAzUjLd" target="_blank" rel="noopener noreferrer" className="text-inherit">
+                      <svg viewBox="0 0 24 24" className="w-4 h-4" aria-hidden="true">
+                        <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="2" />
+                        <path d="M7.2 9.2c3.4-1 7.5-.6 10.1 1M8 12.2c2.8-.8 6-.5 8.3.8M8.8 15c2.1-.6 4.5-.3 6.2.7" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="1.6" />
+                      </svg>
+                    </a>
+                  ),
+                },
+              ].map(({ label, className, icon }) => (
+                <span
+                  key={label}
+                  role="img"
+                  aria-label={label}
+                  className={`w-8 h-8 rounded-sm bg-[#121214] border border-[#27272a] flex items-center justify-center text-[#a1a1aa] transition-colors ${className}`}
                 >
-                  <Icon className="w-3.5 h-3.5" />
-                </button>
+                  {icon}
+                </span>
               ))}
             </div>
           </div>
@@ -125,12 +169,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectSection }) => {
         {/* Bottom Copyright */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-[10px] text-[#71717a]">
           <div>
-            © 2025 TIME OF METAL. Todos los derechos reservados. · Dedicado a la preservación del Underground Internacional.
-          </div>
-          <div className="flex items-center gap-6">
-            <button onClick={() => navTo('inicio')} className="hover:text-[#a1a1aa] cursor-pointer">Términos de Uso</button>
-            <button onClick={() => navTo('inicio')} className="hover:text-[#a1a1aa] cursor-pointer">Privacidad</button>
-            <button onClick={() => navTo('resenas')} className="hover:text-[#a1a1aa] cursor-pointer">Manifiesto Editorial</button>
+            © {anioActual} TIME OF METAL. Todos los derechos reservados. · Dedicado a la preservación del Underground Nacional e Internacional.
           </div>
         </div>
       </div>

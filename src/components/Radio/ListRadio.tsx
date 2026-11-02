@@ -14,20 +14,6 @@ const ListRadio: React.FC<ListRadioProps> = ({ currentTrack, onSelectTrack }) =>
                 <span>EN CABINA AHORA (16:00 - 19:00 CET)</span>
             </div>
 
-            <div className="flex items-center gap-4 mb-6">
-                <div>
-                    <h3 className="font-display font-black text-2xl uppercase text-white">
-                        DJ MANRO
-                    </h3>
-                    <div className="font-mono text-xs text-[#DC2626] font-bold uppercase mb-1">
-                        BRUTAL ZONE
-                    </div>
-                    <p className="text-zinc-400 text-xs leading-relaxed">
-                        Seleccionando prensas originales de Osmose Productions, Deathlike Silence y Earache Records (1988–1995).
-                    </p>
-                </div>
-            </div>
-
             <div className="border-t border-zinc-800 pt-4">
                 <h3 className="font-mono text-[10px] uppercase tracking-widest text-zinc-500 mb-3">
                     Lista de reproducción
