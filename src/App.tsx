@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { AudioTrack, SectionId } from './data/mockData';
 import { Navbar } from './components/organism/Navbar';
 import { Footer } from './components/organism/Footer';
@@ -36,6 +36,10 @@ export default function App() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const currentTrackIndexRef = useRef(0);
+
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+  }, [activeSection]);
 
   const handleTogglePlay = async () => {
     const audio = audioRef.current;
@@ -162,7 +166,6 @@ export default function App() {
       });
       setPlayRequestId((requestId) => requestId + 1);
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
