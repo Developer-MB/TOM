@@ -25,7 +25,7 @@ const FilterRegister: React.FC<FilterRegisterProps> = ({
                 type="text"
                 value={searchQuery}
                 onChange={(event) => onSearchQueryChange(event.target.value)}
-                placeholder="Filtrar por código TOM, título o autor..."
+                placeholder="Filtrar por código TOM, banda, disco o autor..."
                 aria-label="Buscar publicaciones"
                 className="w-full bg-[#070709] border border-zinc-800 focus:border-[#DC2626] text-xs font-mono text-white pl-10 pr-4 py-2.5 outline-none"
             />
@@ -50,10 +50,10 @@ const FilterRegister: React.FC<FilterRegisterProps> = ({
                             </td>
                             <td className="py-3.5 px-4">
                                 <div className="font-sans font-bold text-sm text-white">
-                                    {item.title}
+                                    {item.band} — {item.disc}
                                 </div>
                                 <div className="text-[10px] text-zinc-500 mt-0.5">
-                                    {item.category} {item.score ? `· NOTA: ${item.score}` : ''} · {item.date}
+                                    {item.genre} · {item.year} · {item.publish}
                                 </div>
                             </td>
                             <td className="py-3.5 px-4">
@@ -78,14 +78,14 @@ const FilterRegister: React.FC<FilterRegisterProps> = ({
                                 <div className="inline-flex items-center gap-2">
                                     <button
                                         onClick={() => {
-                                            if (item.type === 'RESEÑA') onSelectSection('resenas');
-                                            else if (item.type === 'PODCAST') onSelectSection('videopodcast');
-                                            else if (item.type === 'CRÓNICA') onSelectSection('galeria');
-                                            else onSelectSection('inicio');
+                                            if (item.type === 'RECOMENDACION') onSelectSection('resenas');
+                                            else if (item.type === 'VIDEO') onSelectSection('videopodcast');
+                                            else if (item.type === 'GALERIA') onSelectSection('galeria');
+                                            else onSelectSection('eventos');
                                         }}
                                         className="p-1.5 text-zinc-400 hover:text-white border border-zinc-800 hover:border-zinc-600 cursor-pointer"
                                         title="Ver en portal"
-                                        aria-label={`Ver ${item.title} en el portal`}
+                                        aria-label={`Ver ${item.band} — ${item.disc} en el portal`}
                                     >
                                         <Eye className="w-3.5 h-3.5" />
                                     </button>
@@ -93,7 +93,7 @@ const FilterRegister: React.FC<FilterRegisterProps> = ({
                                         onClick={() => onDeleteItem(item.id)}
                                         className="p-1.5 text-zinc-400 hover:text-[#DC2626] border border-zinc-800 hover:border-[#DC2626] cursor-pointer"
                                         title="Eliminar entrada"
-                                        aria-label={`Eliminar ${item.title}`}
+                                        aria-label={`Eliminar ${item.band} — ${item.disc}`}
                                     >
                                         <Trash2 className="w-3.5 h-3.5" />
                                     </button>

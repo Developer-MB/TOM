@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { SectionId } from '../data/mockData';
 import HeadCMS from '../components/CMS/HeadCMS';
 import ControlModule from '../components/CMS/ControlModule';
 import Nodo from '../components/CMS/Nodo';
 import Metrics from '../components/CMS/Metrics';
-import PublisherForm from '../components/CMS/PublisherForm';
-import { INITIAL_CMS_ITEMS, type CmsPostItem, type CmsPostType } from '../data/Cms';
 import HeadPubliRegister from '../components/CMS/HeadPubliRegister';
 import FilterRegister from '../components/CMS/FilterRegister';
+import PublishDiscForm from '../components/CMS/PublishDiscForm';
+import type { CmsPostCreateInput, CmsPostItem, CmsPostType } from '../data/Cms';
 
 interface CmsSectionProps {
   onSelectSection: (section: SectionId) => void;
@@ -16,39 +16,90 @@ interface CmsSectionProps {
 type CmsFilterType = CmsPostType | 'TODOS';
 
 export const CmsSection: React.FC<CmsSectionProps> = ({ onSelectSection }) => {
-  const [items, setItems] = useState<CmsPostItem[]>(INITIAL_CMS_ITEMS);
+  const [items, setItems] = useState<CmsPostItem[]>([]);
   const [filterType, setFilterType] = useState<CmsFilterType>('TODOS');
   const [searchQuery, setSearchQuery] = useState('');
+  const [isLoadingPosts, setIsLoadingPosts] = useState(true);
+  const [persistenceError, setPersistenceError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const loadPosts = async () => {
+      try {
+        const response = await fetch('/api/cms/posts', { signal: controller.signal });
+        if (!response.ok) {
+          const result = await response.json() as { error?: string };
+          throw new Error(result.error ?? 'No se pudieron cargar las publicaciones.');
+        }
+
+        const posts: unknown = await response.json();
+        if (!Array.isArray(posts)) {
+          throw new Error('El servidor devolvió una lista de publicaciones no válida.');
+        }
+
+        setItems(posts as CmsPostItem[]);
+        setPersistenceError(null);
+      } catch (error) {
+        if (controller.signal.aborted) return;
+        const message = error instanceof Error ? error.message : 'No se pudieron cargar las publicaciones.';
+        setPersistenceError(message);
+      } finally {
+        if (!controller.signal.aborted) setIsLoadingPosts(false);
+      }
+    };
+
+    void loadPosts();
+    return () => controller.abort();
+  }, []);
 
   const filteredItems = items.filter((item) => {
     const matchesType = filterType === 'TODOS' || item.type === filterType;
     const normalizedQuery = searchQuery.trim().toLowerCase();
     const matchesSearch =
       !normalizedQuery ||
-      item.title.toLowerCase().includes(normalizedQuery) ||
+      item.band.toLowerCase().includes(normalizedQuery) ||
+      item.disc.toLowerCase().includes(normalizedQuery) ||
       item.code.toLowerCase().includes(normalizedQuery) ||
       item.author.toLowerCase().includes(normalizedQuery);
 
     return matchesType && matchesSearch;
   });
 
-  const handleCreatePost = (post: Omit<CmsPostItem, 'id' | 'code'>): CmsPostItem => {
-    const highestCode = items.reduce((highest, item) => {
-      const codeNumber = Number(item.code.match(/^TOM-(\d+)$/)?.[1]);
-      return Number.isFinite(codeNumber) ? Math.max(highest, codeNumber) : highest;
-    }, 894);
-    const created: CmsPostItem = {
-      ...post,
-      id: `cms-${Date.now()}`,
-      code: `TOM-${highestCode + 1}`,
-    };
+  const handleCreatePost = async (post: CmsPostCreateInput): Promise<CmsPostItem> => {
+    const response = await fetch('/api/cms/posts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(post),
+    });
+    const result = await response.json() as CmsPostItem | { error?: string };
+    if (!response.ok) {
+      throw new Error('error' in result && result.error ? result.error : 'No se pudo guardar la publicación.');
+    }
 
+    const created = result as CmsPostItem;
     setItems((currentItems) => [created, ...currentItems]);
+    setPersistenceError(null);
     return created;
   };
 
-  const handleDeleteItem = (id: string) => {
-    setItems((currentItems) => currentItems.filter((item) => item.id !== id));
+  const handleCreatePostError = (error: unknown) => {
+    setPersistenceError(error instanceof Error ? error.message : 'No se pudo guardar la publicación.');
+  };
+
+  const handleDeleteItem = async (id: string) => {
+    try {
+      const response = await fetch(`/api/cms/posts/${encodeURIComponent(id)}`, { method: 'DELETE' });
+      if (!response.ok) {
+        const result = await response.json() as { error?: string };
+        throw new Error(result.error ?? 'No se pudo eliminar la publicación.');
+      }
+
+      setItems((currentItems) => currentItems.filter((item) => item.id !== id));
+      setPersistenceError(null);
+    } catch (error) {
+      setPersistenceError(error instanceof Error ? error.message : 'No se pudo eliminar la publicación.');
+    }
   };
 
   return (
@@ -75,10 +126,24 @@ export const CmsSection: React.FC<CmsSectionProps> = ({ onSelectSection }) => {
             <Metrics />
 
             {/* QUICK EDITORIAL PUBLISHER FORM */}
-            <PublisherForm onCreatePost={handleCreatePost} />
+            <PublishDiscForm
+              onCreatePost={handleCreatePost}
+              onCreatePostError={handleCreatePostError}
+              disabled={isLoadingPosts}
+            />
 
             {/* EDITORIAL QUEUE TABLE */}
             <div className="border border-zinc-800 bg-[#0E0E12] p-6">
+              {isLoadingPosts && (
+                <p className="mb-6 border border-zinc-800 bg-[#0E0E12] px-4 py-3 text-xs text-zinc-400">
+                  Cargando publicaciones guardadas…
+                </p>
+              )}
+              {persistenceError && (
+                <div role="alert" className="mb-4 border border-red-900 bg-red-950/40 px-4 py-3 text-xs text-red-300">
+                  {persistenceError}
+                </div>
+              )}
               <HeadPubliRegister
                 count={filteredItems.length}
                 filterType={filterType}

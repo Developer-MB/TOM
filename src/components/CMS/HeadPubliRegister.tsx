@@ -9,7 +9,7 @@ interface HeadPubliRegisterProps {
     onFilterChange: (filterType: CmsFilterType) => void;
 }
 
-const FILTER_TYPES: CmsFilterType[] = ['TODOS', 'RESEÑA', 'PODCAST', 'CRÓNICA', 'NOTICIA'];
+const FILTER_TYPES: CmsFilterType[] = ['TODOS', 'RECOMENDACION', 'GALERIA', 'VIDEO', 'GIRAS'];
 
 const HeadPubliRegister: React.FC<HeadPubliRegisterProps> = ({
     count,
@@ -38,7 +38,7 @@ const HeadPubliRegister: React.FC<HeadPubliRegisterProps> = ({
                         : 'bg-[#070709] text-zinc-400 border-zinc-800 hover:text-white'
                         }`}
                 >
-                    {type}
+                    {type === 'RECOMENDACION' ? 'RECOMENDACIÓN' : type === 'GALERIA' ? 'GALERÍA' : type}
                 </button>
             ))}
         </div>

@@ -25,6 +25,16 @@ El comando inicia ambos procesos. Vite sirve el frontend en el puerto `3000` y r
 
 Cada respuesta contiene el título del canal, `items` con ID, título, descripción, fecha y miniatura, y el token de paginación si hay más videos. Las respuestas se almacenan en memoria durante 10 minutos.
 
+## Publicaciones del CMS
+
+Las publicaciones del CMS se guardan en `data/post-disc.json` en el servidor:
+
+- `GET /api/cms/posts` carga la cola editorial.
+- `POST /api/cms/posts` valida y guarda los datos, genera un ID y un código secuencial por tipo (por ejemplo, `TOM-REC-0009`), y almacena la portada en `public/image/discos/`.
+- `DELETE /api/cms/posts/:id` elimina una publicación.
+
+El archivo se inicializa con las publicaciones de ejemplo si todavía no existe. Estos endpoints requieren que el backend de Node.js esté ejecutándose; un despliegue estático por sí solo no puede escribir en el JSON.
+
 ## Producción
 
 Despliega la aplicación en un hosting que ejecute Node.js, configura `YOUTUBE_API_KEY` como variable secreta del entorno y ejecuta:
