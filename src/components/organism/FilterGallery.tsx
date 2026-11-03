@@ -1,60 +1,34 @@
 import React, { useState } from 'react'
-import { GALLERY_FILTERS, HOME_PICS } from '@/src/data/HomePics';
-import { Camera, MapPin, Maximize2, Search } from 'lucide-react';
+import { getGalleryFilters, type HomeGalleryItem } from '@/src/data/HomePics';
+import { Search } from 'lucide-react';
 import Gallery from '../Gallery/Gallery';
 
-type EditorialGallery = (typeof HOME_PICS)[number] & {
-    id: string;
-    date: string;
-    venue: string;
-    photosCount: string;
-    title: string;
-    desc: string;
-    photographer: string;
-    category: string;
-    image: string;
-};
+interface FilterGalleryProps {
+    galleries: HomeGalleryItem[];
+}
 
-const editorialGalleries = HOME_PICS.filter(
-    (gallery): gallery is EditorialGallery =>
-        typeof gallery.id === 'string' &&
-        typeof gallery.date === 'string' &&
-        typeof gallery.venue === 'string' &&
-        typeof gallery.photosCount === 'string' &&
-        typeof gallery.title === 'string' &&
-        typeof gallery.desc === 'string' &&
-        typeof gallery.photographer === 'string' &&
-        typeof gallery.category === 'string' &&
-        typeof gallery.image === 'string',
-);
-
-const FilterGallery = () => {
+const FilterGallery: React.FC<FilterGalleryProps> = ({ galleries }) => {
     const [activeFilter, setActiveFilter] = useState('TODOS LOS EVENTOS');
     const [searchQuery, setSearchQuery] = useState('');
-    const filteredGalleries = editorialGalleries.filter((g) => {
+    const galleryFilters = getGalleryFilters(galleries);
+    const filteredGalleries = galleries.filter((g) => {
         const matchesCategory =
             activeFilter === 'TODOS LOS EVENTOS' || g.category === activeFilter;
         const matchesSearch =
             !searchQuery.trim() ||
             g.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
             g.venue.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            g.photographer.toLowerCase().includes(searchQuery.toLowerCase());
+            g.concert.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            g.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            g.credit.toLowerCase().includes(searchQuery.toLowerCase());
         return matchesCategory && matchesSearch;
     });
-    const [lightboxItem, setLightboxItem] = useState<{
-        title: string;
-        venue: string;
-        date: string;
-        photographer: string;
-        image: string;
-        exif: string;
-    } | null>(null);
     return (
         <section className="max-w-[1440px] mx-auto lg:px-8 pb-10">
             <div className="mx-auto pb-8">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#0E0E12] border border-zinc-800 p-4">
                     <div className="flex flex-wrap items-center gap-2">
-                        {GALLERY_FILTERS.map((f) => {
+                        {galleryFilters.map((f) => {
                             const active = activeFilter === f.id;
                             return (
                                 <button
@@ -90,7 +64,7 @@ const FilterGallery = () => {
                 </div>
             </div>
             <div>
-                <Gallery />
+                <Gallery galleries={filteredGalleries} />
             </div>
         </section>
     )

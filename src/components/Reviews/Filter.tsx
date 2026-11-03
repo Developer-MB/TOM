@@ -21,7 +21,8 @@ const Filter: React.FC<FilterProps> = ({ reviews, filters, onFiltersChange }) =>
     const countries = [...new Set(reviews.map((review) => review.country))].sort();
     const genres = [
         'TODOS',
-        ...new Set(reviews.flatMap((review) => review.genreKey.split('/').map((genre) => genre.trim()))),
+        ...[...new Set(reviews.flatMap((review) => review.genreKey.split('/').map((genre) => genre.trim())))]
+            .sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' })),
     ];
 
     const updateFilter = <K extends keyof ReviewFilters>(key: K, value: ReviewFilters[K]) => {

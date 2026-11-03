@@ -7,39 +7,50 @@ import Metrics from '../components/CMS/Metrics';
 import HeadPubliRegister from '../components/CMS/HeadPubliRegister';
 import FilterRegister from '../components/CMS/FilterRegister';
 import PublishDiscForm from '../components/CMS/PublishDiscForm';
-import { INITIAL_CMS_ITEMS, type CmsPostCreateInput, type CmsPostItem, type CmsPostType } from '../data/Cms';
+import PublishGalleryForm from '../components/CMS/PublishGalleryForm';
+import {
+  INITIAL_CMS_GALLERIES,
+  INITIAL_CMS_ITEMS,
+  type CmsGalleryItem,
+  type CmsPostCreateInput,
+  type CmsPostItem,
+} from '../data/Cms';
 import { readJsonResponse } from '../data/readJsonResponse';
 
 interface CmsSectionProps {
   onSelectSection: (section: SectionId) => void;
 }
 
-type CmsFilterType = CmsPostType | 'TODOS';
+type CmsComposerType = 'RECOMENDACION' | 'GALERIA';
 
 export const CmsSection: React.FC<CmsSectionProps> = ({ onSelectSection }) => {
   const [items, setItems] = useState<CmsPostItem[]>(INITIAL_CMS_ITEMS);
-  const [filterType, setFilterType] = useState<CmsFilterType>('TODOS');
+  const [galleries, setGalleries] = useState<CmsGalleryItem[]>(INITIAL_CMS_GALLERIES);
+  const [editingGallery, setEditingGallery] = useState<CmsGalleryItem | null>(null);
+  const [composerType, setComposerType] = useState<CmsComposerType>('RECOMENDACION');
   const [searchQuery, setSearchQuery] = useState('');
-  const [isLoadingPosts, setIsLoadingPosts] = useState(import.meta.env.DEV);
+  const [isLoadingPosts, setIsLoadingPosts] = useState(true);
   const [persistenceError, setPersistenceError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!import.meta.env.DEV) return;
-
     const controller = new AbortController();
 
     const loadPosts = async () => {
       try {
-        const response = await fetch('/api/cms/posts', { signal: controller.signal });
-        const posts = await readJsonResponse<unknown>(
-          response,
-          'No se pudieron cargar las publicaciones.',
-        );
-        if (!Array.isArray(posts)) {
-          throw new Error('El servidor devolvió una lista de publicaciones no válida.');
+        const [postsResponse, galleriesResponse] = await Promise.all([
+          fetch('/api/cms/posts', { signal: controller.signal }),
+          fetch('/api/cms/galleries', { signal: controller.signal }),
+        ]);
+        const [posts, savedGalleries] = await Promise.all([
+          readJsonResponse<unknown>(postsResponse, 'No se pudieron cargar las publicaciones.'),
+          readJsonResponse<unknown>(galleriesResponse, 'No se pudieron cargar las galerías.'),
+        ]);
+        if (!Array.isArray(posts) || !Array.isArray(savedGalleries)) {
+          throw new Error('El servidor devolvió registros del CMS no válidos.');
         }
 
         setItems(posts as CmsPostItem[]);
+        setGalleries(savedGalleries as CmsGalleryItem[]);
         setPersistenceError(null);
       } catch (error) {
         if (controller.signal.aborted) return;
@@ -51,21 +62,14 @@ export const CmsSection: React.FC<CmsSectionProps> = ({ onSelectSection }) => {
     };
 
     void loadPosts();
-    return () => controller.abort();
+    const intervalId = window.setInterval(() => {
+      void loadPosts();
+    }, 15_000);
+    return () => {
+      controller.abort();
+      window.clearInterval(intervalId);
+    };
   }, []);
-
-  const filteredItems = items.filter((item) => {
-    const matchesType = filterType === 'TODOS' || item.type === filterType;
-    const normalizedQuery = searchQuery.trim().toLowerCase();
-    const matchesSearch =
-      !normalizedQuery ||
-      item.band.toLowerCase().includes(normalizedQuery) ||
-      item.disc.toLowerCase().includes(normalizedQuery) ||
-      item.code.toLowerCase().includes(normalizedQuery) ||
-      item.author.toLowerCase().includes(normalizedQuery);
-
-    return matchesType && matchesSearch;
-  });
 
   const handleCreatePost = async (post: CmsPostCreateInput): Promise<CmsPostItem> => {
     const response = await fetch('/api/cms/posts', {
@@ -84,6 +88,25 @@ export const CmsSection: React.FC<CmsSectionProps> = ({ onSelectSection }) => {
 
   const handleCreatePostError = (error: unknown) => {
     setPersistenceError(error instanceof Error ? error.message : 'No se pudo guardar la publicación.');
+  };
+
+  const handleSaveGallery = (gallery: CmsGalleryItem) => {
+    setGalleries((currentGalleries) => [
+      gallery,
+      ...currentGalleries.filter((current) => current.id !== gallery.id),
+    ]);
+    setPersistenceError(null);
+  };
+
+  const handleContinueGallery = (id: string) => {
+    const gallery = galleries.find((item) => item.id === id);
+    if (!gallery) {
+      setPersistenceError('No se encontró el borrador de galería seleccionado.');
+      return;
+    }
+
+    setEditingGallery(gallery);
+    setComposerType('GALERIA');
   };
 
   const handleDeleteItem = async (id: string) => {
@@ -123,18 +146,42 @@ export const CmsSection: React.FC<CmsSectionProps> = ({ onSelectSection }) => {
             {/* 4 KPI METRIC CARDS */}
             <Metrics />
 
-            {/* QUICK EDITORIAL PUBLISHER FORM */}
-            <PublishDiscForm
-              onCreatePost={handleCreatePost}
-              onCreatePostError={handleCreatePostError}
-              disabled={isLoadingPosts}
-            />
+            <section className="border border-zinc-800 bg-[#0E0E12] p-6">
+              <label className="block max-w-sm">
+                <span className="mb-1.5 block font-mono text-[10px] uppercase tracking-widest text-zinc-400">
+                  TIPO DE PUBLICACIÓN
+                </span>
+                <select
+                  value={composerType}
+                  onChange={(event) => setComposerType(event.target.value as CmsComposerType)}
+                  className="w-full bg-[#070709] border border-zinc-800 focus:border-[#DC2626] px-3.5 py-2.5 text-xs font-mono text-white outline-none"
+                >
+                  <option value="RECOMENDACION">RECOMENDACIÓN</option>
+                  <option value="GALERIA">GALERÍA</option>
+                </select>
+              </label>
+            </section>
+
+            {composerType === 'RECOMENDACION' ? (
+              <PublishDiscForm
+                type={composerType}
+                onCreatePost={handleCreatePost}
+                onCreatePostError={handleCreatePostError}
+                disabled={isLoadingPosts}
+              />
+            ) : (
+              <PublishGalleryForm
+                draft={editingGallery}
+                onSaveGallery={handleSaveGallery}
+                onFinishEditing={() => setEditingGallery(null)}
+              />
+            )}
 
             {/* EDITORIAL QUEUE TABLE */}
             <div className="border border-zinc-800 bg-[#0E0E12] p-6">
               {isLoadingPosts && (
                 <p className="mb-6 border border-zinc-800 bg-[#0E0E12] px-4 py-3 text-xs text-zinc-400">
-                  Cargando publicaciones guardadas…
+                  Cargando publicaciones y galerías guardadas…
                 </p>
               )}
               {persistenceError && (
@@ -143,16 +190,16 @@ export const CmsSection: React.FC<CmsSectionProps> = ({ onSelectSection }) => {
                 </div>
               )}
               <HeadPubliRegister
-                count={filteredItems.length}
-                filterType={filterType}
-                onFilterChange={setFilterType}
+                count={items.length + galleries.length}
               />
               <FilterRegister
-                items={filteredItems}
+                items={items}
+                galleries={galleries}
                 searchQuery={searchQuery}
                 onSearchQueryChange={setSearchQuery}
                 onSelectSection={onSelectSection}
                 onDeleteItem={handleDeleteItem}
+                onContinueGallery={handleContinueGallery}
               />
             </div>
           </div>

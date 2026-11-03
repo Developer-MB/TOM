@@ -2,9 +2,10 @@ import React, { useRef, useState } from 'react';
 import { Plus, Save } from 'lucide-react';
 import type { CmsPostCreateInput, CmsPostItem, CmsPostStatus, CmsPostType } from '../../data/Cms';
 
-type CmsPostFields = Omit<CmsPostItem, 'id' | 'code' | 'cover' | 'publish'>;
+type CmsPostFields = Omit<CmsPostItem, 'id' | 'code' | 'cover' | 'publish' | 'type'>;
 
 interface PublishDiscFormProps {
+    type: CmsPostType;
     onCreatePost: (post: CmsPostCreateInput) => Promise<CmsPostItem>;
     onCreatePostError: (error: unknown) => void;
     disabled?: boolean;
@@ -30,6 +31,7 @@ const toBase64 = (file: File): Promise<string> =>
     });
 
 const PublishDiscForm: React.FC<PublishDiscFormProps> = ({
+    type,
     onCreatePost,
     onCreatePostError,
     disabled = false,
@@ -41,7 +43,6 @@ const PublishDiscForm: React.FC<PublishDiscFormProps> = ({
     const coverInputRef = useRef<HTMLInputElement>(null);
     const [publishDate, setPublishDate] = useState('');
     const [formData, setFormData] = useState<CmsPostFields>({
-        type: 'RECOMENDACION',
         band: '',
         disc: '',
         genre: '',
@@ -95,6 +96,8 @@ const PublishDiscForm: React.FC<PublishDiscFormProps> = ({
         try {
             const created = await onCreatePost({
                 ...formData,
+                type,
+                author: formData.author.trim().toLocaleUpperCase('es'),
                 publish: formData.status === 'PROGRAMADO' ? new Date(publishDate).toISOString() : '',
                 coverImage: {
                     mimeType: coverImage.type,
@@ -147,21 +150,6 @@ const PublishDiscForm: React.FC<PublishDiscFormProps> = ({
 
             <form onSubmit={handleCreatePost} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <label className="block">
-                        <span className="block font-mono text-[10px] uppercase tracking-widest text-zinc-400 mb-1.5">
-                            TIPO
-                        </span>
-                        <select
-                            value={formData.type}
-                            onChange={(event) => updateField('type', event.target.value as CmsPostType)}
-                            className={fieldClassName}
-                        >
-                            <option value="RECOMENDACION">RECOMENDACIÓN</option>
-                            <option value="GALERIA">GALERÍA</option>
-                            <option value="VIDEO">VIDEO</option>
-                            <option value="GIRAS">GIRAS</option>
-                        </select>
-                    </label>
                     {textField('band', 'BANDA', 'Ej: SMOULDER')}
                     {textField('disc', 'DISCO', 'Nombre del álbum')}
                     {textField('genre', 'GÉNERO', 'Ej: DOOM / POWER METAL')}

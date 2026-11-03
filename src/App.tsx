@@ -10,8 +10,14 @@ import { CmsSection } from './sections/CmsSection';
 import { Tours } from './components/Tours/Tours';
 import { AUDIO_ASSETS } from './data/Radio';
 import { RadioSection } from './sections/RadioSection';
-import { INITIAL_CMS_ITEMS, type CmsPostItem } from './data/Cms';
+import {
+  INITIAL_CMS_GALLERIES,
+  INITIAL_CMS_ITEMS,
+  type CmsGalleryItem,
+  type CmsPostItem,
+} from './data/Cms';
 import { readJsonResponse } from './data/readJsonResponse';
+import { toHomeGalleryItems } from './data/HomePics';
 
 const toAudioTrack = (track: (typeof AUDIO_ASSETS)[number]): AudioTrack => ({
   id: track.id,
@@ -30,6 +36,7 @@ export default function App() {
   const [currentTrack, setCurrentTrack] = useState<AudioTrack>(() => toAudioTrack(AUDIO_ASSETS[0]));
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [cmsPosts, setCmsPosts] = useState<CmsPostItem[]>(INITIAL_CMS_ITEMS);
+  const [cmsGalleries, setCmsGalleries] = useState<CmsGalleryItem[]>(INITIAL_CMS_GALLERIES);
   const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(import.meta.env.DEV);
   const [recommendationsError, setRecommendationsError] = useState<string | null>(null);
 
@@ -43,38 +50,45 @@ export default function App() {
   const currentTrackIndexRef = useRef(0);
 
   useEffect(() => {
-    if (!import.meta.env.DEV) return;
-    if (activeSection !== 'inicio' && activeSection !== 'resenas') return;
-
     const controller = new AbortController();
-    setIsLoadingRecommendations(true);
 
-    const loadRecommendations = async () => {
+    const loadCmsEntries = async () => {
       try {
-        const response = await fetch('/api/cms/posts', { signal: controller.signal });
-        const posts = await readJsonResponse<unknown>(
-          response,
-          'No se pudieron cargar las recomendaciones.',
-        );
-        if (!Array.isArray(posts)) {
-          throw new Error('El servidor devolvió una lista de publicaciones no válida.');
+        const [postsResponse, galleriesResponse] = await Promise.all([
+          fetch('/api/cms/posts', { signal: controller.signal }),
+          fetch('/api/cms/galleries', { signal: controller.signal }),
+        ]);
+        const [posts, galleries] = await Promise.all([
+          readJsonResponse<unknown>(postsResponse, 'No se pudieron cargar las publicaciones.'),
+          readJsonResponse<unknown>(galleriesResponse, 'No se pudieron cargar las galerías.'),
+        ]);
+        if (!Array.isArray(posts) || !Array.isArray(galleries)) {
+          throw new Error('El servidor devolvió registros del CMS no válidos.');
         }
 
         setCmsPosts(posts as CmsPostItem[]);
+        setCmsGalleries(galleries as CmsGalleryItem[]);
         setRecommendationsError(null);
       } catch (error) {
         if (controller.signal.aborted) return;
-        setRecommendationsError(
-          error instanceof Error ? error.message : 'No se pudieron cargar las recomendaciones.',
-        );
+        const message = error instanceof Error ? error.message : 'No se pudieron cargar las publicaciones.';
+        if (import.meta.env.DEV) setRecommendationsError(message);
+        console.error('No se pudieron actualizar las entradas del CMS:', error);
       } finally {
         if (!controller.signal.aborted) setIsLoadingRecommendations(false);
       }
     };
 
-    void loadRecommendations();
-    return () => controller.abort();
-  }, [activeSection]);
+    void loadCmsEntries();
+    const intervalId = window.setInterval(() => {
+      void loadCmsEntries();
+    }, 15_000);
+
+    return () => {
+      controller.abort();
+      window.clearInterval(intervalId);
+    };
+  }, []);
 
   useLayoutEffect(() => {
     window.scrollTo(0, 0);
@@ -210,6 +224,7 @@ export default function App() {
   const publishedRecommendations = cmsPosts.filter(
     (post) => post.type === 'RECOMENDACION' && post.status === 'PUBLICADO',
   );
+  const publishedGalleries = toHomeGalleryItems(cmsGalleries);
 
   return (
     <div className="min-h-screen bg-[#000] text-[#F4F4F6] flex flex-col selection:bg-[#DC2626] selection:text-white">
@@ -239,6 +254,7 @@ export default function App() {
           <HomeSection
             onSelectSection={handleSelectSection}
             reviews={publishedRecommendations}
+            galleries={publishedGalleries}
             isLoadingReviews={isLoadingRecommendations}
             reviewsError={recommendationsError}
           />
@@ -263,6 +279,7 @@ export default function App() {
             isPlaying={isPlaying}
             onTogglePlay={handleTogglePlay}
             onSelectSection={handleSelectSection}
+            galleries={publishedGalleries}
           />
         )}
 

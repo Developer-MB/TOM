@@ -9,12 +9,15 @@ import { HOME_VIDEOS, resolveHomeVideoUrl } from '../src/data/HomeVideo';
 import type { YouTubeVideo, YouTubeVideosResponse } from '../src/data/YouTube';
 
 const app = express();
+app.use('/api/cms/galleries', express.json({ limit: '105mb' }));
 app.use(express.json({ limit: '8mb' }));
 const backendDirectory = path.dirname(fileURLToPath(import.meta.url));
 const projectDirectory = path.resolve(backendDirectory, '..');
 const cmsDataDirectory = path.join(projectDirectory, 'data');
 const cmsPostsPath = path.join(cmsDataDirectory, 'post-disc.json');
+const cmsGalleriesPath = path.join(cmsDataDirectory, 'post-pics.json');
 const discCoversDirectory = path.join(projectDirectory, 'public', 'image', 'discos');
+const concertPhotosDirectory = path.join(projectDirectory, 'public', 'image', 'concerts');
 const port = Number(process.env.PORT ?? 3001);
 const cacheDurationMs = 10 * 60 * 1000;
 const maxCachedPages = 10;
@@ -59,7 +62,23 @@ const maxFieldLengths: Record<(typeof requiredPostFields)[number], number> = {
   excerpt: 2000,
   author: 100,
 };
+const maxGalleryImages = 15;
+const maxGalleryFieldLengths = {
+  concert: 150,
+  date: 10,
+  venue: 150,
+  city: 100,
+  title: 200,
+  desc: 2000,
+  credit: 100,
+} as const;
+const galleryFieldNames = Object.keys(maxGalleryFieldLengths) as (keyof typeof maxGalleryFieldLengths)[];
 let cmsMutationQueue: Promise<void> = Promise.resolve();
+
+const isValidEventDate = (date: string) =>
+  /^\d{4}-\d{2}-\d{2}$/.test(date) &&
+  Number.isFinite(Date.parse(date)) &&
+  new Date(`${date}T00:00:00.000Z`).toISOString().slice(0, 10) === date;
 
 const withCmsMutation = <T>(mutation: () => Promise<T>): Promise<T> => {
   const result = cmsMutationQueue.then(mutation);
@@ -69,6 +88,62 @@ const withCmsMutation = <T>(mutation: () => Promise<T>): Promise<T> => {
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
+
+type GalleryImage = { id: number; pic: string };
+type GalleryRecord = {
+  id: string;
+  code?: string;
+  status?: CmsPostStatus;
+  publish?: string;
+  concert: string;
+  date: string;
+  venue: string;
+  city: string;
+  title: string;
+  desc: string;
+  credit: string;
+  img: GalleryImage[];
+};
+
+const isGalleryRecord = (value: unknown): value is GalleryRecord =>
+  isRecord(value) &&
+  typeof value.id === 'string' &&
+  (value.code === undefined || typeof value.code === 'string') &&
+  (value.status === undefined || cmsPostStatuses.includes(value.status as CmsPostStatus)) &&
+  (value.publish === undefined || typeof value.publish === 'string') &&
+  typeof value.concert === 'string' &&
+  typeof value.date === 'string' &&
+  typeof value.venue === 'string' &&
+  typeof value.city === 'string' &&
+  typeof value.title === 'string' &&
+  typeof value.desc === 'string' &&
+  typeof value.credit === 'string' &&
+  Array.isArray(value.img) &&
+  value.img.every((image) =>
+    isRecord(image) && typeof image.id === 'number' && typeof image.pic === 'string'
+  );
+
+const readCmsGalleries = async (): Promise<GalleryRecord[]> => {
+  try {
+    const contents = await readFile(cmsGalleriesPath, 'utf8');
+    const galleries: unknown = JSON.parse(contents);
+    if (!Array.isArray(galleries) || !galleries.every(isGalleryRecord)) {
+      throw new Error('El archivo de galerías del CMS tiene un formato no válido.');
+    }
+    return galleries;
+  } catch (error) {
+    if (!isRecord(error) || error.code !== 'ENOENT') throw error;
+
+    await mkdir(cmsDataDirectory, { recursive: true });
+    await writeFile(cmsGalleriesPath, '[]\n', 'utf8');
+    return [];
+  }
+};
+
+const writeCmsGalleries = async (galleries: GalleryRecord[]) => {
+  await mkdir(cmsDataDirectory, { recursive: true });
+  await writeFile(cmsGalleriesPath, `${JSON.stringify(galleries, null, 2)}\n`, 'utf8');
+};
 
 type CmsPostInputRecord = Record<(typeof requiredPostFields)[number], string> & {
   type: CmsPostType;
@@ -165,9 +240,241 @@ const writeCmsPosts = async (posts: CmsPostItem[]) => {
   await writeFile(cmsPostsPath, `${JSON.stringify(posts, null, 2)}\n`, 'utf8');
 };
 
+const publishScheduledCmsEntries = async () => withCmsMutation(async () => {
+  const now = Date.now();
+  const [posts, galleries] = await Promise.all([readCmsPosts(), readCmsGalleries()]);
+  const publishedPosts = posts.map((post) =>
+    post.status === 'PROGRAMADO' &&
+    Number.isFinite(Date.parse(post.publish)) &&
+    Date.parse(post.publish) <= now
+      ? { ...post, status: 'PUBLICADO' as const }
+      : post,
+  );
+  const publishedGalleries = galleries.map((gallery) =>
+    gallery.status === 'PROGRAMADO' &&
+    typeof gallery.publish === 'string' &&
+    Number.isFinite(Date.parse(gallery.publish)) &&
+    Date.parse(gallery.publish) <= now
+      ? { ...gallery, status: 'PUBLICADO' as const }
+      : gallery,
+  );
+
+  const postsChanged = publishedPosts.some((post, index) => post !== posts[index]);
+  const galleriesChanged = publishedGalleries.some((gallery, index) => gallery !== galleries[index]);
+  if (postsChanged) await writeCmsPosts(publishedPosts);
+  if (galleriesChanged) await writeCmsGalleries(publishedGalleries);
+
+  return postsChanged || galleriesChanged;
+});
+
+type GalleryCreateInput = Record<keyof typeof maxGalleryFieldLengths, string> & {
+  status: CmsPostStatus;
+  publish: string;
+  img: unknown[];
+};
+
+const isGalleryCreateInput = (value: unknown): value is GalleryCreateInput =>
+  isRecord(value) &&
+  cmsPostStatuses.includes(value.status as CmsPostStatus) &&
+  typeof value.publish === 'string' &&
+  galleryFieldNames.every((field) =>
+    typeof value[field] === 'string' && value[field].trim().length > 0
+  ) &&
+  Array.isArray(value.img);
+
+app.get('/api/cms/galleries', async (_request, response) => {
+  try {
+    response.setHeader('Cache-Control', 'no-store');
+    await publishScheduledCmsEntries();
+    response.json(await readCmsGalleries());
+  } catch (error) {
+    console.error('No se pudieron leer las galerías del CMS:', error);
+    response.status(500).json({ error: 'No se pudieron cargar las galerías.' });
+  }
+});
+
+app.post('/api/cms/galleries', async (request, response) => {
+  const body: unknown = request.body;
+  if (!isGalleryCreateInput(body) ||
+    galleryFieldNames.some((field) => body[field].trim().length > maxGalleryFieldLengths[field]) ||
+    !isValidEventDate(body.date) ||
+    body.publish.length > 100 ||
+    (body.status !== 'BORRADOR' && body.img.length === 0) ||
+    body.img.length > maxGalleryImages) {
+    response.status(400).json({
+      error: `Completa los datos de la galería. Los borradores pueden guardarse sin fotos; para publicar o programar selecciona de 1 a ${maxGalleryImages}.`,
+    });
+    return;
+  }
+
+  if (body.status === 'PROGRAMADO' && (!body.publish || !Number.isFinite(Date.parse(body.publish)))) {
+    response.status(400).json({ error: 'Indica una fecha y hora válida para la publicación programada.' });
+    return;
+  }
+
+  const parsedImages = body.img.map(parseCoverImage);
+  if (!parsedImages.every((image): image is NonNullable<typeof image> => image !== null)) {
+    response.status(400).json({ error: 'Cada imagen debe ser JPG, PNG, WebP o GIF y pesar hasta 5 MB.' });
+    return;
+  }
+
+  try {
+    const created = await withCmsMutation(async () => {
+      const galleries = await readCmsGalleries();
+      const id = randomUUID();
+      const savedImagePaths: string[] = [];
+      const codePattern = /^TOM-CON-(\d+)$/;
+      const highestCode = galleries.reduce((highest, gallery) => {
+        const codeNumber = Number(gallery.code?.match(codePattern)?.[1]);
+        return Number.isFinite(codeNumber) ? Math.max(highest, codeNumber) : highest;
+      }, 0);
+
+      try {
+        await mkdir(concertPhotosDirectory, { recursive: true });
+        const img: GalleryImage[] = [];
+        for (const [index, image] of parsedImages.entries()) {
+          const filename = `${randomUUID()}.${image.extension}`;
+          const imagePath = path.join(concertPhotosDirectory, filename);
+          await writeFile(imagePath, image.bytes, { flag: 'wx' });
+          savedImagePaths.push(imagePath);
+          img.push({ id: index + 1, pic: `/image/concerts/${filename}` });
+        }
+
+        const gallery: GalleryRecord = {
+          id,
+          code: `TOM-CON-${String(highestCode + 1).padStart(4, '0')}`,
+          status: body.status,
+          publish: body.status === 'PUBLICADO'
+            ? new Date().toISOString()
+            : body.status === 'PROGRAMADO'
+              ? new Date(body.publish).toISOString()
+              : '',
+          concert: body.concert.trim(),
+          date: body.date,
+          venue: body.venue.trim(),
+          city: body.city.trim(),
+          title: body.title.trim(),
+          desc: body.desc.trim(),
+          credit: body.credit.trim().toLocaleUpperCase('es'),
+          img,
+        };
+        await writeCmsGalleries([gallery, ...galleries]);
+        return gallery;
+      } catch (error) {
+        await Promise.all(savedImagePaths.map((imagePath) => unlink(imagePath)));
+        throw error;
+      }
+    });
+
+    response.status(201).json(created);
+  } catch (error) {
+    console.error('No se pudo guardar la galería del CMS:', error);
+    response.status(500).json({ error: 'No se pudo guardar la galería.' });
+  }
+});
+
+app.put('/api/cms/galleries/:id', async (request, response) => {
+  const body: unknown = request.body;
+  if (!isGalleryCreateInput(body) ||
+    galleryFieldNames.some((field) => body[field].trim().length > maxGalleryFieldLengths[field]) ||
+    !isValidEventDate(body.date) ||
+    body.publish.length > 100 ||
+    body.img.length > maxGalleryImages) {
+    response.status(400).json({ error: `Completa los datos de la galería. Puedes agregar hasta ${maxGalleryImages} fotografías.` });
+    return;
+  }
+
+  if (body.status === 'PROGRAMADO' && (!body.publish || !Number.isFinite(Date.parse(body.publish)))) {
+    response.status(400).json({ error: 'Indica una fecha y hora válida para la publicación programada.' });
+    return;
+  }
+
+  const parsedImages = body.img.map(parseCoverImage);
+  if (!parsedImages.every((image): image is NonNullable<typeof image> => image !== null)) {
+    response.status(400).json({ error: 'Cada imagen debe ser JPG, PNG, WebP o GIF y pesar hasta 5 MB.' });
+    return;
+  }
+
+  try {
+    const result = await withCmsMutation(async () => {
+      const galleries = await readCmsGalleries();
+      const galleryIndex = galleries.findIndex((gallery) => gallery.id === request.params.id);
+      if (galleryIndex === -1) return { kind: 'not-found' as const };
+
+      const previous = galleries[galleryIndex];
+      if ((previous.status ?? 'PUBLICADO') !== 'BORRADOR') {
+        return { kind: 'not-draft' as const };
+      }
+      if (previous.img.length + parsedImages.length > maxGalleryImages) {
+        return { kind: 'too-many-images' as const };
+      }
+
+      const savedImagePaths: string[] = [];
+      try {
+        const addedImages: GalleryImage[] = [];
+        await mkdir(concertPhotosDirectory, { recursive: true });
+        for (const [index, image] of parsedImages.entries()) {
+          const filename = `${randomUUID()}.${image.extension}`;
+          const imagePath = path.join(concertPhotosDirectory, filename);
+          await writeFile(imagePath, image.bytes, { flag: 'wx' });
+          savedImagePaths.push(imagePath);
+          addedImages.push({
+            id: previous.img.length + index + 1,
+            pic: `/image/concerts/${filename}`,
+          });
+        }
+
+        const updated: GalleryRecord = {
+          ...previous,
+          status: body.status,
+          publish: body.status === 'PUBLICADO'
+            ? new Date().toISOString()
+            : body.status === 'PROGRAMADO'
+              ? new Date(body.publish).toISOString()
+              : '',
+          concert: body.concert.trim(),
+          date: body.date,
+          venue: body.venue.trim(),
+          city: body.city.trim(),
+          title: body.title.trim(),
+          desc: body.desc.trim(),
+          credit: body.credit.trim().toLocaleUpperCase('es'),
+          img: [...previous.img, ...addedImages],
+        };
+        const updatedGalleries = [...galleries];
+        updatedGalleries[galleryIndex] = updated;
+        await writeCmsGalleries(updatedGalleries);
+        return { kind: 'updated' as const, gallery: updated };
+      } catch (error) {
+        await Promise.all(savedImagePaths.map((imagePath) => unlink(imagePath)));
+        throw error;
+      }
+    });
+
+    if (result.kind === 'not-found') {
+      response.status(404).json({ error: 'No se encontró el borrador de galería.' });
+      return;
+    }
+    if (result.kind === 'not-draft') {
+      response.status(409).json({ error: 'Solo se pueden continuar galerías guardadas como borrador.' });
+      return;
+    }
+    if (result.kind === 'too-many-images') {
+      response.status(400).json({ error: `La galería no puede superar ${maxGalleryImages} fotografías.` });
+      return;
+    }
+
+    response.json(result.gallery);
+  } catch (error) {
+    console.error('No se pudo continuar la publicación de la galería:', error);
+    response.status(500).json({ error: 'No se pudo actualizar la galería.' });
+  }
+});
+
 app.get('/api/cms/posts', async (_request, response) => {
   try {
     response.setHeader('Cache-Control', 'no-store');
+    await publishScheduledCmsEntries();
     response.json(await readCmsPosts());
   } catch (error) {
     console.error('No se pudieron leer las publicaciones del CMS:', error);
@@ -212,7 +519,7 @@ app.post('/api/cms/posts', async (request, response) => {
         ? new Date(body.publish).toISOString()
         : '',
     status: body.status as CmsPostStatus,
-    author: body.author.trim(),
+    author: body.author.trim().toLocaleUpperCase('es'),
   };
 
   try {
@@ -433,6 +740,24 @@ app.use(express.static(path.join(projectDirectory, 'dist')));
 app.get('*', (_request, response) => {
   response.sendFile(path.join(projectDirectory, 'dist', 'index.html'));
 });
+
+const scheduledPublicationInterval = setInterval(() => {
+  void publishScheduledCmsEntries()
+    .then((changed) => {
+      if (changed) console.info('Se publicaron automáticamente entradas programadas.');
+    })
+    .catch((error: unknown) => {
+      console.error('No se pudieron publicar las entradas programadas:', error);
+    });
+}, 15_000);
+scheduledPublicationInterval.unref();
+void publishScheduledCmsEntries()
+  .then((changed) => {
+    if (changed) console.info('Se publicaron automáticamente entradas programadas.');
+  })
+  .catch((error: unknown) => {
+    console.error('No se pudieron publicar las entradas programadas:', error);
+  });
 
 app.listen(port, () => {
   console.info(`TOM server listening on port ${port}`);

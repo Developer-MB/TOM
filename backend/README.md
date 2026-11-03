@@ -35,6 +35,18 @@ Las publicaciones del CMS se guardan en `data/post-disc.json` en el servidor:
 
 El archivo se inicializa con las publicaciones de ejemplo si todavía no existe. Estos endpoints requieren que el backend de Node.js esté ejecutándose; un despliegue estático por sí solo no puede escribir en el JSON.
 
+## Galerías del CMS
+
+Las galerías creadas desde el CMS se guardan en `data/post-pics.json`:
+
+- `GET /api/cms/galleries` carga las galerías guardadas.
+- `POST /api/cms/galleries` genera un ID y código, guarda hasta 15 imágenes JPG, PNG, WebP o GIF (máximo 5 MB cada una) en `public/image/concerts/` y registra sus rutas, estado y fecha de publicación junto con los datos del evento. Los borradores pueden guardarse sin imágenes; las galerías publicadas o programadas requieren al menos una.
+- `PUT /api/cms/galleries/:id` permite continuar un borrador, conservar sus fotos existentes y agregar imágenes sin superar 15 en total. Mantiene el ID y código, y actualiza el estado y la fecha de publicación.
+
+Como con las publicaciones, guardar galerías requiere que el backend de Node.js esté ejecutándose.
+
+Las publicaciones y galerías programadas cambian a `PUBLICADO` cuando llega su fecha/hora. El backend las revisa periódicamente y también al consultar las listas del CMS.
+
 ## Producción
 
 Despliega la aplicación en un hosting que ejecute Node.js, configura `YOUTUBE_API_KEY` como variable secreta del entorno y ejecuta:

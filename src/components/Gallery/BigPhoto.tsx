@@ -1,26 +1,17 @@
 import React, { useEffect, useState } from 'react'
 import { Calendar, Eye, MapPin } from 'lucide-react'
-import { HOME_PICS } from '@/src/data/HomePics'
+import type { HomeGalleryItem } from '@/src/data/HomePics'
 import ModalGal from './ModalGal'
 
-type HomePhotoGallery = {
-    id: string;
-    img: { id: number; pic: string }[];
-    concert: string;
-    date: string;
-    city: string;
-    title: string;
-    desc: string;
-    credit: string;
-    venue: string;
-};
+type HomePhotoGallery = HomeGalleryItem;
 
-const BigPhoto = () => {
-    const fotoGallery = HOME_PICS.find(
-        (gallery): gallery is HomePhotoGallery =>
-            Array.isArray(gallery.img) &&
-            typeof gallery.concert === 'string' &&
-            typeof gallery.credit === 'string',
+interface BigPhotoProps {
+    galleries: HomePhotoGallery[];
+}
+
+const BigPhoto: React.FC<BigPhotoProps> = ({ galleries }) => {
+    const fotoGallery: HomePhotoGallery | undefined = galleries.find(
+        (gallery) => gallery.img.length > 0,
     )
     const photos = fotoGallery?.img ?? []
     const featuredPhoto = photos[0]
