@@ -22,23 +22,25 @@ const toLocalDateTimeInput = (value: string | undefined) => {
     return new Date(date.getTime() - timezoneOffset).toISOString().slice(0, 16);
 };
 
+const getInitialFormData = (): TourFields => ({
+    month: String(new Date().getMonth() + 1).padStart(2, '0'),
+    day: '',
+    year: String(new Date().getFullYear()),
+    band: '',
+    tourName: '',
+    venue: '',
+    info: '',
+    ticketsInfo: '',
+    ticketsLow: false,
+    status: 'PUBLICADO',
+});
+
 const PublishTourForm: React.FC<PublishTourFormProps> = ({
     draft,
     onSaveTour,
     onFinishEditing,
 }) => {
-    const [formData, setFormData] = useState<TourFields>({
-        month: String(new Date().getMonth() + 1).padStart(2, '0'),
-        day: '',
-        year: String(new Date().getFullYear()),
-        band: '',
-        tourName: '',
-        venue: '',
-        info: '',
-        ticketsInfo: '',
-        ticketsLow: false,
-        status: 'PUBLICADO',
-    });
+    const [formData, setFormData] = useState<TourFields>(getInitialFormData);
     const [publishDate, setPublishDate] = useState('');
     const [formError, setFormError] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -64,6 +66,14 @@ const PublishTourForm: React.FC<PublishTourFormProps> = ({
         setSuccessMessage(null);
         formContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, [draft]);
+
+    const handleCancelEditing = () => {
+        setFormData(getInitialFormData());
+        setPublishDate('');
+        setFormError(null);
+        setSuccessMessage(null);
+        onFinishEditing();
+    };
 
     const updateField = <K extends keyof TourFields>(field: K, value: TourFields[K]) => {
         setFormData((current) => ({ ...current, [field]: value }));
@@ -108,22 +118,11 @@ const PublishTourForm: React.FC<PublishTourFormProps> = ({
             );
 
             onSaveTour(savedTour);
-            setFormData({
-                month: String(new Date().getMonth() + 1).padStart(2, '0'),
-                day: '',
-                year: String(new Date().getFullYear()),
-                band: '',
-                tourName: '',
-                venue: '',
-                info: '',
-                ticketsInfo: '',
-                ticketsLow: false,
-                status: 'PUBLICADO',
-            });
+            setFormData(getInitialFormData());
             setPublishDate('');
             setSuccessMessage(
                 draft
-                    ? `Borrador actualizado (${savedTour.code}).`
+                    ? `Gira actualizada (${savedTour.code}).`
                     : `Gira guardada en post-tours.json (ID: ${savedTour.id}, código: ${savedTour.code}).`,
             );
             if (draft) onFinishEditing();
@@ -160,7 +159,7 @@ const PublishTourForm: React.FC<PublishTourFormProps> = ({
         <div ref={formContainerRef} className="border border-zinc-800 bg-[#0E0E12] p-6">
             <div className="flex items-center justify-between pb-4 mb-5 border-b border-zinc-800">
                 <h2 className="font-display font-black text-2xl uppercase text-white">
-                    {draft ? 'CONTINUAR PUBLICACIÓN' : 'PUBLICAR GIRA'}
+                    {draft ? (draft.status === 'BORRADOR' ? 'CONTINUAR PUBLICACIÓN' : 'EDITAR GIRA') : 'PUBLICAR GIRA'}
                 </h2>
                 <CalendarDays className="w-5 h-5 text-[#DC2626]" />
             </div>
@@ -303,13 +302,25 @@ const PublishTourForm: React.FC<PublishTourFormProps> = ({
                             ''
                         )}
                     </div>
-                    <button
-                        type="submit"
-                        disabled={isSaving}
-                        className="bg-[#DC2626] hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-mono text-xs font-bold uppercase tracking-widest px-6 py-3 flex items-center gap-2 transition-colors cursor-pointer"
-                    >
-                        <Save className="w-4 h-4" /> {isSaving ? 'GUARDANDO…' : 'GUARDAR GIRA'}
-                    </button>
+                    <div className="flex gap-2">
+                        {draft && (
+                            <button
+                                type="button"
+                                onClick={handleCancelEditing}
+                                disabled={isSaving}
+                                className="border border-zinc-700 px-4 py-3 font-mono text-xs font-bold uppercase tracking-widest text-zinc-300 hover:text-white disabled:opacity-50 cursor-pointer"
+                            >
+                                CANCELAR
+                            </button>
+                        )}
+                        <button
+                            type="submit"
+                            disabled={isSaving}
+                            className="bg-[#DC2626] hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-mono text-xs font-bold uppercase tracking-widest px-6 py-3 flex items-center gap-2 transition-colors cursor-pointer"
+                        >
+                            <Save className="w-4 h-4" /> {isSaving ? 'GUARDANDO…' : draft ? 'GUARDAR CAMBIOS' : 'GUARDAR GIRA'}
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>

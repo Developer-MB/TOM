@@ -175,7 +175,7 @@ export const CmsSection: React.FC<CmsSectionProps> = ({ onSelectSection }) => {
   const handleContinueTour = (id: string) => {
     const tour = tours.find((item) => item.id === id);
     if (!tour) {
-      setPersistenceError('No se encontró el borrador de gira seleccionado.');
+      setPersistenceError('No se encontró el registro de gira seleccionado.');
       return;
     }
 

@@ -972,10 +972,10 @@ app.put('/api/cms/tours/:id', async (request, response) => {
       const tours = await readCmsTours();
       const tourIndex = tours.findIndex((tour) => tour.id === request.params.id);
       if (tourIndex === -1) return { kind: 'not-found' as const };
-      if (tours[tourIndex].status !== 'BORRADOR') return { kind: 'not-draft' as const };
 
+      const previous = tours[tourIndex];
       const updated: CmsTourItem = {
-        ...tours[tourIndex],
+        ...previous,
         month: body.month.padStart(2, '0'),
         day: body.day.padStart(2, '0'),
         year: body.year,
@@ -987,7 +987,7 @@ app.put('/api/cms/tours/:id', async (request, response) => {
         ticketsLow: body.ticketsLow,
         status: body.status,
         publish: body.status === 'PUBLICADO'
-          ? new Date().toISOString()
+          ? (previous.status === 'PUBLICADO' && previous.publish ? previous.publish : new Date().toISOString())
           : body.status === 'PROGRAMADO'
             ? new Date(body.publish).toISOString()
             : '',
@@ -999,11 +999,7 @@ app.put('/api/cms/tours/:id', async (request, response) => {
     });
 
     if (result.kind === 'not-found') {
-      response.status(404).json({ error: 'No se encontró el borrador de gira.' });
-      return;
-    }
-    if (result.kind === 'not-draft') {
-      response.status(409).json({ error: 'Solo se pueden continuar giras guardadas como borrador.' });
+      response.status(404).json({ error: 'No se encontró el registro de gira.' });
       return;
     }
     response.json(result.tour);

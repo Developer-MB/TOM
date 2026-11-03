@@ -19,6 +19,25 @@ import {
 import { readJsonResponseOrFallback } from './data/readJsonResponse';
 import { toHomeGalleryItems } from './data/HomePics';
 
+const VALID_SECTIONS: SectionId[] = [
+  'inicio',
+  'resenas',
+  'galeria',
+  'videopodcast',
+  'eventos',
+  'radio',
+  'cms',
+];
+
+const getInitialSection = (): SectionId => {
+  if (typeof window === 'undefined') return 'inicio';
+  const params = new URLSearchParams(window.location.search);
+  const sectionParam = params.get('section') || window.location.hash.replace(/^#/, '');
+  return VALID_SECTIONS.includes(sectionParam as SectionId)
+    ? (sectionParam as SectionId)
+    : 'inicio';
+};
+
 const toAudioTrack = (track: (typeof AUDIO_ASSETS)[number]): AudioTrack => ({
   id: track.id,
   title: track.title,
@@ -32,7 +51,7 @@ const toAudioTrack = (track: (typeof AUDIO_ASSETS)[number]): AudioTrack => ({
 });
 
 export default function App() {
-  const [activeSection, setActiveSection] = useState<SectionId>('inicio');
+  const [activeSection, setActiveSection] = useState<SectionId>(getInitialSection);
   const [currentTrack, setCurrentTrack] = useState<AudioTrack>(() => toAudioTrack(AUDIO_ASSETS[0]));
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [cmsPosts, setCmsPosts] = useState<CmsPostItem[]>(INITIAL_CMS_ITEMS);

@@ -24,7 +24,7 @@ const FilterRegister: React.FC<FilterRegisterProps> = ({
     tours,
     searchQuery,
     onSearchQueryChange,
-    onSelectSection,
+    onSelectSection: _onSelectSection,
     onDeleteItem,
     onContinueGallery,
     onContinueVideo,
@@ -235,14 +235,16 @@ const FilterRegister: React.FC<FilterRegisterProps> = ({
                             </td>
                             <td className="py-3.5 px-4 text-right">
                                 <div className="inline-flex items-center gap-2">
-                                    <button
-                                        onClick={() => onSelectSection(entry.section)}
+                                    <a
+                                        href={`/?section=${entry.section}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
                                         className="p-1.5 text-zinc-400 hover:text-white border border-zinc-800 hover:border-zinc-600 cursor-pointer"
                                         title="Ver en portal"
                                         aria-label={`Ver ${entry.title} en el portal`}
                                     >
                                         <Eye className="w-3.5 h-3.5" />
-                                    </button>
+                                    </a>
                                     {!entry.isGallery && (
                                         <button
                                             onClick={() => onDeleteItem(
@@ -276,12 +278,12 @@ const FilterRegister: React.FC<FilterRegisterProps> = ({
                                             <ClipboardEdit className="w-3.5 h-3.5" />
                                         </button>
                                     )}
-                                    {entry.isTour && entry.status === 'BORRADOR' && (
+                                    {entry.isTour && (
                                         <button
                                             onClick={() => onContinueTour(entry.id)}
                                             className="p-1.5 text-amber-400 hover:text-white border border-amber-900 hover:border-amber-500 cursor-pointer"
-                                            title="Continuar publicación del borrador"
-                                            aria-label={`Continuar publicación de ${entry.title}`}
+                                            title={entry.status === 'BORRADOR' ? 'Continuar publicación del borrador' : 'Editar gira'}
+                                            aria-label={`${entry.status === 'BORRADOR' ? 'Continuar publicación de' : 'Editar'} ${entry.title}`}
                                         >
                                             <ClipboardEdit className="w-3.5 h-3.5" />
                                         </button>
