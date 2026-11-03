@@ -71,24 +71,24 @@ const BigPhoto: React.FC<BigPhotoProps> = ({ galleries }) => {
                 {/* Right / Editorial Details */}
                 <div className="lg:col-span-4 p-6 sm:p-8 flex flex-col justify-between border-t lg:border-t-0 lg:border-l border-zinc-800 bg-[#0B0B0E]">
                     <div>
-                        <div className="flex items-center justify-between font-mono text-[11px] text-zinc-400 mb-4 pb-3 border-b border-zinc-800/80">
+                        <div className="flex items-center justify-between font-mono text-[10px] text-zinc-400 mb-4 pb-3 border-b border-zinc-800/80">
                             <span className="flex items-center gap-1.5">
-                                <MapPin className="w-3.5 h-3.5 text-[#DC2626]" /> {fotoGallery?.venue} / {fotoGallery?.city}
+                                <MapPin className="w-4 h-4 text-[#DC2626]" /> {fotoGallery?.venue} / {fotoGallery?.city}
                             </span>
-                            <span className="flex items-center gap-1.5">
+                            <span className="flex items-center gap-2">
                                 <Calendar className="w-3.5 h-3.5 text-zinc-500" /> {fotoGallery?.date}
                             </span>
                         </div>
 
-                        <h2 className="font-display text-2xl sm:text-3xl tracking-tight leading-tight text-[#DC2626]">
+                        <h2 className="font-display text-2xl sm:text-2xl tracking-tight leading-tight text-[#DC2626]">
                             {fotoGallery?.concert}
                         </h2>
-                        <span className='font-display text-2xl sm:text-3xl tracking-tight leading-tight text-[#f0f0f0a2]'>
+                        <span className='font-display text-2xl sm:text-2xl tracking-tight leading-tight text-[#f0f0f0a2]'>
                             {fotoGallery?.title}
                         </span>
 
                         {/* Mini Thumbnail Strip */}
-                        <div className="mb-6">
+                        <div className="mb-6 pt-4">
                             <div className="font-mono text-[10px] uppercase tracking-widest text-zinc-500 mb-4">
                                 VISTA PREVIA DEL CARRETE ({String(photos.length).padStart(2, '0')} FOTOS):
                             </div>

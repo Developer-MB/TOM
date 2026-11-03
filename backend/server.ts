@@ -4,8 +4,16 @@ import { randomUUID } from 'node:crypto';
 import { mkdir, readFile, unlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { INITIAL_CMS_ITEMS, type CmsPostItem, type CmsPostStatus, type CmsPostType } from '../src/data/Cms';
-import { HOME_VIDEOS, resolveHomeVideoUrl } from '../src/data/HomeVideo';
+import {
+  INITIAL_CMS_ITEMS,
+} from '../src/data/Cms';
+import type {
+  CmsPostItem,
+  CmsPostStatus,
+  CmsPostType,
+  CmsVideoItem,
+} from '../src/data/CmsTypes';
+import { resolveHomeVideoUrl } from '../src/data/YouTubeUrl';
 import type { YouTubeVideo, YouTubeVideosResponse } from '../src/data/YouTube';
 
 const app = express();
@@ -16,6 +24,7 @@ const projectDirectory = path.resolve(backendDirectory, '..');
 const cmsDataDirectory = path.join(projectDirectory, 'data');
 const cmsPostsPath = path.join(cmsDataDirectory, 'post-disc.json');
 const cmsGalleriesPath = path.join(cmsDataDirectory, 'post-pics.json');
+const cmsVideosPath = path.join(cmsDataDirectory, 'post-video.json');
 const discCoversDirectory = path.join(projectDirectory, 'public', 'image', 'discos');
 const concertPhotosDirectory = path.join(projectDirectory, 'public', 'image', 'concerts');
 const port = Number(process.env.PORT ?? 3001);
@@ -30,6 +39,11 @@ const cmsTypeCodePrefixes: Record<CmsPostType, string> = {
   VIDEO: 'VID',
   GIRAS: 'GIR',
 };
+const maxVideoFieldLengths = {
+  title: 200,
+  description: 2000,
+  url: 2048,
+} as const;
 const coverImageExtensions = {
   'image/jpeg': 'jpg',
   'image/png': 'png',
@@ -103,6 +117,65 @@ type GalleryRecord = {
   desc: string;
   credit: string;
   img: GalleryImage[];
+};
+
+type CmsVideoInput = {
+  title: string;
+  description: string;
+  url: string;
+  status: CmsPostStatus;
+  publish: string;
+};
+
+const isValidHomeVideoUrl = (url: string) => {
+  try {
+    resolveHomeVideoUrl(url);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+const isCmsVideoItem = (value: unknown): value is CmsVideoItem =>
+  isRecord(value) &&
+  typeof value.id === 'string' &&
+  typeof value.code === 'string' &&
+  /^TOM-VID-\d{4}$/.test(value.code) &&
+  typeof value.title === 'string' &&
+  typeof value.description === 'string' &&
+  typeof value.url === 'string' &&
+  isValidHomeVideoUrl(value.url) &&
+  cmsPostStatuses.includes(value.status as CmsPostStatus) &&
+  typeof value.publish === 'string';
+
+const isCmsVideoInput = (value: unknown): value is CmsVideoInput =>
+  isRecord(value) &&
+  typeof value.title === 'string' &&
+  typeof value.description === 'string' &&
+  typeof value.url === 'string' &&
+  cmsPostStatuses.includes(value.status as CmsPostStatus) &&
+  typeof value.publish === 'string';
+
+const readCmsVideos = async (): Promise<CmsVideoItem[]> => {
+  try {
+    const contents = await readFile(cmsVideosPath, 'utf8');
+    const videos: unknown = JSON.parse(contents);
+    if (!Array.isArray(videos) || !videos.every(isCmsVideoItem)) {
+      throw new Error('El archivo de videos del CMS tiene un formato no válido.');
+    }
+    return videos;
+  } catch (error) {
+    if (!isRecord(error) || error.code !== 'ENOENT') throw error;
+
+    await mkdir(cmsDataDirectory, { recursive: true });
+    await writeFile(cmsVideosPath, '[]\n', 'utf8');
+    return [];
+  }
+};
+
+const writeCmsVideos = async (videos: CmsVideoItem[]) => {
+  await mkdir(cmsDataDirectory, { recursive: true });
+  await writeFile(cmsVideosPath, `${JSON.stringify(videos, null, 2)}\n`, 'utf8');
 };
 
 const isGalleryRecord = (value: unknown): value is GalleryRecord =>
@@ -242,7 +315,11 @@ const writeCmsPosts = async (posts: CmsPostItem[]) => {
 
 const publishScheduledCmsEntries = async () => withCmsMutation(async () => {
   const now = Date.now();
-  const [posts, galleries] = await Promise.all([readCmsPosts(), readCmsGalleries()]);
+  const [posts, galleries, videos] = await Promise.all([
+    readCmsPosts(),
+    readCmsGalleries(),
+    readCmsVideos(),
+  ]);
   const publishedPosts = posts.map((post) =>
     post.status === 'PROGRAMADO' &&
     Number.isFinite(Date.parse(post.publish)) &&
@@ -258,13 +335,22 @@ const publishScheduledCmsEntries = async () => withCmsMutation(async () => {
       ? { ...gallery, status: 'PUBLICADO' as const }
       : gallery,
   );
+  const publishedVideos = videos.map((video) =>
+    video.status === 'PROGRAMADO' &&
+    Number.isFinite(Date.parse(video.publish)) &&
+    Date.parse(video.publish) <= now
+      ? { ...video, status: 'PUBLICADO' as const }
+      : video,
+  );
 
   const postsChanged = publishedPosts.some((post, index) => post !== posts[index]);
   const galleriesChanged = publishedGalleries.some((gallery, index) => gallery !== galleries[index]);
+  const videosChanged = publishedVideos.some((video, index) => video !== videos[index]);
   if (postsChanged) await writeCmsPosts(publishedPosts);
   if (galleriesChanged) await writeCmsGalleries(publishedGalleries);
+  if (videosChanged) await writeCmsVideos(publishedVideos);
 
-  return postsChanged || galleriesChanged;
+  return postsChanged || galleriesChanged || videosChanged;
 });
 
 type GalleryCreateInput = Record<keyof typeof maxGalleryFieldLengths, string> & {
@@ -579,6 +665,150 @@ app.delete('/api/cms/posts/:id', async (request, response) => {
   }
 });
 
+app.get('/api/cms/videos', async (_request, response) => {
+  try {
+    response.setHeader('Cache-Control', 'no-store');
+    await publishScheduledCmsEntries();
+    response.json(await readCmsVideos());
+  } catch (error) {
+    console.error('No se pudieron leer los videos del CMS:', error);
+    response.status(500).json({ error: 'No se pudieron cargar los videos.' });
+  }
+});
+
+app.post('/api/cms/videos', async (request, response) => {
+  const body: unknown = request.body;
+  if (!isCmsVideoInput(body) ||
+    !body.title.trim() ||
+    !body.description.trim() ||
+    !body.url.trim() ||
+    body.title.trim().length > maxVideoFieldLengths.title ||
+    body.description.trim().length > maxVideoFieldLengths.description ||
+    body.url.trim().length > maxVideoFieldLengths.url ||
+    body.publish.length > 100 ||
+    !isValidHomeVideoUrl(body.url.trim())) {
+    response.status(400).json({ error: 'Completa el título, la descripción y una URL válida de YouTube.' });
+    return;
+  }
+
+  if (body.status === 'PROGRAMADO' && (!body.publish || !Number.isFinite(Date.parse(body.publish)))) {
+    response.status(400).json({ error: 'Indica una fecha y hora válida para la publicación programada.' });
+    return;
+  }
+
+  try {
+    const created = await withCmsMutation(async () => {
+      const videos = await readCmsVideos();
+      const codePattern = /^TOM-VID-(\d+)$/;
+      const highestCode = videos.reduce((highest, video) => {
+        const codeNumber = Number(video.code.match(codePattern)?.[1]);
+        return Number.isFinite(codeNumber) ? Math.max(highest, codeNumber) : highest;
+      }, 0);
+      const video: CmsVideoItem = {
+        id: randomUUID(),
+        code: `TOM-VID-${String(highestCode + 1).padStart(4, '0')}`,
+        title: body.title.trim(),
+        description: body.description.trim(),
+        url: body.url.trim(),
+        status: body.status,
+        publish: body.status === 'PUBLICADO'
+          ? new Date().toISOString()
+          : body.status === 'PROGRAMADO'
+            ? new Date(body.publish).toISOString()
+            : '',
+      };
+      await writeCmsVideos([video, ...videos]);
+      return video;
+    });
+
+    response.status(201).json(created);
+  } catch (error) {
+    console.error('No se pudo guardar el video del CMS:', error);
+    response.status(500).json({ error: 'No se pudo guardar el video.' });
+  }
+});
+
+app.put('/api/cms/videos/:id', async (request, response) => {
+  const body: unknown = request.body;
+  if (!isCmsVideoInput(body) ||
+    !body.title.trim() ||
+    !body.description.trim() ||
+    !body.url.trim() ||
+    body.title.trim().length > maxVideoFieldLengths.title ||
+    body.description.trim().length > maxVideoFieldLengths.description ||
+    body.url.trim().length > maxVideoFieldLengths.url ||
+    body.publish.length > 100 ||
+    !isValidHomeVideoUrl(body.url.trim())) {
+    response.status(400).json({ error: 'Completa el título, la descripción y una URL válida de YouTube.' });
+    return;
+  }
+
+  if (body.status === 'PROGRAMADO' && (!body.publish || !Number.isFinite(Date.parse(body.publish)))) {
+    response.status(400).json({ error: 'Indica una fecha y hora válida para la publicación programada.' });
+    return;
+  }
+
+  try {
+    const result = await withCmsMutation(async () => {
+      const videos = await readCmsVideos();
+      const videoIndex = videos.findIndex((video) => video.id === request.params.id);
+      if (videoIndex === -1) return { kind: 'not-found' as const };
+      if (videos[videoIndex].status !== 'BORRADOR') return { kind: 'not-draft' as const };
+
+      const updated: CmsVideoItem = {
+        ...videos[videoIndex],
+        title: body.title.trim(),
+        description: body.description.trim(),
+        url: body.url.trim(),
+        status: body.status,
+        publish: body.status === 'PUBLICADO'
+          ? new Date().toISOString()
+          : body.status === 'PROGRAMADO'
+            ? new Date(body.publish).toISOString()
+            : '',
+      };
+      const updatedVideos = [...videos];
+      updatedVideos[videoIndex] = updated;
+      await writeCmsVideos(updatedVideos);
+      return { kind: 'updated' as const, video: updated };
+    });
+
+    if (result.kind === 'not-found') {
+      response.status(404).json({ error: 'No se encontró el borrador de video.' });
+      return;
+    }
+    if (result.kind === 'not-draft') {
+      response.status(409).json({ error: 'Solo se pueden continuar videos guardados como borrador.' });
+      return;
+    }
+    response.json(result.video);
+  } catch (error) {
+    console.error('No se pudo continuar la publicación del video:', error);
+    response.status(500).json({ error: 'No se pudo actualizar el video.' });
+  }
+});
+
+app.delete('/api/cms/videos/:id', async (request, response) => {
+  try {
+    const deleted = await withCmsMutation(async () => {
+      const videos = await readCmsVideos();
+      const remainingVideos = videos.filter((video) => video.id !== request.params.id);
+      if (remainingVideos.length === videos.length) return false;
+      await writeCmsVideos(remainingVideos);
+      return true;
+    });
+
+    if (!deleted) {
+      response.status(404).json({ error: 'No se encontró el video solicitado.' });
+      return;
+    }
+    response.status(204).end();
+  } catch (error) {
+    console.error('No se pudo eliminar el video del CMS:', error);
+    response.status(500).json({ error: 'No se pudo eliminar el video.' });
+  }
+});
+
 type YouTubeApiResponse<T> = {
   items?: T[];
   nextPageToken?: string;
@@ -601,16 +831,22 @@ type PlaylistItemResponse = {
 
 let channelPromise: Promise<{ channelTitle: string; uploadsPlaylistId: string }> | undefined;
 
-app.get('/api/home/videos', (_request, response) => {
+app.get('/api/home/videos', async (_request, response) => {
   try {
-    const items = HOME_VIDEOS.map((video) => ({
-      ...video,
-      ...resolveHomeVideoUrl(video.url),
-    }));
-    response.setHeader('Cache-Control', 'public, max-age=300');
+    await publishScheduledCmsEntries();
+    const videos = await readCmsVideos();
+    const items = videos
+      .filter((video) => video.status === 'PUBLICADO')
+      .sort((first, second) => Date.parse(second.publish) - Date.parse(first.publish))
+      .map((video) => ({
+        ...video,
+        fecha: video.publish,
+        ...resolveHomeVideoUrl(video.url),
+      }));
+    response.setHeader('Cache-Control', 'no-store');
     response.json({ items });
   } catch (error) {
-    console.error('No se pudieron cargar los videos de HOME_VIDEOS:', error);
+    console.error('No se pudieron cargar los videos publicados:', error);
     response.status(500).json({ error: 'No se pudieron cargar los videos destacados.' });
   }
 });

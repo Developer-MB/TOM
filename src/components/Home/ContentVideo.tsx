@@ -1,22 +1,47 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { ArrowRight } from 'lucide-react';
 import { SectionId } from '@/src/data/mockData';
 import { HOME_VIDEOS, resolveHomeVideoUrl } from '../../data/HomeVideo';
-import type { ResolvedHomeVideo } from '../../data/HomeVideo';
+import type { HomeVideosResponse, ResolvedHomeVideo } from '../../data/HomeVideo';
+import { readJsonResponse } from '../../data/readJsonResponse';
 
 interface ContentVideoProps {
     onSelectSection: (section: SectionId) => void;
 }
 
 export const ContentVideo: React.FC<ContentVideoProps> = ({ onSelectSection }) => {
-    const video = useMemo<ResolvedHomeVideo | undefined>(() => HOME_VIDEOS
+    const [videos, setVideos] = useState<ResolvedHomeVideo[]>(() => HOME_VIDEOS
         .map((item) => ({
             ...item,
             ...resolveHomeVideoUrl(item.url),
         }))
         .sort((first, second) =>
             new Date(second.fecha).getTime() - new Date(first.fecha).getTime()
-        )[0], []);
+        ));
+    const [videoError, setVideoError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const controller = new AbortController();
+        const loadVideos = async () => {
+            try {
+                const response = await fetch('/api/home/videos', { signal: controller.signal });
+                const result = await readJsonResponse<HomeVideosResponse>(
+                    response,
+                    'No se pudieron cargar los videos publicados.',
+                );
+                setVideos(result.items);
+                setVideoError(null);
+            } catch (error) {
+                if (controller.signal.aborted) return;
+                setVideoError(error instanceof Error ? error.message : 'No se pudieron cargar los videos publicados.');
+            }
+        };
+
+        void loadVideos();
+        return () => controller.abort();
+    }, []);
+
+    const video = useMemo(() => videos[0], [videos]);
 
     return (
         <div>
@@ -30,6 +55,11 @@ export const ContentVideo: React.FC<ContentVideoProps> = ({ onSelectSection }) =
                     <ArrowRight className="w-3.5 h-3.5" />
                 </button>
             </div>
+            {videoError && (
+                <p role="alert" className="mb-4 border border-red-900 bg-red-950/40 p-4 text-sm text-red-300">
+                    {videoError} Se muestran los videos guardados localmente.
+                </p>
+            )}
             {video ? (
                 <div className="bg-[#121214] border border-[#27272a] rounded-sm p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                     <div className="lg:col-span-7 space-y-3">

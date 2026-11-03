@@ -1,26 +1,30 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, ClipboardEdit, Eye, Search, Trash2 } from 'lucide-react';
 import type { SectionId } from '../../data/mockData';
-import type { CmsGalleryItem, CmsPostItem } from '../../data/Cms';
+import type { CmsGalleryItem, CmsPostItem, CmsVideoItem } from '../../data/Cms';
 
 interface FilterRegisterProps {
     items: CmsPostItem[];
     galleries: CmsGalleryItem[];
+    videos: CmsVideoItem[];
     searchQuery: string;
     onSearchQueryChange: (query: string) => void;
     onSelectSection: (section: SectionId) => void;
-    onDeleteItem: (id: string) => void;
+    onDeleteItem: (id: string, isVideo: boolean) => void;
     onContinueGallery: (id: string) => void;
+    onContinueVideo: (id: string) => void;
 }
 
 const FilterRegister: React.FC<FilterRegisterProps> = ({
     items,
     galleries,
+    videos,
     searchQuery,
     onSearchQueryChange,
     onSelectSection,
     onDeleteItem,
     onContinueGallery,
+    onContinueVideo,
 }) => {
     const [typeFilter, setTypeFilter] = useState('TODOS');
     const [authorFilter, setAuthorFilter] = useState('TODOS');
@@ -47,6 +51,20 @@ const FilterRegister: React.FC<FilterRegisterProps> = ({
                         ? 'galeria' as const
                         : 'eventos' as const,
             isGallery: false,
+            isVideo: false,
+        })),
+        ...videos.map((video) => ({
+            id: video.id,
+            code: video.code,
+            title: video.title,
+            details: `${video.publish || 'Sin publicar'} · ${video.url}`,
+            type: 'VIDEO',
+            author: 'VIDEOPODCAST',
+            status: video.status,
+            date: video.publish,
+            section: 'videopodcast' as const,
+            isGallery: false,
+            isVideo: true,
         })),
         ...galleries.map((gallery, index) => ({
             id: gallery.id,
@@ -59,8 +77,9 @@ const FilterRegister: React.FC<FilterRegisterProps> = ({
             date: gallery.publish || gallery.date,
             section: 'galeria' as const,
             isGallery: true,
+            isVideo: false,
         })),
-    ], [items, galleries]);
+    ], [items, galleries, videos]);
 
     const authors = useMemo(
         () => [...new Set(entries.map((entry) => entry.author).filter(Boolean))]
@@ -125,7 +144,7 @@ const FilterRegister: React.FC<FilterRegisterProps> = ({
                 type="text"
                 value={searchQuery}
                 onChange={(event) => onSearchQueryChange(event.target.value)}
-                placeholder="Filtrar por ID, banda, disco, concierto, venue o autor..."
+                placeholder="Filtrar por ID, título, concierto, URL o autor..."
                 aria-label="Buscar publicaciones"
                 className="w-full bg-[#070709] border border-zinc-800 focus:border-[#DC2626] text-xs font-mono text-white pl-10 pr-4 py-2.5 outline-none"
             />
@@ -205,7 +224,7 @@ const FilterRegister: React.FC<FilterRegisterProps> = ({
                                     </button>
                                     {!entry.isGallery && (
                                         <button
-                                            onClick={() => onDeleteItem(entry.id)}
+                                            onClick={() => onDeleteItem(entry.id, entry.isVideo)}
                                             className="p-1.5 text-zinc-400 hover:text-[#DC2626] border border-zinc-800 hover:border-[#DC2626] cursor-pointer"
                                             title="Eliminar entrada"
                                             aria-label={`Eliminar ${entry.title}`}
@@ -216,6 +235,16 @@ const FilterRegister: React.FC<FilterRegisterProps> = ({
                                     {entry.isGallery && entry.status === 'BORRADOR' && (
                                         <button
                                             onClick={() => onContinueGallery(entry.id)}
+                                            className="p-1.5 text-amber-400 hover:text-white border border-amber-900 hover:border-amber-500 cursor-pointer"
+                                            title="Continuar publicación del borrador"
+                                            aria-label={`Continuar publicación de ${entry.title}`}
+                                        >
+                                            <ClipboardEdit className="w-3.5 h-3.5" />
+                                        </button>
+                                    )}
+                                    {entry.isVideo && entry.status === 'BORRADOR' && (
+                                        <button
+                                            onClick={() => onContinueVideo(entry.id)}
                                             className="p-1.5 text-amber-400 hover:text-white border border-amber-900 hover:border-amber-500 cursor-pointer"
                                             title="Continuar publicación del borrador"
                                             aria-label={`Continuar publicación de ${entry.title}`}

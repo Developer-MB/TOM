@@ -11,22 +11,27 @@ import PublishGalleryForm from '../components/CMS/PublishGalleryForm';
 import {
   INITIAL_CMS_GALLERIES,
   INITIAL_CMS_ITEMS,
+  type CmsVideoItem,
   type CmsGalleryItem,
   type CmsPostCreateInput,
   type CmsPostItem,
 } from '../data/Cms';
 import { readJsonResponse } from '../data/readJsonResponse';
+import PublishVideoForm from '../components/CMS/PublishVideoForm';
+import { INITIAL_CMS_VIDEOS } from '../data/HomeVideo';
 
 interface CmsSectionProps {
   onSelectSection: (section: SectionId) => void;
 }
 
-type CmsComposerType = 'RECOMENDACION' | 'GALERIA';
+type CmsComposerType = 'RECOMENDACION' | 'GALERIA' | 'VIDEO';
 
 export const CmsSection: React.FC<CmsSectionProps> = ({ onSelectSection }) => {
   const [items, setItems] = useState<CmsPostItem[]>(INITIAL_CMS_ITEMS);
   const [galleries, setGalleries] = useState<CmsGalleryItem[]>(INITIAL_CMS_GALLERIES);
+  const [videos, setVideos] = useState<CmsVideoItem[]>(INITIAL_CMS_VIDEOS);
   const [editingGallery, setEditingGallery] = useState<CmsGalleryItem | null>(null);
+  const [editingVideo, setEditingVideo] = useState<CmsVideoItem | null>(null);
   const [composerType, setComposerType] = useState<CmsComposerType>('RECOMENDACION');
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoadingPosts, setIsLoadingPosts] = useState(true);
@@ -37,20 +42,23 @@ export const CmsSection: React.FC<CmsSectionProps> = ({ onSelectSection }) => {
 
     const loadPosts = async () => {
       try {
-        const [postsResponse, galleriesResponse] = await Promise.all([
+        const [postsResponse, galleriesResponse, videosResponse] = await Promise.all([
           fetch('/api/cms/posts', { signal: controller.signal }),
           fetch('/api/cms/galleries', { signal: controller.signal }),
+          fetch('/api/cms/videos', { signal: controller.signal }),
         ]);
-        const [posts, savedGalleries] = await Promise.all([
+        const [posts, savedGalleries, savedVideos] = await Promise.all([
           readJsonResponse<unknown>(postsResponse, 'No se pudieron cargar las publicaciones.'),
           readJsonResponse<unknown>(galleriesResponse, 'No se pudieron cargar las galerías.'),
+          readJsonResponse<unknown>(videosResponse, 'No se pudieron cargar los videos.'),
         ]);
-        if (!Array.isArray(posts) || !Array.isArray(savedGalleries)) {
+        if (!Array.isArray(posts) || !Array.isArray(savedGalleries) || !Array.isArray(savedVideos)) {
           throw new Error('El servidor devolvió registros del CMS no válidos.');
         }
 
         setItems(posts as CmsPostItem[]);
         setGalleries(savedGalleries as CmsGalleryItem[]);
+        setVideos(savedVideos as CmsVideoItem[]);
         setPersistenceError(null);
       } catch (error) {
         if (controller.signal.aborted) return;
@@ -98,6 +106,14 @@ export const CmsSection: React.FC<CmsSectionProps> = ({ onSelectSection }) => {
     setPersistenceError(null);
   };
 
+  const handleSaveVideo = (video: CmsVideoItem) => {
+    setVideos((currentVideos) => [
+      video,
+      ...currentVideos.filter((current) => current.id !== video.id),
+    ]);
+    setPersistenceError(null);
+  };
+
   const handleContinueGallery = (id: string) => {
     const gallery = galleries.find((item) => item.id === id);
     if (!gallery) {
@@ -109,14 +125,32 @@ export const CmsSection: React.FC<CmsSectionProps> = ({ onSelectSection }) => {
     setComposerType('GALERIA');
   };
 
-  const handleDeleteItem = async (id: string) => {
+  const handleContinueVideo = (id: string) => {
+    const video = videos.find((item) => item.id === id);
+    if (!video) {
+      setPersistenceError('No se encontró el borrador de video seleccionado.');
+      return;
+    }
+
+    setEditingVideo(video);
+    setComposerType('VIDEO');
+  };
+
+  const handleDeleteItem = async (id: string, isVideo: boolean) => {
     try {
-      const response = await fetch(`/api/cms/posts/${encodeURIComponent(id)}`, { method: 'DELETE' });
+      const response = await fetch(
+        `/api/cms/${isVideo ? 'videos' : 'posts'}/${encodeURIComponent(id)}`,
+        { method: 'DELETE' },
+      );
       if (!response.ok) {
-        await readJsonResponse<unknown>(response, 'No se pudo eliminar la publicación.');
+        await readJsonResponse<unknown>(
+          response,
+          isVideo ? 'No se pudo eliminar el video.' : 'No se pudo eliminar la publicación.',
+        );
       }
 
-      setItems((currentItems) => currentItems.filter((item) => item.id !== id));
+      if (isVideo) setVideos((currentVideos) => currentVideos.filter((item) => item.id !== id));
+      else setItems((currentItems) => currentItems.filter((item) => item.id !== id));
       setPersistenceError(null);
     } catch (error) {
       setPersistenceError(error instanceof Error ? error.message : 'No se pudo eliminar la publicación.');
@@ -158,6 +192,7 @@ export const CmsSection: React.FC<CmsSectionProps> = ({ onSelectSection }) => {
                 >
                   <option value="RECOMENDACION">RECOMENDACIÓN</option>
                   <option value="GALERIA">GALERÍA</option>
+                  <option value="VIDEO">VIDEOS</option>
                 </select>
               </label>
             </section>
@@ -169,11 +204,17 @@ export const CmsSection: React.FC<CmsSectionProps> = ({ onSelectSection }) => {
                 onCreatePostError={handleCreatePostError}
                 disabled={isLoadingPosts}
               />
-            ) : (
+            ) : composerType === 'GALERIA' ? (
               <PublishGalleryForm
                 draft={editingGallery}
                 onSaveGallery={handleSaveGallery}
                 onFinishEditing={() => setEditingGallery(null)}
+              />
+            ) : (
+              <PublishVideoForm
+                draft={editingVideo}
+                onSaveVideo={handleSaveVideo}
+                onFinishEditing={() => setEditingVideo(null)}
               />
             )}
 
@@ -181,7 +222,7 @@ export const CmsSection: React.FC<CmsSectionProps> = ({ onSelectSection }) => {
             <div className="border border-zinc-800 bg-[#0E0E12] p-6">
               {isLoadingPosts && (
                 <p className="mb-6 border border-zinc-800 bg-[#0E0E12] px-4 py-3 text-xs text-zinc-400">
-                  Cargando publicaciones y galerías guardadas…
+                  Cargando publicaciones, galerías y videos guardados…
                 </p>
               )}
               {persistenceError && (
@@ -190,16 +231,18 @@ export const CmsSection: React.FC<CmsSectionProps> = ({ onSelectSection }) => {
                 </div>
               )}
               <HeadPubliRegister
-                count={items.length + galleries.length}
+                count={items.length + galleries.length + videos.length}
               />
               <FilterRegister
                 items={items}
                 galleries={galleries}
+                videos={videos}
                 searchQuery={searchQuery}
                 onSearchQueryChange={setSearchQuery}
                 onSelectSection={onSelectSection}
                 onDeleteItem={handleDeleteItem}
                 onContinueGallery={handleContinueGallery}
+                onContinueVideo={handleContinueVideo}
               />
             </div>
           </div>
