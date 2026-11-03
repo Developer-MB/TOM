@@ -3,7 +3,6 @@ import cmsPosts from '../../data/post-disc.json';
 import cmsGalleries from '../../data/post-pics.json';
 import cmsVideos from '../../data/post-video.json';
 import cmsTours from '../../data/post-tours.json';
-import { readMetricsCounter } from '../../backend/metricsStore';
 
 type ApiRequest = IncomingMessage;
 
@@ -28,6 +27,38 @@ const isPublished = (value: unknown, now: number, missingStatusIsPublished = fal
     return Date.parse(value.publish) <= now;
   }
   return missingStatusIsPublished && value.status === undefined;
+};
+
+const readMetricsCounter = async (key: string): Promise<number> => {
+  const url = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!url || !token) throw new Error('Las variables de Redis no están configuradas.');
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(['GET', key]),
+  });
+  if (!response.ok) throw new Error(`Redis respondió HTTP ${response.status}.`);
+
+  const payload: unknown = await response.json();
+  if (!isRecord(payload) || typeof payload.error === 'string') {
+    throw new Error('Redis devolvió una respuesta no válida.');
+  }
+  const result = payload.result;
+  if (result === null) return 0;
+  const count = typeof result === 'number'
+    ? result
+    : typeof result === 'string' && /^\d+$/.test(result)
+      ? Number(result)
+      : Number.NaN;
+  if (!Number.isSafeInteger(count) || count < 0) {
+    throw new Error('Redis devolvió un contador no válido.');
+  }
+  return count;
 };
 
 export default async function handler(_request: ApiRequest, response: ServerResponse) {

@@ -1,8 +1,15 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import tours from '../../data/post-tours.json';
-import { respondWithJsonGet } from '../../backend/vercelApi';
 
 export default function handler(request: IncomingMessage, response: ServerResponse) {
+  response.setHeader('Cache-Control', 'no-store');
+  response.setHeader('Content-Type', 'application/json; charset=utf-8');
+  if (request.method !== 'GET') {
+    response.setHeader('Allow', 'GET');
+    response.statusCode = 405;
+    response.end(JSON.stringify({ error: 'Método no permitido.' }));
+    return;
+  }
   const now = Date.now();
   const publishedTours = tours.filter((tour) =>
     tour.status === 'PUBLICADO' ||
@@ -10,5 +17,6 @@ export default function handler(request: IncomingMessage, response: ServerRespon
       Number.isFinite(Date.parse(tour.publish)) &&
       Date.parse(tour.publish) <= now),
   );
-  respondWithJsonGet(request, response, publishedTours);
+  response.statusCode = 200;
+  response.end(JSON.stringify(publishedTours));
 }
