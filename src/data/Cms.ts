@@ -8,6 +8,7 @@ export type {
     CmsPostItem,
     CmsPostStatus,
     CmsPostType,
+    CmsTourItem,
     CmsVideoItem,
 } from './CmsTypes';
 

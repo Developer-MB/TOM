@@ -1,23 +1,16 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { ArrowRight } from 'lucide-react';
 import { SectionId } from '@/src/data/mockData';
-import { HOME_VIDEOS, resolveHomeVideoUrl } from '../../data/HomeVideo';
+import { INITIAL_RESOLVED_HOME_VIDEOS } from '../../data/HomeVideo';
 import type { HomeVideosResponse, ResolvedHomeVideo } from '../../data/HomeVideo';
-import { readJsonResponse } from '../../data/readJsonResponse';
+import { readJsonResponseOrFallback } from '../../data/readJsonResponse';
 
 interface ContentVideoProps {
     onSelectSection: (section: SectionId) => void;
 }
 
 export const ContentVideo: React.FC<ContentVideoProps> = ({ onSelectSection }) => {
-    const [videos, setVideos] = useState<ResolvedHomeVideo[]>(() => HOME_VIDEOS
-        .map((item) => ({
-            ...item,
-            ...resolveHomeVideoUrl(item.url),
-        }))
-        .sort((first, second) =>
-            new Date(second.fecha).getTime() - new Date(first.fecha).getTime()
-        ));
+    const [videos, setVideos] = useState<ResolvedHomeVideo[]>(INITIAL_RESOLVED_HOME_VIDEOS);
     const [videoError, setVideoError] = useState<string | null>(null);
 
     useEffect(() => {
@@ -25,9 +18,10 @@ export const ContentVideo: React.FC<ContentVideoProps> = ({ onSelectSection }) =
         const loadVideos = async () => {
             try {
                 const response = await fetch('/api/home/videos', { signal: controller.signal });
-                const result = await readJsonResponse<HomeVideosResponse>(
+                const result = await readJsonResponseOrFallback<HomeVideosResponse>(
                     response,
                     'No se pudieron cargar los videos publicados.',
+                    { items: INITIAL_RESOLVED_HOME_VIDEOS },
                 );
                 setVideos(result.items);
                 setVideoError(null);

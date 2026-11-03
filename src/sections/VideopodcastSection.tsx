@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Calendar, Play, Search, Volume2 } from 'lucide-react';
 import { AudioTrack, SectionId } from '../data/mockData';
-import { HOME_VIDEOS, resolveHomeVideoUrl, type ResolvedHomeVideo } from '../data/HomeVideo';
+import { INITIAL_RESOLVED_HOME_VIDEOS } from '../data/HomeVideo';
 import type { HomeVideosResponse } from '../data/HomeVideo';
 import type { YouTubeVideo } from '../data/YouTube';
 import HeadVideo from '../components/Videopodcast/HeadVideo';
 import PremierEpisode from '../components/Videopodcast/PremierEpisode';
-import { readJsonResponse } from '../data/readJsonResponse';
+import { readJsonResponseOrFallback } from '../data/readJsonResponse';
 
 interface VideopodcastSectionProps {
   currentTrack: AudioTrack;
@@ -19,9 +19,7 @@ export const VideopodcastSection: React.FC<VideopodcastSectionProps> = ({
   onTogglePlay,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [videosFromCms, setVideosFromCms] = useState<ResolvedHomeVideo[]>(() =>
-    HOME_VIDEOS.map((video) => ({ ...video, ...resolveHomeVideoUrl(video.url) })),
-  );
+  const [videosFromCms, setVideosFromCms] = useState(INITIAL_RESOLVED_HOME_VIDEOS);
   const [videoError, setVideoError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -29,9 +27,10 @@ export const VideopodcastSection: React.FC<VideopodcastSectionProps> = ({
     const loadVideos = async () => {
       try {
         const response = await fetch('/api/home/videos', { signal: controller.signal });
-        const result = await readJsonResponse<HomeVideosResponse>(
+        const result = await readJsonResponseOrFallback<HomeVideosResponse>(
           response,
           'No se pudieron cargar los videos publicados.',
+          { items: INITIAL_RESOLVED_HOME_VIDEOS },
         );
         setVideosFromCms(result.items);
         setVideoError(null);

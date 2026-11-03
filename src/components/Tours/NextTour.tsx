@@ -1,7 +1,13 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { ArrowRight, MapPin } from 'lucide-react'
-import { UPCOMING_TOURS } from '@/src/data/HomeTours'
+import {
+    formatTourMonth,
+    INITIAL_CMS_TOURS,
+    UPCOMING_TOURS,
+    type HomeTour,
+} from '@/src/data/HomeTours'
 import type { SectionId } from '@/src/data/mockData'
+import { readJsonResponseOrFallback } from '@/src/data/readJsonResponse'
 
 interface NextTourProps {
     onSelectSection?: (section: SectionId) => void;
@@ -9,7 +15,35 @@ interface NextTourProps {
 }
 
 const NextTour: React.FC<NextTourProps> = ({ onSelectSection, showAll = false }) => {
-    const tours = showAll ? UPCOMING_TOURS : UPCOMING_TOURS.slice(0, 3);
+    const [allTours, setAllTours] = useState<HomeTour[]>(UPCOMING_TOURS);
+    const [loadError, setLoadError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const controller = new AbortController();
+        const loadTours = async () => {
+            try {
+                const response = await fetch('/api/home/tours', { signal: controller.signal });
+                const publishedTours = await readJsonResponseOrFallback<HomeTour[]>(
+                    response,
+                    'No se pudieron cargar las giras publicadas.',
+                    INITIAL_CMS_TOURS.filter((tour) => tour.status === 'PUBLICADO'),
+                );
+                if (!Array.isArray(publishedTours)) {
+                    throw new Error('El servidor devolvió una lista de giras no válida.');
+                }
+                setAllTours(publishedTours);
+                setLoadError(null);
+            } catch (error) {
+                if (controller.signal.aborted) return;
+                setLoadError(error instanceof Error ? error.message : 'No se pudieron cargar las giras publicadas.');
+            }
+        };
+
+        void loadTours();
+        return () => controller.abort();
+    }, []);
+
+    const tours = showAll ? allTours : allTours.slice(0, 3);
 
     return (
         <div id={showAll ? 'eventos' : undefined} className="max-w-[1440px] mx-auto px-8 lg:px-8 space-y-6">
@@ -22,6 +56,11 @@ const NextTour: React.FC<NextTourProps> = ({ onSelectSection, showAll = false })
             </div>
 
             <div className="space-y-3 pb-20">
+                {loadError && (
+                    <p role="alert" className="border border-red-900 bg-red-950/40 p-4 text-sm text-red-300">
+                        {loadError} Se muestran las giras incluidas en el sitio.
+                    </p>
+                )}
                 {tours.map((tour) => (
                     <div
                         key={tour.id}
@@ -30,7 +69,7 @@ const NextTour: React.FC<NextTourProps> = ({ onSelectSection, showAll = false })
                         <div className="flex items-center gap-4">
                             <div className="w-14 h-14 bg-[#18181b] border border-[#27272a] rounded-sm flex flex-col items-center justify-center font-mono shrink-0">
                                 <span className="text-[9px] text-[#ef4444] uppercase font-bold">
-                                    {tour.month}
+                                    {formatTourMonth(tour.month)}
                                 </span>
                                 <span className="text-lg font-extrabold text-white leading-none my-0.5">
                                     {tour.day}
@@ -40,16 +79,16 @@ const NextTour: React.FC<NextTourProps> = ({ onSelectSection, showAll = false })
                             <div className="space-y-1">
                                 <div className="flex flex-wrap items-center gap-2.5">
                                     <h3 className="font-display font-bold text-base sm:text-lg text-white">
-                                        {tour.title}
+                                        {tour.band}
                                     </h3>
                                     <span className="px-2 py-0.5 bg-[#18181b] border border-[#3f3f46] font-mono text-[10px] text-[#ef4444] rounded-sm">
-                                        {tour.badge}
+                                        {tour.tourName}
                                     </span>
                                 </div>
                                 <p className="font-mono text-xs text-[#a1a1aa] flex items-center gap-1.5">
                                     <MapPin className="w-3.5 h-3.5 text-[#71717a]" />
                                     <span>
-                                        {tour.venue} • {tour.info}
+                                        {tour.venue}{tour.info ? ` • ${tour.info}` : ''}
                                     </span>
                                 </p>
                             </div>
@@ -57,12 +96,12 @@ const NextTour: React.FC<NextTourProps> = ({ onSelectSection, showAll = false })
 
                         <div className="flex items-center gap-3 self-end sm:self-center">
                             <span
-                                className={`font-mono text-[10px] px-2.5 py-1 rounded-sm border uppercase ${tour.statusUrgent
+                                className={`font-mono text-[10px] px-2.5 py-1 rounded-sm border uppercase ${tour.ticketsLow
                                     ? 'bg-[#dc2626]/15 border-[#991b1b] text-[#ef4444]'
                                     : 'bg-[#18181b] border-[#27272a] text-[#a1a1aa]'
                                     }`}
                             >
-                                {tour.status}
+                                {tour.ticketsInfo || 'INFORMACIÓN PRÓXIMAMENTE'}
                             </span>
                         </div>
                     </div>

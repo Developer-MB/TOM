@@ -46,6 +46,22 @@ export interface CmsVideoItem {
     publish: string;
 }
 
+export interface CmsTourItem {
+    id: string;
+    code: string;
+    month: string;
+    day: string;
+    year: string;
+    band: string;
+    tourName: string;
+    venue: string;
+    info: string;
+    ticketsInfo: string;
+    ticketsLow: boolean;
+    status: CmsPostStatus;
+    publish: string;
+}
+
 export type CmsPostCreateInput = Omit<CmsPostItem, 'id' | 'code' | 'cover'> & {
     coverImage: {
         mimeType: string;

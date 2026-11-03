@@ -16,7 +16,7 @@ import {
   type CmsGalleryItem,
   type CmsPostItem,
 } from './data/Cms';
-import { readJsonResponse } from './data/readJsonResponse';
+import { readJsonResponseOrFallback } from './data/readJsonResponse';
 import { toHomeGalleryItems } from './data/HomePics';
 
 const toAudioTrack = (track: (typeof AUDIO_ASSETS)[number]): AudioTrack => ({
@@ -30,6 +30,22 @@ const toAudioTrack = (track: (typeof AUDIO_ASSETS)[number]): AudioTrack => ({
   currentTime: '',
   bitrate: '320 kbps',
 });
+
+const recordAnalyticsEvent = async (type: 'portal' | 'radio') => {
+  try {
+    const response = await fetch('/api/analytics/events', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type }),
+      keepalive: true,
+    });
+    if (response.status !== 204) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+  } catch (error) {
+    console.error('No se pudo registrar la visita en las métricas:', error);
+  }
+};
 
 export default function App() {
   const [activeSection, setActiveSection] = useState<SectionId>('inicio');
@@ -48,6 +64,13 @@ export default function App() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const currentTrackIndexRef = useRef(0);
+  const hasRecordedPortalVisit = useRef(false);
+
+  useEffect(() => {
+    if (hasRecordedPortalVisit.current) return;
+    hasRecordedPortalVisit.current = true;
+    void recordAnalyticsEvent('portal');
+  }, []);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -59,8 +82,16 @@ export default function App() {
           fetch('/api/cms/galleries', { signal: controller.signal }),
         ]);
         const [posts, galleries] = await Promise.all([
-          readJsonResponse<unknown>(postsResponse, 'No se pudieron cargar las publicaciones.'),
-          readJsonResponse<unknown>(galleriesResponse, 'No se pudieron cargar las galerías.'),
+          readJsonResponseOrFallback<unknown>(
+            postsResponse,
+            'No se pudieron cargar las publicaciones.',
+            INITIAL_CMS_ITEMS,
+          ),
+          readJsonResponseOrFallback<unknown>(
+            galleriesResponse,
+            'No se pudieron cargar las galerías.',
+            INITIAL_CMS_GALLERIES,
+          ),
         ]);
         if (!Array.isArray(posts) || !Array.isArray(galleries)) {
           throw new Error('El servidor devolvió registros del CMS no válidos.');
@@ -212,6 +243,9 @@ export default function App() {
   };
 
   const handleSelectSection = (section: SectionId) => {
+    if (section === 'radio' && activeSection !== 'radio') {
+      void recordAnalyticsEvent('radio');
+    }
     setActiveSection(section);
     if (section === 'radio' && !isPlaying) {
       void audioContextRef.current?.resume().catch((error: unknown) => {

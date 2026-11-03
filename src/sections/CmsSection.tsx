@@ -12,26 +12,31 @@ import {
   INITIAL_CMS_GALLERIES,
   INITIAL_CMS_ITEMS,
   type CmsVideoItem,
+  type CmsTourItem,
   type CmsGalleryItem,
   type CmsPostCreateInput,
   type CmsPostItem,
 } from '../data/Cms';
-import { readJsonResponse } from '../data/readJsonResponse';
+import { readJsonResponse, readJsonResponseOrFallback } from '../data/readJsonResponse';
 import PublishVideoForm from '../components/CMS/PublishVideoForm';
 import { INITIAL_CMS_VIDEOS } from '../data/HomeVideo';
+import PublishTourForm from '../components/CMS/PublishTourForm';
+import { INITIAL_CMS_TOURS } from '../data/HomeTours';
 
 interface CmsSectionProps {
   onSelectSection: (section: SectionId) => void;
 }
 
-type CmsComposerType = 'RECOMENDACION' | 'GALERIA' | 'VIDEO';
+type CmsComposerType = 'RECOMENDACION' | 'GALERIA' | 'VIDEO' | 'TOUR';
 
 export const CmsSection: React.FC<CmsSectionProps> = ({ onSelectSection }) => {
   const [items, setItems] = useState<CmsPostItem[]>(INITIAL_CMS_ITEMS);
   const [galleries, setGalleries] = useState<CmsGalleryItem[]>(INITIAL_CMS_GALLERIES);
   const [videos, setVideos] = useState<CmsVideoItem[]>(INITIAL_CMS_VIDEOS);
+  const [tours, setTours] = useState<CmsTourItem[]>(INITIAL_CMS_TOURS);
   const [editingGallery, setEditingGallery] = useState<CmsGalleryItem | null>(null);
   const [editingVideo, setEditingVideo] = useState<CmsVideoItem | null>(null);
+  const [editingTour, setEditingTour] = useState<CmsTourItem | null>(null);
   const [composerType, setComposerType] = useState<CmsComposerType>('RECOMENDACION');
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoadingPosts, setIsLoadingPosts] = useState(true);
@@ -42,23 +47,47 @@ export const CmsSection: React.FC<CmsSectionProps> = ({ onSelectSection }) => {
 
     const loadPosts = async () => {
       try {
-        const [postsResponse, galleriesResponse, videosResponse] = await Promise.all([
+        const [postsResponse, galleriesResponse, videosResponse, toursResponse] = await Promise.all([
           fetch('/api/cms/posts', { signal: controller.signal }),
           fetch('/api/cms/galleries', { signal: controller.signal }),
           fetch('/api/cms/videos', { signal: controller.signal }),
+          fetch('/api/cms/tours', { signal: controller.signal }),
         ]);
-        const [posts, savedGalleries, savedVideos] = await Promise.all([
-          readJsonResponse<unknown>(postsResponse, 'No se pudieron cargar las publicaciones.'),
-          readJsonResponse<unknown>(galleriesResponse, 'No se pudieron cargar las galerías.'),
-          readJsonResponse<unknown>(videosResponse, 'No se pudieron cargar los videos.'),
+        const [posts, savedGalleries, savedVideos, savedTours] = await Promise.all([
+          readJsonResponseOrFallback<unknown>(
+            postsResponse,
+            'No se pudieron cargar las publicaciones.',
+            INITIAL_CMS_ITEMS,
+          ),
+          readJsonResponseOrFallback<unknown>(
+            galleriesResponse,
+            'No se pudieron cargar las galerías.',
+            INITIAL_CMS_GALLERIES,
+          ),
+          readJsonResponseOrFallback<unknown>(
+            videosResponse,
+            'No se pudieron cargar los videos.',
+            INITIAL_CMS_VIDEOS,
+          ),
+          readJsonResponseOrFallback<unknown>(
+            toursResponse,
+            'No se pudieron cargar las giras.',
+            INITIAL_CMS_TOURS,
+          ),
         ]);
-        if (!Array.isArray(posts) || !Array.isArray(savedGalleries) || !Array.isArray(savedVideos)) {
+        if (
+          !Array.isArray(posts) ||
+          !Array.isArray(savedGalleries) ||
+          !Array.isArray(savedVideos) ||
+          !Array.isArray(savedTours)
+        ) {
           throw new Error('El servidor devolvió registros del CMS no válidos.');
         }
 
         setItems(posts as CmsPostItem[]);
         setGalleries(savedGalleries as CmsGalleryItem[]);
         setVideos(savedVideos as CmsVideoItem[]);
+        setTours(savedTours as CmsTourItem[]);
         setPersistenceError(null);
       } catch (error) {
         if (controller.signal.aborted) return;
@@ -114,6 +143,14 @@ export const CmsSection: React.FC<CmsSectionProps> = ({ onSelectSection }) => {
     setPersistenceError(null);
   };
 
+  const handleSaveTour = (tour: CmsTourItem) => {
+    setTours((currentTours) => [
+      tour,
+      ...currentTours.filter((current) => current.id !== tour.id),
+    ]);
+    setPersistenceError(null);
+  };
+
   const handleContinueGallery = (id: string) => {
     const gallery = galleries.find((item) => item.id === id);
     if (!gallery) {
@@ -136,26 +173,82 @@ export const CmsSection: React.FC<CmsSectionProps> = ({ onSelectSection }) => {
     setComposerType('VIDEO');
   };
 
-  const handleDeleteItem = async (id: string, isVideo: boolean) => {
+  const handleContinueTour = (id: string) => {
+    const tour = tours.find((item) => item.id === id);
+    if (!tour) {
+      setPersistenceError('No se encontró el borrador de gira seleccionado.');
+      return;
+    }
+
+    setEditingTour(tour);
+    setComposerType('TOUR');
+  };
+
+  const handleDeleteItem = async (id: string, type: 'post' | 'video' | 'tour') => {
     try {
       const response = await fetch(
-        `/api/cms/${isVideo ? 'videos' : 'posts'}/${encodeURIComponent(id)}`,
+        `/api/cms/${type === 'post' ? 'posts' : `${type}s`}/${encodeURIComponent(id)}`,
         { method: 'DELETE' },
       );
       if (!response.ok) {
         await readJsonResponse<unknown>(
           response,
-          isVideo ? 'No se pudo eliminar el video.' : 'No se pudo eliminar la publicación.',
+          type === 'video'
+            ? 'No se pudo eliminar el video.'
+            : type === 'tour'
+              ? 'No se pudo eliminar la gira.'
+              : 'No se pudo eliminar la publicación.',
         );
       }
 
-      if (isVideo) setVideos((currentVideos) => currentVideos.filter((item) => item.id !== id));
+      if (type === 'video') setVideos((currentVideos) => currentVideos.filter((item) => item.id !== id));
+      else if (type === 'tour') setTours((currentTours) => currentTours.filter((item) => item.id !== id));
       else setItems((currentItems) => currentItems.filter((item) => item.id !== id));
       setPersistenceError(null);
     } catch (error) {
       setPersistenceError(error instanceof Error ? error.message : 'No se pudo eliminar la publicación.');
     }
   };
+
+  const composerForm = (() => {
+    switch (composerType) {
+      case 'RECOMENDACION':
+        return (
+          <PublishDiscForm
+            type={composerType}
+            onCreatePost={handleCreatePost}
+            onCreatePostError={handleCreatePostError}
+            disabled={isLoadingPosts}
+          />
+        );
+      case 'GALERIA':
+        return (
+          <PublishGalleryForm
+            draft={editingGallery}
+            onSaveGallery={handleSaveGallery}
+            onFinishEditing={() => setEditingGallery(null)}
+          />
+        );
+      case 'VIDEO':
+        return (
+          <PublishVideoForm
+            draft={editingVideo}
+            onSaveVideo={handleSaveVideo}
+            onFinishEditing={() => setEditingVideo(null)}
+          />
+        );
+      case 'TOUR':
+        return (
+          <PublishTourForm
+            draft={editingTour}
+            onSaveTour={handleSaveTour}
+            onFinishEditing={() => setEditingTour(null)}
+          />
+        );
+      default:
+        return null;
+    }
+  })();
 
   return (
     <div className="min-h-screen bg-[#070709] text-[#F4F4F6]">
@@ -193,36 +286,18 @@ export const CmsSection: React.FC<CmsSectionProps> = ({ onSelectSection }) => {
                   <option value="RECOMENDACION">RECOMENDACIÓN</option>
                   <option value="GALERIA">GALERÍA</option>
                   <option value="VIDEO">VIDEOS</option>
+                  <option value="TOUR">TOUR</option>
                 </select>
               </label>
             </section>
 
-            {composerType === 'RECOMENDACION' ? (
-              <PublishDiscForm
-                type={composerType}
-                onCreatePost={handleCreatePost}
-                onCreatePostError={handleCreatePostError}
-                disabled={isLoadingPosts}
-              />
-            ) : composerType === 'GALERIA' ? (
-              <PublishGalleryForm
-                draft={editingGallery}
-                onSaveGallery={handleSaveGallery}
-                onFinishEditing={() => setEditingGallery(null)}
-              />
-            ) : (
-              <PublishVideoForm
-                draft={editingVideo}
-                onSaveVideo={handleSaveVideo}
-                onFinishEditing={() => setEditingVideo(null)}
-              />
-            )}
+            {composerForm}
 
             {/* EDITORIAL QUEUE TABLE */}
             <div className="border border-zinc-800 bg-[#0E0E12] p-6">
               {isLoadingPosts && (
                 <p className="mb-6 border border-zinc-800 bg-[#0E0E12] px-4 py-3 text-xs text-zinc-400">
-                  Cargando publicaciones, galerías y videos guardados…
+                  Cargando publicaciones, galerías, videos y giras guardados…
                 </p>
               )}
               {persistenceError && (
@@ -231,18 +306,20 @@ export const CmsSection: React.FC<CmsSectionProps> = ({ onSelectSection }) => {
                 </div>
               )}
               <HeadPubliRegister
-                count={items.length + galleries.length + videos.length}
+                count={items.length + galleries.length + videos.length + tours.length}
               />
               <FilterRegister
                 items={items}
                 galleries={galleries}
                 videos={videos}
+                tours={tours}
                 searchQuery={searchQuery}
                 onSearchQueryChange={setSearchQuery}
                 onSelectSection={onSelectSection}
                 onDeleteItem={handleDeleteItem}
                 onContinueGallery={handleContinueGallery}
                 onContinueVideo={handleContinueVideo}
+                onContinueTour={handleContinueTour}
               />
             </div>
           </div>

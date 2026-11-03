@@ -221,7 +221,7 @@ const PublishVideoForm: React.FC<PublishVideoFormProps> = ({
                         ) : successMessage ? (
                             <span className="text-emerald-400 font-bold">{successMessage}</span>
                         ) : (
-                            'El servidor generará el ID y el código TOM-VID-0000 automáticamente.'
+                            ''
                         )}
                     </div>
                     <button

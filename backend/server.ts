@@ -11,9 +11,11 @@ import type {
   CmsPostItem,
   CmsPostStatus,
   CmsPostType,
+  CmsTourItem,
   CmsVideoItem,
 } from '../src/data/CmsTypes';
 import { resolveHomeVideoUrl } from '../src/data/YouTubeUrl';
+import { INITIAL_CMS_TOURS } from '../src/data/HomeTours';
 import type { YouTubeVideo, YouTubeVideosResponse } from '../src/data/YouTube';
 
 const app = express();
@@ -25,6 +27,8 @@ const cmsDataDirectory = path.join(projectDirectory, 'data');
 const cmsPostsPath = path.join(cmsDataDirectory, 'post-disc.json');
 const cmsGalleriesPath = path.join(cmsDataDirectory, 'post-pics.json');
 const cmsVideosPath = path.join(cmsDataDirectory, 'post-video.json');
+const cmsToursPath = path.join(cmsDataDirectory, 'post-tours.json');
+const analyticsPath = path.join(cmsDataDirectory, 'analytics.json');
 const discCoversDirectory = path.join(projectDirectory, 'public', 'image', 'discos');
 const concertPhotosDirectory = path.join(projectDirectory, 'public', 'image', 'concerts');
 const port = Number(process.env.PORT ?? 3001);
@@ -43,6 +47,13 @@ const maxVideoFieldLengths = {
   title: 200,
   description: 2000,
   url: 2048,
+} as const;
+const maxTourFieldLengths = {
+  band: 150,
+  tourName: 200,
+  venue: 200,
+  info: 2000,
+  ticketsInfo: 300,
 } as const;
 const coverImageExtensions = {
   'image/jpeg': 'jpg',
@@ -103,6 +114,40 @@ const withCmsMutation = <T>(mutation: () => Promise<T>): Promise<T> => {
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
 
+type AnalyticsMonth = { visits: number; radioEntries: number };
+type AnalyticsData = { months: Record<string, AnalyticsMonth> };
+
+const isAnalyticsData = (value: unknown): value is AnalyticsData =>
+  isRecord(value) &&
+  isRecord(value.months) &&
+  Object.entries(value.months).every(([month, stats]) =>
+    /^\d{4}-\d{2}$/.test(month) &&
+    isRecord(stats) &&
+    Number.isSafeInteger(stats.visits) &&
+    (stats.visits as number) >= 0 &&
+    Number.isSafeInteger(stats.radioEntries) &&
+    (stats.radioEntries as number) >= 0
+  );
+
+const readAnalytics = async (): Promise<AnalyticsData> => {
+  try {
+    const contents = await readFile(analyticsPath, 'utf8');
+    const analytics: unknown = JSON.parse(contents);
+    if (!isAnalyticsData(analytics)) {
+      throw new Error('El archivo de métricas tiene un formato no válido.');
+    }
+    return analytics;
+  } catch (error) {
+    if (!isRecord(error) || error.code !== 'ENOENT') throw error;
+    return { months: {} };
+  }
+};
+
+const writeAnalytics = async (analytics: AnalyticsData) => {
+  await mkdir(cmsDataDirectory, { recursive: true });
+  await writeFile(analyticsPath, `${JSON.stringify(analytics, null, 2)}\n`, 'utf8');
+};
+
 type GalleryImage = { id: number; pic: string };
 type GalleryRecord = {
   id: string;
@@ -125,6 +170,74 @@ type CmsVideoInput = {
   url: string;
   status: CmsPostStatus;
   publish: string;
+};
+
+type CmsTourInput = Omit<CmsTourItem, 'id' | 'code'>;
+
+const isValidTourDate = (year: string, month: string, day: string) => {
+  if (!/^\d{4}$/.test(year) || !/^\d{1,2}$/.test(month) || !/^\d{1,2}$/.test(day)) return false;
+  const parsedYear = Number(year);
+  const parsedMonth = Number(month);
+  const parsedDay = Number(day);
+  if (parsedYear < 2000 || parsedYear > 2100) return false;
+  const date = new Date(Date.UTC(parsedYear, parsedMonth - 1, parsedDay));
+  return parsedMonth >= 1 &&
+    parsedMonth <= 12 &&
+    date.getUTCFullYear() === parsedYear &&
+    date.getUTCMonth() === parsedMonth - 1 &&
+    date.getUTCDate() === parsedDay;
+};
+
+const isCmsTourInput = (value: unknown): value is CmsTourInput =>
+  isRecord(value) &&
+  typeof value.month === 'string' &&
+  typeof value.day === 'string' &&
+  typeof value.year === 'string' &&
+  typeof value.band === 'string' &&
+  typeof value.tourName === 'string' &&
+  typeof value.venue === 'string' &&
+  typeof value.info === 'string' &&
+  typeof value.ticketsInfo === 'string' &&
+  typeof value.ticketsLow === 'boolean' &&
+  cmsPostStatuses.includes(value.status as CmsPostStatus) &&
+  typeof value.publish === 'string';
+
+const isCmsTourItem = (value: unknown): value is CmsTourItem =>
+  isRecord(value) &&
+  typeof value.id === 'string' &&
+  typeof value.code === 'string' &&
+  /^TOM-GIR-\d+$/.test(value.code) &&
+  isCmsTourInput(value) &&
+  isValidTourDate(value.year, value.month, value.day);
+
+const isValidCmsTourInput = (value: unknown): value is CmsTourInput =>
+  isCmsTourInput(value) &&
+  isValidTourDate(value.year, value.month, value.day) &&
+  Object.entries(maxTourFieldLengths).every(([field, maxLength]) =>
+    value[field as keyof typeof maxTourFieldLengths].trim().length <= maxLength
+  ) &&
+  value.publish.length <= 100;
+
+const readCmsTours = async (): Promise<CmsTourItem[]> => {
+  try {
+    const contents = await readFile(cmsToursPath, 'utf8');
+    const tours: unknown = JSON.parse(contents);
+    if (!Array.isArray(tours) || !tours.every(isCmsTourItem)) {
+      throw new Error('El archivo de giras del CMS tiene un formato no válido.');
+    }
+    return tours;
+  } catch (error) {
+    if (!isRecord(error) || error.code !== 'ENOENT') throw error;
+
+    await mkdir(cmsDataDirectory, { recursive: true });
+    await writeFile(cmsToursPath, `${JSON.stringify(INITIAL_CMS_TOURS, null, 2)}\n`, 'utf8');
+    return [...INITIAL_CMS_TOURS];
+  }
+};
+
+const writeCmsTours = async (tours: CmsTourItem[]) => {
+  await mkdir(cmsDataDirectory, { recursive: true });
+  await writeFile(cmsToursPath, `${JSON.stringify(tours, null, 2)}\n`, 'utf8');
 };
 
 const isValidHomeVideoUrl = (url: string) => {
@@ -315,10 +428,11 @@ const writeCmsPosts = async (posts: CmsPostItem[]) => {
 
 const publishScheduledCmsEntries = async () => withCmsMutation(async () => {
   const now = Date.now();
-  const [posts, galleries, videos] = await Promise.all([
+  const [posts, galleries, videos, tours] = await Promise.all([
     readCmsPosts(),
     readCmsGalleries(),
     readCmsVideos(),
+    readCmsTours(),
   ]);
   const publishedPosts = posts.map((post) =>
     post.status === 'PROGRAMADO' &&
@@ -342,15 +456,24 @@ const publishScheduledCmsEntries = async () => withCmsMutation(async () => {
       ? { ...video, status: 'PUBLICADO' as const }
       : video,
   );
+  const publishedTours = tours.map((tour) =>
+    tour.status === 'PROGRAMADO' &&
+    Number.isFinite(Date.parse(tour.publish)) &&
+    Date.parse(tour.publish) <= now
+      ? { ...tour, status: 'PUBLICADO' as const }
+      : tour,
+  );
 
   const postsChanged = publishedPosts.some((post, index) => post !== posts[index]);
   const galleriesChanged = publishedGalleries.some((gallery, index) => gallery !== galleries[index]);
   const videosChanged = publishedVideos.some((video, index) => video !== videos[index]);
+  const toursChanged = publishedTours.some((tour, index) => tour !== tours[index]);
   if (postsChanged) await writeCmsPosts(publishedPosts);
   if (galleriesChanged) await writeCmsGalleries(publishedGalleries);
   if (videosChanged) await writeCmsVideos(publishedVideos);
+  if (toursChanged) await writeCmsTours(publishedTours);
 
-  return postsChanged || galleriesChanged || videosChanged;
+  return postsChanged || galleriesChanged || videosChanged || toursChanged;
 });
 
 type GalleryCreateInput = Record<keyof typeof maxGalleryFieldLengths, string> & {
@@ -809,6 +932,155 @@ app.delete('/api/cms/videos/:id', async (request, response) => {
   }
 });
 
+app.get('/api/cms/tours', async (_request, response) => {
+  try {
+    response.setHeader('Cache-Control', 'no-store');
+    await publishScheduledCmsEntries();
+    response.json(await readCmsTours());
+  } catch (error) {
+    console.error('No se pudieron leer las giras del CMS:', error);
+    response.status(500).json({ error: 'No se pudieron cargar las giras.' });
+  }
+});
+
+app.post('/api/cms/tours', async (request, response) => {
+  const body: unknown = request.body;
+  if (!isValidCmsTourInput(body)) {
+    response.status(400).json({ error: 'Los datos de la gira no son válidos. Revisa la fecha y los campos.' });
+    return;
+  }
+  if (body.status === 'PROGRAMADO' && (!body.publish || !Number.isFinite(Date.parse(body.publish)))) {
+    response.status(400).json({ error: 'Indica una fecha y hora válida para la publicación programada.' });
+    return;
+  }
+
+  try {
+    const created = await withCmsMutation(async () => {
+      const tours = await readCmsTours();
+      const highestCode = tours.reduce((highest, tour) => {
+        const codeNumber = Number(tour.code.match(/^TOM-GIR-(\d+)$/)?.[1]);
+        return Number.isFinite(codeNumber) ? Math.max(highest, codeNumber) : highest;
+      }, 0);
+      const tour: CmsTourItem = {
+        id: randomUUID(),
+        code: `TOM-GIR-${String(highestCode + 1).padStart(4, '0')}`,
+        month: body.month.padStart(2, '0'),
+        day: body.day.padStart(2, '0'),
+        year: body.year,
+        band: body.band.trim(),
+        tourName: body.tourName.trim(),
+        venue: body.venue.trim(),
+        info: body.info.trim(),
+        ticketsInfo: body.ticketsInfo.trim(),
+        ticketsLow: body.ticketsLow,
+        status: body.status,
+        publish: body.status === 'PUBLICADO'
+          ? new Date().toISOString()
+          : body.status === 'PROGRAMADO'
+            ? new Date(body.publish).toISOString()
+            : '',
+      };
+      await writeCmsTours([tour, ...tours]);
+      return tour;
+    });
+
+    response.status(201).json(created);
+  } catch (error) {
+    console.error('No se pudo guardar la gira del CMS:', error);
+    response.status(500).json({ error: 'No se pudo guardar la gira.' });
+  }
+});
+
+app.put('/api/cms/tours/:id', async (request, response) => {
+  const body: unknown = request.body;
+  if (!isValidCmsTourInput(body)) {
+    response.status(400).json({ error: 'Los datos de la gira no son válidos. Revisa la fecha y los campos.' });
+    return;
+  }
+  if (body.status === 'PROGRAMADO' && (!body.publish || !Number.isFinite(Date.parse(body.publish)))) {
+    response.status(400).json({ error: 'Indica una fecha y hora válida para la publicación programada.' });
+    return;
+  }
+
+  try {
+    const result = await withCmsMutation(async () => {
+      const tours = await readCmsTours();
+      const tourIndex = tours.findIndex((tour) => tour.id === request.params.id);
+      if (tourIndex === -1) return { kind: 'not-found' as const };
+      if (tours[tourIndex].status !== 'BORRADOR') return { kind: 'not-draft' as const };
+
+      const updated: CmsTourItem = {
+        ...tours[tourIndex],
+        month: body.month.padStart(2, '0'),
+        day: body.day.padStart(2, '0'),
+        year: body.year,
+        band: body.band.trim(),
+        tourName: body.tourName.trim(),
+        venue: body.venue.trim(),
+        info: body.info.trim(),
+        ticketsInfo: body.ticketsInfo.trim(),
+        ticketsLow: body.ticketsLow,
+        status: body.status,
+        publish: body.status === 'PUBLICADO'
+          ? new Date().toISOString()
+          : body.status === 'PROGRAMADO'
+            ? new Date(body.publish).toISOString()
+            : '',
+      };
+      const updatedTours = [...tours];
+      updatedTours[tourIndex] = updated;
+      await writeCmsTours(updatedTours);
+      return { kind: 'updated' as const, tour: updated };
+    });
+
+    if (result.kind === 'not-found') {
+      response.status(404).json({ error: 'No se encontró el borrador de gira.' });
+      return;
+    }
+    if (result.kind === 'not-draft') {
+      response.status(409).json({ error: 'Solo se pueden continuar giras guardadas como borrador.' });
+      return;
+    }
+    response.json(result.tour);
+  } catch (error) {
+    console.error('No se pudo continuar la publicación de la gira:', error);
+    response.status(500).json({ error: 'No se pudo actualizar la gira.' });
+  }
+});
+
+app.delete('/api/cms/tours/:id', async (request, response) => {
+  try {
+    const deleted = await withCmsMutation(async () => {
+      const tours = await readCmsTours();
+      const remainingTours = tours.filter((tour) => tour.id !== request.params.id);
+      if (remainingTours.length === tours.length) return false;
+      await writeCmsTours(remainingTours);
+      return true;
+    });
+
+    if (!deleted) {
+      response.status(404).json({ error: 'No se encontró la gira solicitada.' });
+      return;
+    }
+    response.status(204).end();
+  } catch (error) {
+    console.error('No se pudo eliminar la gira del CMS:', error);
+    response.status(500).json({ error: 'No se pudo eliminar la gira.' });
+  }
+});
+
+app.get('/api/home/tours', async (_request, response) => {
+  try {
+    await publishScheduledCmsEntries();
+    const tours = await readCmsTours();
+    response.setHeader('Cache-Control', 'no-store');
+    response.json(tours.filter((tour) => tour.status === 'PUBLICADO'));
+  } catch (error) {
+    console.error('No se pudieron cargar las giras publicadas:', error);
+    response.status(500).json({ error: 'No se pudieron cargar las giras publicadas.' });
+  }
+});
+
 type YouTubeApiResponse<T> = {
   items?: T[];
   nextPageToken?: string;
@@ -994,6 +1266,72 @@ void publishScheduledCmsEntries()
   .catch((error: unknown) => {
     console.error('No se pudieron publicar las entradas programadas:', error);
   });
+
+app.post('/api/analytics/events', async (request, response) => {
+  if (!isRecord(request.body) || !['portal', 'radio'].includes(request.body.type as string)) {
+    response.status(400).json({ error: 'El tipo de evento de métricas no es válido.' });
+    return;
+  }
+
+  try {
+    await withCmsMutation(async () => {
+      const analytics = await readAnalytics();
+      const month = new Date().toISOString().slice(0, 7);
+      const stats = analytics.months[month] ?? { visits: 0, radioEntries: 0 };
+      if (request.body.type === 'portal') stats.visits += 1;
+      else stats.radioEntries += 1;
+      analytics.months[month] = stats;
+      await writeAnalytics(analytics);
+    });
+    response.status(204).end();
+  } catch (error) {
+    console.error('No se pudo registrar el evento de métricas:', error);
+    response.status(500).json({ error: 'No se pudo registrar la visita.' });
+  }
+});
+
+app.get('/api/cms/metrics', async (_request, response) => {
+  try {
+    await publishScheduledCmsEntries();
+    const [posts, galleries, videos, tours, analytics] = await Promise.all([
+      readCmsPosts(),
+      readCmsGalleries(),
+      readCmsVideos(),
+      readCmsTours(),
+      withCmsMutation(readAnalytics),
+    ]);
+    const now = new Date();
+    const currentMonth = now.toISOString().slice(0, 7);
+    const previousMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 1, 1))
+      .toISOString()
+      .slice(0, 7);
+    const currentStats = analytics.months[currentMonth] ?? { visits: 0, radioEntries: 0 };
+    const previousVisits = analytics.months[previousMonth]?.visits ?? 0;
+    const isPublishedGallery = (gallery: GalleryRecord) =>
+      (gallery.status ?? 'PUBLICADO') === 'PUBLICADO';
+    const publishedPosts = posts.filter((post) => post.status === 'PUBLICADO').length +
+      galleries.filter(isPublishedGallery).length +
+      videos.filter((video) => video.status === 'PUBLICADO').length +
+      tours.filter((tour) => tour.status === 'PUBLICADO').length;
+    const photoCount = galleries
+      .filter(isPublishedGallery)
+      .reduce((total, gallery) => total + gallery.img.length, 0);
+
+    response.setHeader('Cache-Control', 'no-store');
+    response.json({
+      monthlyVisits: currentStats.visits,
+      radioEntries: currentStats.radioEntries,
+      publishedPosts,
+      photoCount,
+      comparisonPercent: previousVisits > 0
+        ? Math.round(((currentStats.visits - previousVisits) / previousVisits) * 1000) / 10
+        : null,
+    });
+  } catch (error) {
+    console.error('No se pudieron cargar las métricas del CMS:', error);
+    response.status(500).json({ error: 'No se pudieron cargar las métricas.' });
+  }
+});
 
 app.listen(port, () => {
   console.info(`TOM server listening on port ${port}`);

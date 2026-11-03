@@ -30,3 +30,12 @@ export const readJsonResponse = async <T>(
 
   return body as T;
 };
+
+export const readJsonResponseOrFallback = <T>(
+  response: Response,
+  fallbackMessage: string,
+  fallbackValue: T,
+): Promise<T> => {
+  if (response.status === 404) return Promise.resolve(fallbackValue);
+  return readJsonResponse<T>(response, fallbackMessage);
+};
