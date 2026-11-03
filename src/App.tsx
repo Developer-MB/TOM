@@ -334,7 +334,12 @@ export default function App() {
         )}
 
         {activeSection === 'cms' && (
-          <CmsSection onSelectSection={handleSelectSection} />
+          <CmsSection
+            onSelectSection={handleSelectSection}
+            currentTrack={currentTrack}
+            isPlaying={isPlaying}
+            audioAnalyser={audioAnalyser}
+          />
         )}
       </main>
 

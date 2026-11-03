@@ -4,6 +4,7 @@ import type { CmsGalleryItem, CmsPostItem } from './CmsTypes';
 
 export type {
     CmsGalleryItem,
+    CmsNodeStatus,
     CmsPostCreateInput,
     CmsPostItem,
     CmsPostStatus,

@@ -68,3 +68,22 @@ export type CmsPostCreateInput = Omit<CmsPostItem, 'id' | 'code' | 'cover'> & {
         data: string;
     };
 };
+
+export interface CmsNodeStatus {
+    serverName: string;
+    platform: string;
+    processUptimeSeconds: number;
+    systemUptimeSeconds: number;
+    cpuUsagePercent: number;
+    cpuCores: number;
+    memoryUsedMb: number;
+    memoryTotalMb: number;
+    memoryPercent: number;
+    rssMb: number;
+    activeRequests: number;
+    totalRequests: number;
+    bytesTransferred: number;
+    throughputBps: number;
+    audioTracksCount: number;
+    timestamp: string;
+}

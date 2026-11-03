@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import type { SectionId } from '../data/mockData';
+import type { AudioTrack, SectionId } from '../data/mockData';
 import HeadCMS from '../components/CMS/HeadCMS';
 import ControlModule from '../components/CMS/ControlModule';
 import Nodo from '../components/CMS/Nodo';
@@ -24,11 +24,19 @@ import { INITIAL_CMS_TOURS } from '../data/HomeTours';
 
 interface CmsSectionProps {
   onSelectSection: (section: SectionId) => void;
+  currentTrack?: AudioTrack;
+  isPlaying?: boolean;
+  audioAnalyser?: AnalyserNode | null;
 }
 
 type CmsComposerType = 'RECOMENDACION' | 'GALERIA' | 'VIDEO' | 'TOUR';
 
-export const CmsSection: React.FC<CmsSectionProps> = ({ onSelectSection }) => {
+export const CmsSection: React.FC<CmsSectionProps> = ({
+  onSelectSection,
+  currentTrack,
+  isPlaying,
+  audioAnalyser,
+}) => {
   const [items, setItems] = useState<CmsPostItem[]>(INITIAL_CMS_ITEMS);
   const [galleries, setGalleries] = useState<CmsGalleryItem[]>(INITIAL_CMS_GALLERIES);
   const [videos, setVideos] = useState<CmsVideoItem[]>(INITIAL_CMS_VIDEOS);
@@ -268,7 +276,11 @@ export const CmsSection: React.FC<CmsSectionProps> = ({ onSelectSection }) => {
             />
 
             {/* Icecast / FLAC Server Status Card */}
-            <Nodo />
+            <Nodo
+              currentTrack={currentTrack}
+              isPlaying={isPlaying}
+              audioAnalyser={audioAnalyser}
+            />
           </aside>
 
           {/* MAIN WORKSPACE AREA (9 COLS) */}

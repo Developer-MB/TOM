@@ -2,18 +2,21 @@ import 'dotenv/config';
 import express from 'express';
 import { randomUUID } from 'node:crypto';
 import { mkdir, readFile, unlink, writeFile } from 'node:fs/promises';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   INITIAL_CMS_ITEMS,
 } from '../src/data/Cms';
 import type {
+  CmsNodeStatus,
   CmsPostItem,
   CmsPostStatus,
   CmsPostType,
   CmsTourItem,
   CmsVideoItem,
 } from '../src/data/CmsTypes';
+import { AUDIO_ASSETS } from '../src/data/Radio';
 import { resolveHomeVideoUrl } from '../src/data/YouTubeUrl';
 import { INITIAL_CMS_TOURS } from '../src/data/HomeTours';
 import type { YouTubeVideo, YouTubeVideosResponse } from '../src/data/YouTube';
@@ -21,6 +24,75 @@ import type { YouTubeVideo, YouTubeVideosResponse } from '../src/data/YouTube';
 const app = express();
 app.use('/api/cms/galleries', express.json({ limit: '105mb' }));
 app.use(express.json({ limit: '8mb' }));
+
+let activeRequests = 0;
+let totalRequests = 0;
+let bytesTransferred = 0;
+const recentTransferWindow: { timestamp: number; bytes: number }[] = [];
+
+const sampleCpuSnapshot = () => {
+  const cpus = os.cpus();
+  let idle = 0;
+  let total = 0;
+  for (const cpu of cpus) {
+    for (const ticks of Object.values(cpu.times)) {
+      total += ticks;
+    }
+    idle += cpu.times.idle;
+  }
+  return { idle, total, cores: cpus.length };
+};
+
+let previousCpuSnapshot = sampleCpuSnapshot();
+let lastCpuUsagePercent = 0;
+
+const getCpuUsagePercent = () => {
+  const current = sampleCpuSnapshot();
+  const totalDelta = current.total - previousCpuSnapshot.total;
+  const idleDelta = current.idle - previousCpuSnapshot.idle;
+  if (totalDelta > 0) {
+    const usage = ((totalDelta - idleDelta) / totalDelta) * 100;
+    lastCpuUsagePercent = Math.round(Math.max(0, Math.min(100, usage)) * 10) / 10;
+    previousCpuSnapshot = current;
+  }
+  return { cpuUsagePercent: lastCpuUsagePercent, cpuCores: current.cores };
+};
+
+app.use((request, response, next) => {
+  activeRequests += 1;
+  totalRequests += 1;
+  const incomingBytes = Number(request.headers['content-length'] ?? 0) || 0;
+  let outgoingBytes = 0;
+
+  const originalWrite = response.write.bind(response);
+  const originalEnd = response.end.bind(response);
+
+  response.write = ((chunk: unknown, ...args: unknown[]) => {
+    if (typeof chunk === 'string') outgoingBytes += Buffer.byteLength(chunk);
+    else if (Buffer.isBuffer(chunk)) outgoingBytes += chunk.length;
+    return (originalWrite as (...params: unknown[]) => boolean)(chunk, ...args);
+  }) as typeof response.write;
+
+  response.end = ((chunk?: unknown, ...args: unknown[]) => {
+    if (typeof chunk === 'string') outgoingBytes += Buffer.byteLength(chunk);
+    else if (Buffer.isBuffer(chunk)) outgoingBytes += chunk.length;
+    return (originalEnd as (...params: unknown[]) => typeof response)(chunk, ...args);
+  }) as typeof response.end;
+
+  response.on('finish', () => {
+    activeRequests = Math.max(0, activeRequests - 1);
+    const headerLength = Number(response.getHeader('content-length') ?? 0) || 0;
+    const totalReqBytes = incomingBytes + Math.max(outgoingBytes, headerLength);
+    bytesTransferred += totalReqBytes;
+    const now = Date.now();
+    recentTransferWindow.push({ timestamp: now, bytes: totalReqBytes });
+    while (recentTransferWindow.length > 0 && now - recentTransferWindow[0].timestamp > 5_000) {
+      recentTransferWindow.shift();
+    }
+  });
+
+  next();
+});
 const backendDirectory = path.dirname(fileURLToPath(import.meta.url));
 const projectDirectory = path.resolve(backendDirectory, '..');
 const cmsDataDirectory = path.join(projectDirectory, 'data');
@@ -455,6 +527,46 @@ const isGalleryCreateInput = (value: unknown): value is GalleryCreateInput =>
     typeof value[field] === 'string' && value[field].trim().length > 0
   ) &&
   Array.isArray(value.img);
+
+app.get('/api/cms/node-status', (_request, response) => {
+  response.setHeader('Cache-Control', 'no-store');
+  const { cpuUsagePercent, cpuCores } = getCpuUsagePercent();
+  const totalMem = os.totalmem();
+  const freeMem = os.freemem();
+  const usedMem = Math.max(0, totalMem - freeMem);
+  const memoryTotalMb = Math.round(totalMem / (1024 * 1024));
+  const memoryUsedMb = Math.round(usedMem / (1024 * 1024));
+  const memoryPercent = totalMem > 0 ? Math.round((usedMem / totalMem) * 1000) / 10 : 0;
+  const rssMb = Math.round((process.memoryUsage().rss / (1024 * 1024)) * 10) / 10;
+
+  const now = Date.now();
+  while (recentTransferWindow.length > 0 && now - recentTransferWindow[0].timestamp > 5_000) {
+    recentTransferWindow.shift();
+  }
+  const windowBytes = recentTransferWindow.reduce((sum, entry) => sum + entry.bytes, 0);
+  const throughputBps = Math.round((windowBytes * 8) / 5);
+
+  const payload: CmsNodeStatus = {
+    serverName: os.hostname().toUpperCase(),
+    platform: `${os.platform().toUpperCase()}-${os.arch().toUpperCase()}`,
+    processUptimeSeconds: Math.floor(process.uptime()),
+    systemUptimeSeconds: Math.floor(os.uptime()),
+    cpuUsagePercent,
+    cpuCores,
+    memoryUsedMb,
+    memoryTotalMb,
+    memoryPercent,
+    rssMb,
+    activeRequests,
+    totalRequests,
+    bytesTransferred,
+    throughputBps,
+    audioTracksCount: AUDIO_ASSETS.length,
+    timestamp: new Date().toISOString(),
+  };
+
+  response.json(payload);
+});
 
 app.get('/api/cms/galleries', async (_request, response) => {
   try {
