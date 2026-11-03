@@ -365,7 +365,7 @@ const PublishGalleryForm: React.FC<PublishGalleryFormProps> = ({
                             <span className="text-zinc-500">
                                 {draft
                                     ? 'Al guardar se actualizará este borrador sin cambiar sus fotos existentes.'
-                                    : 'Las imágenes se guardarán en public/image/concerts/.'}
+                                    : ''}
                             </span>
                         )}
                     </div>

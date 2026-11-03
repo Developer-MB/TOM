@@ -238,7 +238,7 @@ const PublishDiscForm: React.FC<PublishDiscFormProps> = ({
                         ) : publishToast ? (
                             <span className="text-emerald-400 font-bold">{publishToast}</span>
                         ) : (
-                            'El servidor guardará la imagen y generará ID y código automáticamente.'
+                            ''
                         )}
                     </div>
                     <button

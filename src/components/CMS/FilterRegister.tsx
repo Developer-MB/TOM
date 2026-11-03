@@ -1,30 +1,34 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, ClipboardEdit, Eye, Search, Trash2 } from 'lucide-react';
 import type { SectionId } from '../../data/mockData';
-import type { CmsGalleryItem, CmsPostItem, CmsVideoItem } from '../../data/Cms';
+import type { CmsGalleryItem, CmsPostItem, CmsTourItem, CmsVideoItem } from '../../data/Cms';
 
 interface FilterRegisterProps {
     items: CmsPostItem[];
     galleries: CmsGalleryItem[];
     videos: CmsVideoItem[];
+    tours: CmsTourItem[];
     searchQuery: string;
     onSearchQueryChange: (query: string) => void;
     onSelectSection: (section: SectionId) => void;
-    onDeleteItem: (id: string, isVideo: boolean) => void;
+    onDeleteItem: (id: string, type: 'post' | 'video' | 'tour') => void;
     onContinueGallery: (id: string) => void;
     onContinueVideo: (id: string) => void;
+    onContinueTour: (id: string) => void;
 }
 
 const FilterRegister: React.FC<FilterRegisterProps> = ({
     items,
     galleries,
     videos,
+    tours,
     searchQuery,
     onSearchQueryChange,
     onSelectSection,
     onDeleteItem,
     onContinueGallery,
     onContinueVideo,
+    onContinueTour,
 }) => {
     const [typeFilter, setTypeFilter] = useState('TODOS');
     const [authorFilter, setAuthorFilter] = useState('TODOS');
@@ -52,6 +56,7 @@ const FilterRegister: React.FC<FilterRegisterProps> = ({
                         : 'eventos' as const,
             isGallery: false,
             isVideo: false,
+            isTour: false,
         })),
         ...videos.map((video) => ({
             id: video.id,
@@ -65,6 +70,21 @@ const FilterRegister: React.FC<FilterRegisterProps> = ({
             section: 'videopodcast' as const,
             isGallery: false,
             isVideo: true,
+            isTour: false,
+        })),
+        ...tours.map((tour) => ({
+            id: tour.id,
+            code: tour.code,
+            title: `${tour.band} — ${tour.tourName}`,
+            details: `${tour.day}/${tour.month}/${tour.year} · ${tour.venue} · ${tour.ticketsInfo}`,
+            type: 'GIRAS',
+            author: 'GIRAS',
+            status: tour.status,
+            date: tour.publish,
+            section: 'eventos' as const,
+            isGallery: false,
+            isVideo: false,
+            isTour: true,
         })),
         ...galleries.map((gallery, index) => ({
             id: gallery.id,
@@ -78,8 +98,9 @@ const FilterRegister: React.FC<FilterRegisterProps> = ({
             section: 'galeria' as const,
             isGallery: true,
             isVideo: false,
+            isTour: false,
         })),
-    ], [items, galleries, videos]);
+    ], [items, galleries, videos, tours]);
 
     const authors = useMemo(
         () => [...new Set(entries.map((entry) => entry.author).filter(Boolean))]
@@ -224,7 +245,10 @@ const FilterRegister: React.FC<FilterRegisterProps> = ({
                                     </button>
                                     {!entry.isGallery && (
                                         <button
-                                            onClick={() => onDeleteItem(entry.id, entry.isVideo)}
+                                            onClick={() => onDeleteItem(
+                                                entry.id,
+                                                entry.isTour ? 'tour' : entry.isVideo ? 'video' : 'post',
+                                            )}
                                             className="p-1.5 text-zinc-400 hover:text-[#DC2626] border border-zinc-800 hover:border-[#DC2626] cursor-pointer"
                                             title="Eliminar entrada"
                                             aria-label={`Eliminar ${entry.title}`}
@@ -245,6 +269,16 @@ const FilterRegister: React.FC<FilterRegisterProps> = ({
                                     {entry.isVideo && entry.status === 'BORRADOR' && (
                                         <button
                                             onClick={() => onContinueVideo(entry.id)}
+                                            className="p-1.5 text-amber-400 hover:text-white border border-amber-900 hover:border-amber-500 cursor-pointer"
+                                            title="Continuar publicación del borrador"
+                                            aria-label={`Continuar publicación de ${entry.title}`}
+                                        >
+                                            <ClipboardEdit className="w-3.5 h-3.5" />
+                                        </button>
+                                    )}
+                                    {entry.isTour && entry.status === 'BORRADOR' && (
+                                        <button
+                                            onClick={() => onContinueTour(entry.id)}
                                             className="p-1.5 text-amber-400 hover:text-white border border-amber-900 hover:border-amber-500 cursor-pointer"
                                             title="Continuar publicación del borrador"
                                             aria-label={`Continuar publicación de ${entry.title}`}

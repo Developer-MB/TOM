@@ -58,6 +58,22 @@ Los videos publicados aparecen en la sección Videopodcast y en el reproductor d
 
 Las publicaciones, galerías y videos programados cambian a `PUBLICADO` cuando llega su fecha/hora. El backend las revisa periódicamente y también al consultar las listas del CMS.
 
+## Giras del CMS
+
+Las giras se guardan en `data/post-tours.json`:
+
+- `GET /api/cms/tours` carga las giras de la cola editorial.
+- `POST /api/cms/tours` valida los datos y la fecha del evento, y genera el ID y el código secuencial `TOM-GIR-0000`.
+- `PUT /api/cms/tours/:id` permite continuar un borrador conservando su ID y código.
+- `DELETE /api/cms/tours/:id` elimina una gira.
+- `GET /api/home/tours` devuelve las giras publicadas para la sección pública de eventos.
+
+Las giras programadas cambian a `PUBLICADO` al llegar la fecha y hora configuradas. En producción, el CMS necesita el backend Node.js para guardar cambios; los datos JSON incluidos en el build estático funcionan como respaldo de lectura.
+
+## Métricas del portal
+
+Las visitas se agregan por mes. La aplicación registra una entrada al cargar el portal y otra cada vez que se navega a Radio. En Vercel, `api/analytics/events.ts` y `api/cms/metrics.ts` implementan las funciones API; las métricas de visitas usan Redis REST para persistir entre ejecuciones sin depender del disco efímero. Conecta una base Redis de Upstash al proyecto Vercel y configura `UPSTASH_REDIS_REST_URL` y `UPSTASH_REDIS_REST_TOKEN` en las variables de entorno de producción y preview. Después de agregarlas, vuelve a desplegar. `GET /api/cms/metrics` devuelve las visitas del mes, su variación frente al anterior, publicaciones publicadas y fotos de galerías publicadas, usando los JSON incluidos en el despliegue. Las entradas a Radio son accesos a la sección, no oyentes simultáneos.
+
 En desarrollo, el watcher del backend excluye `data/` para evitar reiniciarse al guardar archivos del CMS o publicar entradas programadas. Si el servidor ya estaba ejecutándose antes de este cambio, reinicia `npm run dev` para activar la exclusión.
 
 ## Producción
@@ -69,4 +85,4 @@ npm run build
 npm start
 ```
 
-El servidor sirve tanto `/api/youtube/videos` como los archivos compilados del frontend. En despliegues estáticos como Vercel, las publicaciones versionadas en `data/post-disc.json` se incluyen en el build y se muestran sin depender de `/api/cms/posts`. Para crear o eliminar publicaciones desde el CMS, aloja este backend por separado y enruta `/api` hacia él; un despliegue estático por sí solo no puede escribir en el JSON.
+El servidor sirve tanto `/api/youtube/videos` como los archivos compilados del frontend. En despliegues estáticos como Vercel, las publicaciones, galerías y videos versionados en `data/` se incluyen en el build. Si las rutas API responden `404`, el frontend muestra esos datos incluidos en el build para evitar errores de carga. Para guardar cambios desde el CMS y servir contenido actualizado sin volver a desplegar, aloja este backend y enruta `/api` hacia él; un despliegue estático por sí solo no puede escribir en los JSON.
