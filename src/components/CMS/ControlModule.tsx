@@ -1,16 +1,23 @@
 import React, { useState } from 'react'
 import {
     Activity,
-    FileText,
     Disc,
     Mic,
     Camera,
     Radio,
-    Users,
-    Settings,
 } from 'lucide-react'
 
-const ControlModule = () => {
+interface ControlModuleProps {
+    recommendationCount: number;
+    videoCount: number;
+    galleryCount: number;
+}
+
+const ControlModule: React.FC<ControlModuleProps> = ({
+    recommendationCount,
+    videoCount,
+    galleryCount,
+}) => {
     const [activeNav, setActiveNav] = useState('PANEL CENTRAL');
     return (
         <div className="border border-zinc-800 bg-[#0E0E12] p-4">
@@ -20,13 +27,10 @@ const ControlModule = () => {
             <nav className="space-y-1">
                 {[
                     { label: 'PANEL CENTRAL', icon: Activity, count: 'LIVE' },
-                    { label: 'CRÓNICAS & NOTICIAS', icon: FileText, count: '142' },
-                    { label: 'JUICIO CRÍTICO (RESEÑAS)', icon: Disc, count: '318' },
-                    { label: 'VIDEOPODCAST 4K', icon: Mic, count: '48' },
-                    { label: 'GALERÍAS RAW', icon: Camera, count: '6.4K' },
-                    { label: 'CABINA RADIO 24/7', icon: Radio, count: 'ON AIR' },
-                    { label: 'EQUIPO & REDACTORES', icon: Users, count: '12' },
-                    { label: 'AJUSTES DEL SISTEMA', icon: Settings, count: '' },
+                    { label: 'RECOMENDACIONES', icon: Disc, count: recommendationCount },
+                    { label: 'VIDEOPODCAST', icon: Mic, count: videoCount },
+                    { label: 'GALERÍAS', icon: Camera, count: galleryCount },
+                    { label: 'CABINA RADIO 24/7', icon: Radio, count: 'ON AIR', disableHover: true },
                 ].map((nav) => {
                     const Icon = nav.icon;
                     const active = activeNav === nav.label;
@@ -36,14 +40,14 @@ const ControlModule = () => {
                             onClick={() => setActiveNav(nav.label)}
                             className={`w-full flex items-center justify-between px-3 py-2.5 font-mono text-xs uppercase tracking-wider transition-colors cursor-pointer ${active
                                     ? 'bg-[#DC2626] text-white font-bold'
-                                    : 'text-zinc-400 hover:bg-zinc-900 hover:text-white'
+                                    : `text-zinc-400 ${nav.disableHover ? '' : 'hover:bg-zinc-900 hover:text-white'}`
                                 }`}
                         >
                             <span className="flex items-center gap-2.5 truncate">
                                 <Icon className="w-4 h-4 shrink-0" />
                                 <span className="truncate">{nav.label}</span>
                             </span>
-                            {nav.count && (
+                            {nav.count !== '' && (
                                 <span
                                     className={`text-[10px] px-1.5 py-0.5 ${active
                                             ? 'bg-black/30 text-white'

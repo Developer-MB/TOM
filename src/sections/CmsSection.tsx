@@ -261,7 +261,11 @@ export const CmsSection: React.FC<CmsSectionProps> = ({ onSelectSection }) => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* LEFT SIDEBAR NAVIGATION (3 COLS) */}
           <aside className="lg:col-span-3 space-y-6">
-            <ControlModule />
+            <ControlModule
+              recommendationCount={items.filter((item) => item.type === 'RECOMENDACION').length}
+              videoCount={videos.length}
+              galleryCount={galleries.length}
+            />
 
             {/* Icecast / FLAC Server Status Card */}
             <Nodo />
