@@ -85,4 +85,4 @@ npm run build
 npm start
 ```
 
-El servidor sirve tanto `/api/youtube/videos` como los archivos compilados del frontend. En despliegues estáticos como Vercel, las publicaciones, galerías y videos versionados en `data/` se incluyen en el build. Si las rutas API responden `404`, el frontend muestra esos datos incluidos en el build para evitar errores de carga. Para guardar cambios desde el CMS y servir contenido actualizado sin volver a desplegar, aloja este backend y enruta `/api` hacia él; un despliegue estático por sí solo no puede escribir en los JSON.
+El servidor sirve tanto `/api/youtube/videos` como los archivos compilados del frontend. En Vercel, las funciones en `api/` exponen las lecturas del CMS y las secciones públicas desde los archivos JSON incluidos en el despliegue, evitando respuestas `404`. Estas funciones de lectura no guardan cambios: para persistir publicaciones, galerías, videos y giras creados desde el CMS, despliega el backend Node.js con almacenamiento persistente y enruta `/api` hacia él.
