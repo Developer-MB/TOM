@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import tours from '../../data/post-tours.json';
+import tours from '../../data/post-tours.json' with { type: 'json' };
 
 export default function handler(request: IncomingMessage, response: ServerResponse) {
   response.setHeader('Cache-Control', 'no-store');

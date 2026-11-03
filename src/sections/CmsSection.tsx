@@ -3,7 +3,6 @@ import type { SectionId } from '../data/mockData';
 import HeadCMS from '../components/CMS/HeadCMS';
 import ControlModule from '../components/CMS/ControlModule';
 import Nodo from '../components/CMS/Nodo';
-import Metrics from '../components/CMS/Metrics';
 import HeadPubliRegister from '../components/CMS/HeadPubliRegister';
 import FilterRegister from '../components/CMS/FilterRegister';
 import PublishDiscForm from '../components/CMS/PublishDiscForm';
@@ -270,9 +269,6 @@ export const CmsSection: React.FC<CmsSectionProps> = ({ onSelectSection }) => {
 
           {/* MAIN WORKSPACE AREA (9 COLS) */}
           <div className="lg:col-span-9 space-y-6">
-            {/* 4 KPI METRIC CARDS */}
-            <Metrics />
-
             <section className="border border-zinc-800 bg-[#0E0E12] p-6">
               <label className="block max-w-sm">
                 <span className="mb-1.5 block font-mono text-[10px] uppercase tracking-widest text-zinc-400">

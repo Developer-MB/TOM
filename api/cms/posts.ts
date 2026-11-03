@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import posts from '../../data/post-disc.json';
+import posts from '../../data/post-disc.json' with { type: 'json' };
 
 export default function handler(request: IncomingMessage, response: ServerResponse) {
   response.setHeader('Cache-Control', 'no-store');

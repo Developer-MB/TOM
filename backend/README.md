@@ -70,10 +70,6 @@ Las giras se guardan en `data/post-tours.json`:
 
 Las giras programadas cambian a `PUBLICADO` al llegar la fecha y hora configuradas. En producción, el CMS necesita el backend Node.js para guardar cambios; los datos JSON incluidos en el build estático funcionan como respaldo de lectura.
 
-## Métricas del portal
-
-Las visitas se agregan por mes. La aplicación registra una entrada al cargar el portal y otra cada vez que se navega a Radio. En Vercel, `api/analytics/events.ts` y `api/cms/metrics.ts` implementan las funciones API; las métricas de visitas usan Redis REST para persistir entre ejecuciones sin depender del disco efímero. Conecta una base Redis de Upstash al proyecto Vercel y configura `UPSTASH_REDIS_REST_URL` y `UPSTASH_REDIS_REST_TOKEN` en las variables de entorno de producción y preview. Después de agregarlas, vuelve a desplegar. `GET /api/cms/metrics` devuelve las visitas del mes, su variación frente al anterior, publicaciones publicadas y fotos de galerías publicadas, usando los JSON incluidos en el despliegue. Las entradas a Radio son accesos a la sección, no oyentes simultáneos.
-
 En desarrollo, el watcher del backend excluye `data/` para evitar reiniciarse al guardar archivos del CMS o publicar entradas programadas. Si el servidor ya estaba ejecutándose antes de este cambio, reinicia `npm run dev` para activar la exclusión.
 
 ## Producción

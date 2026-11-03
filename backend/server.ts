@@ -28,7 +28,6 @@ const cmsPostsPath = path.join(cmsDataDirectory, 'post-disc.json');
 const cmsGalleriesPath = path.join(cmsDataDirectory, 'post-pics.json');
 const cmsVideosPath = path.join(cmsDataDirectory, 'post-video.json');
 const cmsToursPath = path.join(cmsDataDirectory, 'post-tours.json');
-const analyticsPath = path.join(cmsDataDirectory, 'analytics.json');
 const discCoversDirectory = path.join(projectDirectory, 'public', 'image', 'discos');
 const concertPhotosDirectory = path.join(projectDirectory, 'public', 'image', 'concerts');
 const port = Number(process.env.PORT ?? 3001);
@@ -113,40 +112,6 @@ const withCmsMutation = <T>(mutation: () => Promise<T>): Promise<T> => {
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
-
-type AnalyticsMonth = { visits: number; radioEntries: number };
-type AnalyticsData = { months: Record<string, AnalyticsMonth> };
-
-const isAnalyticsData = (value: unknown): value is AnalyticsData =>
-  isRecord(value) &&
-  isRecord(value.months) &&
-  Object.entries(value.months).every(([month, stats]) =>
-    /^\d{4}-\d{2}$/.test(month) &&
-    isRecord(stats) &&
-    Number.isSafeInteger(stats.visits) &&
-    (stats.visits as number) >= 0 &&
-    Number.isSafeInteger(stats.radioEntries) &&
-    (stats.radioEntries as number) >= 0
-  );
-
-const readAnalytics = async (): Promise<AnalyticsData> => {
-  try {
-    const contents = await readFile(analyticsPath, 'utf8');
-    const analytics: unknown = JSON.parse(contents);
-    if (!isAnalyticsData(analytics)) {
-      throw new Error('El archivo de métricas tiene un formato no válido.');
-    }
-    return analytics;
-  } catch (error) {
-    if (!isRecord(error) || error.code !== 'ENOENT') throw error;
-    return { months: {} };
-  }
-};
-
-const writeAnalytics = async (analytics: AnalyticsData) => {
-  await mkdir(cmsDataDirectory, { recursive: true });
-  await writeFile(analyticsPath, `${JSON.stringify(analytics, null, 2)}\n`, 'utf8');
-};
 
 type GalleryImage = { id: number; pic: string };
 type GalleryRecord = {
@@ -1266,72 +1231,6 @@ void publishScheduledCmsEntries()
   .catch((error: unknown) => {
     console.error('No se pudieron publicar las entradas programadas:', error);
   });
-
-app.post('/api/analytics/events', async (request, response) => {
-  if (!isRecord(request.body) || !['portal', 'radio'].includes(request.body.type as string)) {
-    response.status(400).json({ error: 'El tipo de evento de métricas no es válido.' });
-    return;
-  }
-
-  try {
-    await withCmsMutation(async () => {
-      const analytics = await readAnalytics();
-      const month = new Date().toISOString().slice(0, 7);
-      const stats = analytics.months[month] ?? { visits: 0, radioEntries: 0 };
-      if (request.body.type === 'portal') stats.visits += 1;
-      else stats.radioEntries += 1;
-      analytics.months[month] = stats;
-      await writeAnalytics(analytics);
-    });
-    response.status(204).end();
-  } catch (error) {
-    console.error('No se pudo registrar el evento de métricas:', error);
-    response.status(500).json({ error: 'No se pudo registrar la visita.' });
-  }
-});
-
-app.get('/api/cms/metrics', async (_request, response) => {
-  try {
-    await publishScheduledCmsEntries();
-    const [posts, galleries, videos, tours, analytics] = await Promise.all([
-      readCmsPosts(),
-      readCmsGalleries(),
-      readCmsVideos(),
-      readCmsTours(),
-      withCmsMutation(readAnalytics),
-    ]);
-    const now = new Date();
-    const currentMonth = now.toISOString().slice(0, 7);
-    const previousMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 1, 1))
-      .toISOString()
-      .slice(0, 7);
-    const currentStats = analytics.months[currentMonth] ?? { visits: 0, radioEntries: 0 };
-    const previousVisits = analytics.months[previousMonth]?.visits ?? 0;
-    const isPublishedGallery = (gallery: GalleryRecord) =>
-      (gallery.status ?? 'PUBLICADO') === 'PUBLICADO';
-    const publishedPosts = posts.filter((post) => post.status === 'PUBLICADO').length +
-      galleries.filter(isPublishedGallery).length +
-      videos.filter((video) => video.status === 'PUBLICADO').length +
-      tours.filter((tour) => tour.status === 'PUBLICADO').length;
-    const photoCount = galleries
-      .filter(isPublishedGallery)
-      .reduce((total, gallery) => total + gallery.img.length, 0);
-
-    response.setHeader('Cache-Control', 'no-store');
-    response.json({
-      monthlyVisits: currentStats.visits,
-      radioEntries: currentStats.radioEntries,
-      publishedPosts,
-      photoCount,
-      comparisonPercent: previousVisits > 0
-        ? Math.round(((currentStats.visits - previousVisits) / previousVisits) * 1000) / 10
-        : null,
-    });
-  } catch (error) {
-    console.error('No se pudieron cargar las métricas del CMS:', error);
-    response.status(500).json({ error: 'No se pudieron cargar las métricas.' });
-  }
-});
 
 app.listen(port, () => {
   console.info(`TOM server listening on port ${port}`);

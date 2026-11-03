@@ -31,22 +31,6 @@ const toAudioTrack = (track: (typeof AUDIO_ASSETS)[number]): AudioTrack => ({
   bitrate: '320 kbps',
 });
 
-const recordAnalyticsEvent = async (type: 'portal' | 'radio') => {
-  try {
-    const response = await fetch('/api/analytics/events', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type }),
-      keepalive: true,
-    });
-    if (response.status !== 204) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-  } catch (error) {
-    console.error('No se pudo registrar la visita en las métricas:', error);
-  }
-};
-
 export default function App() {
   const [activeSection, setActiveSection] = useState<SectionId>('inicio');
   const [currentTrack, setCurrentTrack] = useState<AudioTrack>(() => toAudioTrack(AUDIO_ASSETS[0]));
@@ -64,14 +48,6 @@ export default function App() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const currentTrackIndexRef = useRef(0);
-  const hasRecordedPortalVisit = useRef(false);
-
-  useEffect(() => {
-    if (hasRecordedPortalVisit.current) return;
-    hasRecordedPortalVisit.current = true;
-    void recordAnalyticsEvent('portal');
-  }, []);
-
   useEffect(() => {
     const controller = new AbortController();
 
@@ -243,9 +219,6 @@ export default function App() {
   };
 
   const handleSelectSection = (section: SectionId) => {
-    if (section === 'radio' && activeSection !== 'radio') {
-      void recordAnalyticsEvent('radio');
-    }
     setActiveSection(section);
     if (section === 'radio' && !isPlaying) {
       void audioContextRef.current?.resume().catch((error: unknown) => {

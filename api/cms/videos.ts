@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import videos from '../../data/post-video.json';
+import videos from '../../data/post-video.json' with { type: 'json' };
 
 export default function handler(request: IncomingMessage, response: ServerResponse) {
   response.setHeader('Cache-Control', 'no-store');

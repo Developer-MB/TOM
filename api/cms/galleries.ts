@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import galleries from '../../data/post-pics.json';
+import galleries from '../../data/post-pics.json' with { type: 'json' };
 
 export default function handler(request: IncomingMessage, response: ServerResponse) {
   response.setHeader('Cache-Control', 'no-store');
