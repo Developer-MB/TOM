@@ -17,7 +17,7 @@ El comando inicia ambos procesos. Vite sirve el frontend en el puerto `3000` y r
 
 ## Endpoint
 
-`GET /api/home/videos` devuelve los videos configurados en `HOME_VIDEOS` de `src/data/HomeVideo.ts`, incluyendo sus datos, ID de YouTube, URL de inserción y miniatura. No requiere una API key.
+`GET /api/home/videos` devuelve los videos publicados en `data/post-video.json`, incluyendo sus datos, ID de YouTube, URL de inserción y miniatura. No requiere una API key.
 
 `GET /api/youtube/videos` devuelve los videos más recientes del canal. Para solicitar otra página, envía el `nextPageToken` recibido como query param:
 
@@ -34,6 +34,31 @@ Las publicaciones del CMS se guardan en `data/post-disc.json` en el servidor:
 - `DELETE /api/cms/posts/:id` elimina una publicación.
 
 El archivo se inicializa con las publicaciones de ejemplo si todavía no existe. Estos endpoints requieren que el backend de Node.js esté ejecutándose; un despliegue estático por sí solo no puede escribir en el JSON.
+
+## Galerías del CMS
+
+Las galerías creadas desde el CMS se guardan en `data/post-pics.json`:
+
+- `GET /api/cms/galleries` carga las galerías guardadas.
+- `POST /api/cms/galleries` genera un ID y código, guarda hasta 15 imágenes JPG, PNG, WebP o GIF (máximo 5 MB cada una) en `public/image/concerts/` y registra sus rutas, estado y fecha de publicación junto con los datos del evento. Los borradores pueden guardarse sin imágenes; las galerías publicadas o programadas requieren al menos una.
+- `PUT /api/cms/galleries/:id` permite continuar un borrador, conservar sus fotos existentes y agregar imágenes sin superar 15 en total. Mantiene el ID y código, y actualiza el estado y la fecha de publicación.
+
+Como con las publicaciones, guardar galerías requiere que el backend de Node.js esté ejecutándose.
+
+## Videos del CMS
+
+Los videos creados desde la cola editorial se guardan en `data/post-video.json`:
+
+- `GET /api/cms/videos` carga todos los videos de la cola editorial.
+- `POST /api/cms/videos` valida el título, descripción, URL de YouTube y estado, y genera un ID y código secuencial `TOM-VID-0000`.
+- `PUT /api/cms/videos/:id` permite continuar un borrador conservando su ID y código.
+- `DELETE /api/cms/videos/:id` elimina un video.
+
+Los videos publicados aparecen en la sección Videopodcast y en el reproductor destacado de Home. Los videos programados cambian a `PUBLICADO` cuando llega su fecha/hora. El backend revisa las entradas programadas al consultar las listas del CMS o los videos públicos.
+
+Las publicaciones, galerías y videos programados cambian a `PUBLICADO` cuando llega su fecha/hora. El backend las revisa periódicamente y también al consultar las listas del CMS.
+
+En desarrollo, el watcher del backend excluye `data/` para evitar reiniciarse al guardar archivos del CMS o publicar entradas programadas. Si el servidor ya estaba ejecutándose antes de este cambio, reinicia `npm run dev` para activar la exclusión.
 
 ## Producción
 

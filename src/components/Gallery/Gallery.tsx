@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { HOME_PICS } from '@/src/data/HomePics'
+import { HOME_PICS, type HomeGalleryItem } from '@/src/data/HomePics'
 import { Camera, MapPin, Maximize2 } from 'lucide-react'
 import ModalGal from './ModalGal'
 
@@ -13,53 +13,31 @@ type GalleryPic = {
     venue: string;
 };
 
-const toGalleryPic = (item: (typeof HOME_PICS)[number]): GalleryPic => {
-    const photos = 'img' in item && item.img
-        ? item.img
-        : 'image' in item && item.image
-            ? [{ id: 1, pic: item.image }]
-            : [];
-
+const toGalleryPic = (item: HomeGalleryItem): GalleryPic => {
     return {
         id: item.id,
-        img: photos,
-        concert: 'concert' in item && item.concert ? item.concert : item.title,
+        img: item.img,
+        concert: item.concert,
         date: item.date,
         title: item.title,
-        credit: 'credit' in item && item.credit
-            ? item.credit
-            : 'photographer' in item && item.photographer
-                ? item.photographer
-                : '',
+        credit: item.credit,
         venue: item.venue,
     };
 };
 
-const Gallery = () => {
+interface GalleryProps {
+    galleries?: HomeGalleryItem[];
+}
+
+const Gallery: React.FC<GalleryProps> = ({ galleries = HOME_PICS }) => {
     const [selectedGallery, setSelectedGallery] = useState<GalleryPic | null>(null)
     const [photoIndex, setPhotoIndex] = useState(0)
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {HOME_PICS.map((item) => {
-                const firstPhoto = 'img' in item && item.img?.[0]
-                    ? item.img[0].pic
-                    : 'image' in item
-                        ? item.image
-                        : undefined;
-                const galleryTitle = 'concert' in item && item.concert
-                    ? item.concert
-                    : item.title;
-                const photographer = 'credit' in item && item.credit
-                    ? item.credit
-                    : 'photographer' in item
-                        ? item.photographer
-                        : undefined;
-                const category = 'category' in item
-                    ? item.category
-                    : 'city' in item
-                        ? item.city
-                        : '';
+            {galleries.map((item) => {
+                const firstPhoto = item.img[0]?.pic ?? item.image;
+                const galleryTitle = item.concert;
 
                 return (
                 <article
@@ -92,7 +70,7 @@ const Gallery = () => {
                         {/* Content */}
                         <div className="p-6">
                             <div className="font-mono font-bold text-[14px] uppercase tracking-widest text-[#dcd926] mb-2">
-                                {category}
+                                {item.category}
                             </div>
                             <h3 className="font-display font-light text-xl tracking-tight text-white transition-colors mb-3 leading-snug">
                                 {item.title}
@@ -106,7 +84,7 @@ const Gallery = () => {
                     {/* Card Footer */}
                     <div className="px-6 py-4 border-t border-zinc-800/80 bg-[#0A0A0D] flex items-center justify-between">
                         <div className="font-mono text-[12px] text-zinc-400">
-                            FOTOS: <span className="text-blue-700 font-bold">{photographer}</span>
+                            FOTOS: <span className="text-blue-700 font-bold">{item.credit}</span>
                         </div>
                         <button
                             onClick={() => {

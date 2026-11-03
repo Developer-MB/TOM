@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { SectionId } from '@/src/data/mockData';
 import { Camera, ChevronLeft, ChevronRight, X } from 'lucide-react';
-import { HOME_PICS } from '@/src/data/HomePics';
+import type { HomeGalleryItem } from '@/src/data/HomePics';
 import ModalHomePics from './ModalHomePics';
 
-type HomePhotoGallery = (typeof HOME_PICS)[number] & {
+type HomePhotoGallery = HomeGalleryItem & {
     img: { id: number; pic: string }[];
     concert: string;
     date: string;
@@ -12,20 +12,12 @@ type HomePhotoGallery = (typeof HOME_PICS)[number] & {
     credit: string;
 };
 
-const homePhotoGalleries = HOME_PICS.filter(
-    (item): item is HomePhotoGallery =>
-        Array.isArray(item.img) &&
-        typeof item.concert === 'string' &&
-        typeof item.date === 'string' &&
-        typeof item.title === 'string' &&
-        typeof item.credit === 'string',
-);
-
 interface ContentGalleryProps {
     onSelectSection: (section: SectionId) => void;
+    galleries: HomeGalleryItem[];
 }
 
-const ContentGallery = ({ onSelectSection }: ContentGalleryProps) => {
+const ContentGallery = ({ onSelectSection, galleries }: ContentGalleryProps) => {
     const [selectedGallery, setSelectedGallery] = useState<HomePhotoGallery | null>(null);
     const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
     const currentPhoto = selectedGallery?.img[currentPhotoIndex];
@@ -70,7 +62,7 @@ const ContentGallery = ({ onSelectSection }: ContentGalleryProps) => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {homePhotoGalleries.map((item) => (
+                {galleries.map((item) => (
                     <button
                         type="button"
                         key={item.id}

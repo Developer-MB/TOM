@@ -1,0 +1,471 @@
+[
+  {
+    "id": "a1b05189-2bb0-4aa3-8c6e-661ce750716b",
+    "code": "TOM-CON-0013",
+    "status": "PUBLICADO",
+    "publish": "2026-11-03T00:00:41.118Z",
+    "concert": "CANDELABRUM 4",
+    "date": "2025-09-06",
+    "venue": "Velaria de la Feria de Leon",
+    "city": "Guanajuato",
+    "title": "CANDELABRUM 4",
+    "desc": "El Candelabrum Fest IV tiene lugar en la Ciudad de León, Gto,. en La Velaria de la Feria, un recinto que cuenta con más de 8,000m2 techados convirtiéndose así en el festival de metal en México techado más grande que existe y posiblemente de Latinoamérica.\n\nCandelabrum Metal Fest es un festival de metal en México que congrega a las mejores propuestas internacionales y nacionales del Heavy Metal en donde lo más importante siempre es la música.",
+    "credit": "MANRO",
+    "img": [
+      {
+        "id": 1,
+        "pic": "/image/concerts/705a06ca-52f7-4ab9-9286-90ea9bab6cda.jpg"
+      },
+      {
+        "id": 2,
+        "pic": "/image/concerts/72ccf39a-542a-4b3a-b74e-2aec8faaa7df.jpg"
+      },
+      {
+        "id": 3,
+        "pic": "/image/concerts/53432a3c-7a06-45e7-8d52-979cfa09e73e.jpg"
+      },
+      {
+        "id": 4,
+        "pic": "/image/concerts/84ce54a9-8c08-4c83-9242-d1a930d695ea.jpg"
+      }
+    ]
+  },
+  {
+    "id": "afea673d-b220-411b-b28b-4528699507ef",
+    "code": "TOM-CON-0012",
+    "status": "PUBLICADO",
+    "publish": "2026-11-02T23:45:00.000Z",
+    "concert": "Behemoth / Deicide / Massacre / Vltimas / Hate / Nidhogg / Eshtadur",
+    "date": "2025-10-11",
+    "venue": "Pabellon del Palacio de los Deportes",
+    "city": "CDMX",
+    "title": "NIGHT OF THE LIVING DEATH",
+    "desc": "The Night of the Living Death V es un festival de death metal que se llevará a cabo el 11 de octubre de 2025 en el Pabellón Oeste, Ciudad de México. Esta quinta edición marca el regreso del festival tras siete años de ausencia y presenta un cartel encabezado por Behemoth (Polonia), Deicide (EE.UU.) —quienes regresan al festival tras haber participado en una edición anterior— y Massacre (EE.UU.), que interpretará completo su álbum debut From Beyond. El lineup lo completan Vltimas, Hate, Nidhogg y Eshtadur.",
+    "credit": "MANRO",
+    "img": [
+      {
+        "id": 1,
+        "pic": "/image/concerts/5a687c14-1f5d-454e-8973-a653bf74d989.jpg"
+      },
+      {
+        "id": 2,
+        "pic": "/image/concerts/5afca466-98ed-4f3f-a343-a00740631f00.jpg"
+      },
+      {
+        "id": 3,
+        "pic": "/image/concerts/e2f319b2-2b01-467e-9aa9-d3e44ad08571.jpg"
+      },
+      {
+        "id": 4,
+        "pic": "/image/concerts/212f0e3e-4298-4ed4-b1d5-5d271f42452d.jpg"
+      },
+      {
+        "id": 5,
+        "pic": "/image/concerts/45c4a255-b861-4cf3-bdad-996e76bff9ae.jpg"
+      }
+    ]
+  },
+  {
+    "id": "70b493b5-be6a-4fcc-9c5c-c2aeeebb82ff",
+    "code": "TOM-CON-0001",
+    "status": "PUBLICADO",
+    "publish": "2026-11-02T05:01:29.988Z",
+    "concert": "Blast / Metaluzifer",
+    "date": "2025-11-01",
+    "venue": "Foro Sangriento",
+    "city": "CDMX",
+    "title": "Latam Tour 2025",
+    "desc": "Esta fue su segunda visita a México, rindiendo tributo al sonido clásico de la New Wave of British Heavy Metal (NWOBHM).",
+    "credit": "MANRO",
+    "img": [
+      {
+        "id": 1,
+        "pic": "/image/concerts/904d9843-8f31-48f9-a81d-699238cddf69.jpg"
+      },
+      {
+        "id": 2,
+        "pic": "/image/concerts/6ff97882-8e9f-40d0-82a2-022ab59639c6.jpg"
+      },
+      {
+        "id": 3,
+        "pic": "/image/concerts/3d9220c5-2258-411e-b20b-e2ea4b8c6b8d.jpg"
+      },
+      {
+        "id": 4,
+        "pic": "/image/concerts/c8e15484-dc1c-42ca-8d54-98d475296fe3.jpg"
+      },
+      {
+        "id": 5,
+        "pic": "/image/concerts/9d919a2d-d806-4dfe-94ab-c27cbdae0bb9.jpg"
+      },
+      {
+        "id": 6,
+        "pic": "/image/concerts/5697d671-4f92-4b11-8bd1-21b65b60fc3d.jpg"
+      },
+      {
+        "id": 7,
+        "pic": "/image/concerts/43cdb991-fd90-4bc8-8cb8-a7fba4fd4522.jpg"
+      },
+      {
+        "id": 8,
+        "pic": "/image/concerts/66737f00-3257-4c64-b531-161ea4a85200.jpg"
+      }
+    ]
+  },
+  {
+    "id": "904d9843-8f31-48f9-a81d-699238cddf69",
+    "code": "TOM-CON-0002",
+    "status": "PUBLICADO",
+    "publish": "2026-11-02T05:03:29.988Z",
+    "concert": "The Gathering",
+    "date": "10 SEP 2026",
+    "venue": "Auditorio BB",
+    "city": "CDMX",
+    "title": "30th Anniversary Mandylion",
+    "desc": "The Gathering celebró los 30 años de Mandylion en el Auditorio BB. Esta galería reúne momentos de una noche especial para revivir en directo uno de los álbumes más emblemáticos de la banda.",
+    "credit": "MANRO",
+    "img": [
+      {
+        "id": 1,
+        "pic": "/image/concerts/TG-01.JPG"
+      },
+      {
+        "id": 2,
+        "pic": "/image/concerts/TG-02.JPG"
+      },
+      {
+        "id": 3,
+        "pic": "/image/concerts/TG-03.JPG"
+      },
+      {
+        "id": 4,
+        "pic": "/image/concerts/TG-04.JPG"
+      },
+      {
+        "id": 5,
+        "pic": "/image/concerts/TG-05.JPG"
+      },
+      {
+        "id": 6,
+        "pic": "/image/concerts/TG-06.JPG"
+      },
+      {
+        "id": 7,
+        "pic": "/image/concerts/TG-07.JPG"
+      },
+      {
+        "id": 8,
+        "pic": "/image/concerts/TG-08.JPG"
+      },
+      {
+        "id": 9,
+        "pic": "/image/concerts/TG-09.JPG"
+      },
+      {
+        "id": 10,
+        "pic": "/image/concerts/TG-10.JPG"
+      },
+      {
+        "id": 11,
+        "pic": "/image/concerts/TG-11.JPG"
+      },
+      {
+        "id": 12,
+        "pic": "/image/concerts/TG-12.JPG"
+      },
+      {
+        "id": 13,
+        "pic": "/image/concerts/TG-13.JPG"
+      },
+      {
+        "id": 14,
+        "pic": "/image/concerts/TG-14.JPG"
+      },
+      {
+        "id": 15,
+        "pic": "/image/concerts/TG-15.JPG"
+      },
+      {
+        "id": 16,
+        "pic": "/image/concerts/TG-16.JPG"
+      },
+      {
+        "id": 17,
+        "pic": "/image/concerts/TG-17.JPG"
+      },
+      {
+        "id": 18,
+        "pic": "/image/concerts/TG-18.JPG"
+      },
+      {
+        "id": 19,
+        "pic": "/image/concerts/TG-19.JPG"
+      },
+      {
+        "id": 20,
+        "pic": "/image/concerts/TG-20.JPG"
+      }
+    ]
+  },
+  {
+    "id": "6ff97882-8e9f-40d0-82a2-022ab59639c6",
+    "code": "TOM-CON-0003",
+    "status": "PUBLICADO",
+    "publish": "2026-11-02T05:05:29.988Z",
+    "concert": "RIPPLEFEST",
+    "date": "06 DIC 2025",
+    "venue": "Fuckoff Room",
+    "city": "CDMX",
+    "title": "Ripplefest",
+    "desc": "Ripplefest llenó el Fuckoff Room de riffs densos y energía en vivo. Estas fotografías capturan distintos momentos de la jornada y la intensidad de las bandas sobre el escenario.",
+    "credit": "MANRO",
+    "img": [
+      {
+        "id": 1,
+        "pic": "/image/concerts/RF-01.JPG"
+      },
+      {
+        "id": 2,
+        "pic": "/image/concerts/RF-02.JPG"
+      },
+      {
+        "id": 3,
+        "pic": "/image/concerts/RF-03.JPG"
+      },
+      {
+        "id": 4,
+        "pic": "/image/concerts/RF-04.JPG"
+      },
+      {
+        "id": 5,
+        "pic": "/image/concerts/RF-05.JPG"
+      },
+      {
+        "id": 6,
+        "pic": "/image/concerts/RF-06.JPG"
+      },
+      {
+        "id": 7,
+        "pic": "/image/concerts/RF-07.JPG"
+      },
+      {
+        "id": 8,
+        "pic": "/image/concerts/RF-08.JPG"
+      },
+      {
+        "id": 9,
+        "pic": "/image/concerts/RF-09.JPG"
+      },
+      {
+        "id": 10,
+        "pic": "/image/concerts/RF-10.JPG"
+      },
+      {
+        "id": 11,
+        "pic": "/image/concerts/RF-11.JPG"
+      },
+      {
+        "id": 12,
+        "pic": "/image/concerts/RF-12.JPG"
+      }
+    ]
+  },
+  {
+    "id": "3d9220c5-2258-411e-b20b-e2ea4b8c6b8d",
+    "code": "TOM-CON-0004",
+    "status": "PUBLICADO",
+    "publish": "2026-11-02T05:07:29.988Z",
+    "concert": "DISMEMBER PIG",
+    "date": "15 NOV 2025",
+    "venue": "Gato Calavera",
+    "city": "CDMX",
+    "title": "Dismember Pig en el Gato Calavera",
+    "desc": "Dismember Pig llevó su sonido al escenario del Gato Calavera en la Ciudad de México. Una selección de imágenes que recorre la energía del concierto y la conexión con el público.",
+    "credit": "MANRO",
+    "img": [
+      {
+        "id": 1,
+        "pic": "/image/concerts/IMG_20251115_192120.jpg"
+      },
+      {
+        "id": 2,
+        "pic": "/image/concerts/IMG_20251115_194543.jpg"
+      },
+      {
+        "id": 3,
+        "pic": "/image/concerts/IMG_20251115_204502.jpg"
+      },
+      {
+        "id": 4,
+        "pic": "/image/concerts/IMG_20251115_204525.jpg"
+      },
+      {
+        "id": 5,
+        "pic": "/image/concerts/IMG_20251115_205204.jpg"
+      },
+      {
+        "id": 6,
+        "pic": "/image/concerts/IMG_20251115_222520.jpg"
+      },
+      {
+        "id": 7,
+        "pic": "/image/concerts/IMG_20251115_222536.jpg"
+      },
+      {
+        "id": 8,
+        "pic": "/image/concerts/IMG_20251115_222541.jpg"
+      },
+      {
+        "id": 9,
+        "pic": "/image/concerts/IMG_20251115_231302.jpg"
+      },
+      {
+        "id": 10,
+        "pic": "/image/concerts/IMG_20251115_231334.jpg"
+      },
+      {
+        "id": 11,
+        "pic": "/image/concerts/IMG_20251115_231412.jpg"
+      },
+      {
+        "id": 12,
+        "pic": "/image/concerts/IMG_20251115_231417.jpg"
+      }
+    ]
+  },
+  {
+    "id": "c8e15484-dc1c-42ca-8d54-98d475296fe3",
+    "code": "TOM-CON-0005",
+    "status": "PUBLICADO",
+    "publish": "2026-11-02T05:09:29.988Z",
+    "date": "02 NOV 2024",
+    "venue": "CIRCO VOLADOR, CDMX",
+    "city": "CDMX",
+    "title": "ROTTING CHRIST + BORKNAGAR: MISTICISMO EN CDMX",
+    "desc": "Una sesión hipnótica de misticismo helénico y metal pagano nórdico. Sakis Tolis lideró un aquelarre sonoro con un despliegue lumínico escarlata que transformó el recinto.",
+    "photographer": "JAVIER R.",
+    "category": "CLUBES & UNDERGROUND",
+    "image": "/src/assets/images/metal_concert_pyro_1791593129897.jpg",
+    "concert": "ROTTING CHRIST + BORKNAGAR: MISTICISMO EN CDMX",
+    "credit": "JAVIER R.",
+    "img": [
+      {
+        "id": 1,
+        "pic": "/src/assets/images/metal_concert_pyro_1791593129897.jpg"
+      }
+    ]
+  },
+  {
+    "id": "9d919a2d-d806-4dfe-94ab-c27cbdae0bb9",
+    "code": "TOM-CON-0006",
+    "status": "BORRADOR",
+    "publish": "2026-11-02T05:02:29.988Z",
+    "date": "14 OCT 2024",
+    "venue": "BRUTAL ASSAULT, REP. CHECA",
+    "city": "CDMX",
+    "title": "GORGOROTH EN LLAMAS EN EL ESCENARIO PRINCIPAL",
+    "desc": "Invocación cruda entre los muros de la fortaleza de Josefov. Los noruegos desplegaron una descarga inflexible de furia analógica, rodeados por antorchas y niebla.",
+    "photographer": "M. LINDQVIST",
+    "category": "FESTIVALES",
+    "image": "/src/assets/images/metal_concert_pyro_1791593129897.jpg",
+    "concert": "GORGOROTH EN LLAMAS EN EL ESCENARIO PRINCIPAL",
+    "credit": "M. LINDQVIST",
+    "img": [
+      {
+        "id": 1,
+        "pic": "/src/assets/images/metal_concert_pyro_1791593129897.jpg"
+      }
+    ]
+  },
+  {
+    "id": "5697d671-4f92-4b11-8bd1-21b65b60fc3d",
+    "code": "TOM-CON-0007",
+    "status": "BORRADOR",
+    "publish": "2026-11-02T05:04:29.988Z",
+    "date": "18 ENE 2025",
+    "venue": "BLACK TRIDENT, ESTOCOLMO",
+    "city": "CDMX",
+    "title": "WATAIN: CEREMONIA DE SANGRE Y FUEGO SAGRADO",
+    "desc": "Una misa siniestra en su propia tierra natal. Olor a azufre, sudor en primera fila y una atmósfera asfixiante capturada al filo de los tridentes llameantes en el foso más peligroso.",
+    "photographer": "ELENA S.",
+    "category": "EXCLUSIVAS PIT",
+    "image": "/src/assets/images/album_black_metal_cover_1791593147308.jpg",
+    "concert": "WATAIN: CEREMONIA DE SANGRE Y FUEGO SAGRADO",
+    "credit": "ELENA S.",
+    "img": [
+      {
+        "id": 1,
+        "pic": "/src/assets/images/album_black_metal_cover_1791593147308.jpg"
+      }
+    ]
+  },
+  {
+    "id": "43cdb991-fd90-4bc8-8cb8-a7fba4fd4522",
+    "code": "TOM-CON-0009",
+    "status": "BORRADOR",
+    "publish": "2026-11-02T05:06:29.988Z",
+    "date": "05 FEB 2025",
+    "venue": "MARYLAND DEATHFEST, EE.UU.",
+    "city": "CDMX",
+    "photosCount": "28 FOTOS HD",
+    "title": "AUTOPSY & NECROPHAGIA: CARNICERÍA EN BALTIMORE",
+    "desc": "Carnicería pura en los escenarios de Baltimore. Chris Reifert desató su gutural demencial tras los tambores mientras el foso se abría en un torbellino de cuero y cadenas.",
+    "photographer": "TRAVIS K.",
+    "category": "FESTIVALES",
+    "image": "/src/assets/images/metal_studio_podcast_1791593120127.jpg",
+    "concert": "AUTOPSY & NECROPHAGIA: CARNICERÍA EN BALTIMORE",
+    "credit": "TRAVIS K.",
+    "img": [
+      {
+        "id": 1,
+        "pic": "/src/assets/images/metal_studio_podcast_1791593120127.jpg"
+      }
+    ]
+  },
+  {
+    "id": "66737f00-3257-4c64-b531-161ea4a85200",
+    "code": "TOM-CON-0010",
+    "status": "BORRADOR",
+    "publish": "2026-11-02T05:08:29.988Z",
+    "date": "28 ENE 2025",
+    "venue": "ARENA CDMX, MÉXICO",
+    "city": "CDMX",
+    "photosCount": "52 FOTOS HD",
+    "title": "CANNIBAL CORPSE: CICLÓN DE DEATH METAL TÉCNICO",
+    "desc": "El legendario cabeceo circular de Corpsegrinder capturado a 1/1000s. Una demostración demoledora de death metal técnico y contundente ante 12,000 fanáticos.",
+    "photographer": "JAVIER R.",
+    "category": "GIRAS MUNDIALES",
+    "image": "/src/assets/images/metal_concert_pyro_1791593129897.jpg",
+    "concert": "CANNIBAL CORPSE: CICLÓN DE DEATH METAL TÉCNICO",
+    "credit": "JAVIER R.",
+    "img": [
+      {
+        "id": 1,
+        "pic": "/src/assets/images/metal_concert_pyro_1791593129897.jpg"
+      }
+    ]
+  },
+  {
+    "id": "15246f00-7523-4c64-b531-161ea4a90595",
+    "code": "TOM-CON-0011",
+    "status": "BORRADOR",
+    "publish": "2026-11-02T05:10:29.988Z",
+    "date": "12 DIC 2024",
+    "venue": "ROADBURN, PAÍSES BAJOS",
+    "city": "CDMX",
+    "photosCount": "36 FOTOS HD",
+    "title": "CANDLEMASS: CATEDRALES DEL EPIC DOOM METAL",
+    "desc": "Melancolía pesada y tempos fúnebres. Luces cavernosas dibujaron siluetas monumentales mientras Johan Längqvist impartía lecciones de agonía vocal que estremecieron Tilburg.",
+    "photographer": "ARJEN V.",
+    "category": "FESTIVALES",
+    "image": "/src/assets/images/album_catacombs_cover_1791593139425.jpg",
+    "concert": "CANDLEMASS: CATEDRALES DEL EPIC DOOM METAL",
+    "credit": "ARJEN V.",
+    "img": [
+      {
+        "id": 1,
+        "pic": "/src/assets/images/album_catacombs_cover_1791593139425.jpg"
+      }
+    ]
+  }
+]

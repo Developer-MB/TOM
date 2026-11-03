@@ -4,15 +4,17 @@ import { AudioTrack, SectionId } from '../data/mockData';
 import HeadGallery from '../components/Gallery/HeadGallery';
 import BigPhoto from '../components/Gallery/BigPhoto';
 import FilterGallery from '../components/organism/FilterGallery';
+import type { HomeGalleryItem } from '../data/HomePics';
 
 interface GallerySectionProps {
   currentTrack: AudioTrack;
   isPlaying: boolean;
   onTogglePlay: () => void;
   onSelectSection: (section: SectionId) => void;
+  galleries: HomeGalleryItem[];
 }
 
-export const GallerySection: React.FC<GallerySectionProps> = () => {
+export const GallerySection: React.FC<GallerySectionProps> = ({ galleries }) => {
   const [lightboxItem, setLightboxItem] = useState<{
     title: string;
     venue: string;
@@ -31,13 +33,13 @@ export const GallerySection: React.FC<GallerySectionProps> = () => {
 
       {/* FEATURED MONUMENTAL GALLERY */}
       <section className="max-w-[1440px] mx-auto px-4 lg:px-8 pb-8">
-        <BigPhoto />
+        <BigPhoto galleries={galleries} />
       </section>
 
       {/* FILTER BAR & SEARCH */}
       <section className="max-w-[1440px] mx-auto px-4 lg:px-8 pb-8">
         {/* 6-CARD PHOTO GALLERY GRID */}
-        <FilterGallery />
+        <FilterGallery galleries={galleries} />
       </section>
 
       {/* LIGHTBOX MODAL */}

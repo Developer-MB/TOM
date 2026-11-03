@@ -1,10 +1,12 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Calendar, Play, Search, Volume2 } from 'lucide-react';
 import { AudioTrack, SectionId } from '../data/mockData';
-import { HOME_VIDEOS, resolveHomeVideoUrl } from '../data/HomeVideo';
+import { HOME_VIDEOS, resolveHomeVideoUrl, type ResolvedHomeVideo } from '../data/HomeVideo';
+import type { HomeVideosResponse } from '../data/HomeVideo';
 import type { YouTubeVideo } from '../data/YouTube';
 import HeadVideo from '../components/Videopodcast/HeadVideo';
 import PremierEpisode from '../components/Videopodcast/PremierEpisode';
+import { readJsonResponse } from '../data/readJsonResponse';
 
 interface VideopodcastSectionProps {
   currentTrack: AudioTrack;
@@ -17,20 +19,43 @@ export const VideopodcastSection: React.FC<VideopodcastSectionProps> = ({
   onTogglePlay,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const videos = useMemo(() => HOME_VIDEOS
-    .map((video): YouTubeVideo => {
-      const resolvedVideo = resolveHomeVideoUrl(video.url);
-      return {
-        id: resolvedVideo.videoId,
-        title: video.title,
-        description: video.description,
-        publishedAt: video.fecha,
-        thumbnailUrl: resolvedVideo.thumbnailUrl,
-      };
-    })
+  const [videosFromCms, setVideosFromCms] = useState<ResolvedHomeVideo[]>(() =>
+    HOME_VIDEOS.map((video) => ({ ...video, ...resolveHomeVideoUrl(video.url) })),
+  );
+  const [videoError, setVideoError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const loadVideos = async () => {
+      try {
+        const response = await fetch('/api/home/videos', { signal: controller.signal });
+        const result = await readJsonResponse<HomeVideosResponse>(
+          response,
+          'No se pudieron cargar los videos publicados.',
+        );
+        setVideosFromCms(result.items);
+        setVideoError(null);
+      } catch (error) {
+        if (controller.signal.aborted) return;
+        setVideoError(error instanceof Error ? error.message : 'No se pudieron cargar los videos publicados.');
+      }
+    };
+
+    void loadVideos();
+    return () => controller.abort();
+  }, []);
+
+  const videos = useMemo(() => videosFromCms
+    .map((video): YouTubeVideo => ({
+      id: video.videoId,
+      title: video.title,
+      description: video.description,
+      publishedAt: video.publish,
+      thumbnailUrl: video.thumbnailUrl,
+    }))
     .sort((first, second) =>
       new Date(second.publishedAt).getTime() - new Date(first.publishedAt).getTime()
-    ), []);
+    ), [videosFromCms]);
   const [latestVideo, ...otherVideos] = videos;
   const filteredVideos = otherVideos.filter((video) => {
     const query = searchQuery.trim().toLowerCase();
@@ -49,11 +74,16 @@ export const VideopodcastSection: React.FC<VideopodcastSectionProps> = ({
 
       {/* VIDEO MÁS RECIENTE */}
       <section className="max-w-[1440px] mx-auto px-4 lg:px-8 pb-8">
+        {videoError && (
+          <p role="alert" className="mb-4 border border-red-900 bg-red-950/40 p-4 text-sm text-red-300">
+            {videoError} Se muestran los videos guardados localmente.
+          </p>
+        )}
         {latestVideo ? (
           <PremierEpisode onTogglePlay={onTogglePlay} video={latestVideo} />
         ) : (
           <p className="border border-zinc-800 bg-[#0E0E12] p-6 text-sm text-zinc-400">
-            No hay videos configurados en HOME_VIDEOS.
+            No hay videos publicados todavía.
           </p>
         )}
       </section>
