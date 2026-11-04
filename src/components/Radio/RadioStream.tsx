@@ -232,12 +232,12 @@ const RadioStream = () => {
           <li><span className="mr-2 font-mono text-[#DC2626]">03</span>En <strong>Encoder</strong>, elige MP3 y un bitrate compatible con tu plan (por ejemplo, 128 kbps); en <strong>Input</strong>, selecciona Winamp o la entrada de audio.</li>
           <li><span className="mr-2 font-mono text-[#DC2626]">04</span>Pulsa <strong>Connect</strong> en Output. Cuando el panel del proveedor muestre la fuente conectada, pega aquí la URL pública de escucha.</li>
         </ol>
-        <div className="mt-6 border-l-2 border-amber-500 bg-amber-500/5 px-4 py-3 text-xs leading-relaxed text-amber-100/80">
+        {/* <div className="mt-6 border-l-2 border-amber-500 bg-amber-500/5 px-4 py-3 text-xs leading-relaxed text-amber-100/80">
           No pongas la contraseña de fuente en esta web. Usa la URL de oyentes indicada por tu proveedor; algunos servidores Shoutcast v2 requieren añadir el identificador de stream (por ejemplo, <code>/;stream/1</code>).
         </div>
         <p className="mt-4 text-xs leading-relaxed text-zinc-500">
           Si la web está en HTTPS y el servidor solo ofrece HTTP, el navegador bloqueará la conexión. Habilita HTTPS para oyentes o configura un proxy inverso seguro en el servidor.
-        </p>
+        </p> */}
       </aside>
     </div>
   );
