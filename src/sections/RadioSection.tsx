@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { AudioTrack } from '../data/mockData';
 import HeadRadio from '../components/Radio/HeadRadio';
 import ContentRadio from '../components/Radio/ContentRadio';
+import RadioStream from '../components/Radio/RadioStream';
 
 interface RadioSectionProps {
   currentTrack: AudioTrack;
@@ -95,16 +96,14 @@ export const RadioSection: React.FC<RadioSectionProps> = ({
 
   return (
     <div className="min-h-screen bg-black text-[#F4F4F6]">
-      {/* SECTION HEADER */}
       <section className="max-w-360 mx-auto px-4 lg:px-8 pt-8 pb-6">
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-8 border-b border-zinc-800/80">
           <HeadRadio />
         </div>
       </section>
 
-      {/* MASTER BROADCAST DECK CONSOLE */}
       <section className="max-w-360 mx-auto px-4 lg:px-8 pb-10">
-        <ContentRadio
+        {/* <ContentRadio
           currentTrack={currentTrack}
           isPlaying={isPlaying}
           audioAnalyser={audioAnalyser}
@@ -113,7 +112,8 @@ export const RadioSection: React.FC<RadioSectionProps> = ({
           volume={volume}
           onVolumeChange={onVolumeChange}
           onSelectTrack={onSelectTrack}
-        />
+        /> */}
+        <RadioStream />
       </section>
     </div>
   );

@@ -239,11 +239,9 @@ export default function App() {
 
   const handleSelectSection = (section: SectionId) => {
     setActiveSection(section);
-    if (section === 'radio' && !isPlaying) {
-      void audioContextRef.current?.resume().catch((error: unknown) => {
-        console.error('No se pudo activar el análisis de audio:', error);
-      });
-      setPlayRequestId((requestId) => requestId + 1);
+    if (section === 'radio') {
+      audioRef.current?.pause();
+      setIsPlaying(false);
     }
   };
 
