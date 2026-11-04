@@ -103,7 +103,7 @@ export const RadioSection: React.FC<RadioSectionProps> = ({
       </section>
 
       <section className="max-w-360 mx-auto px-4 lg:px-8 pb-10">
-        {/* <ContentRadio
+        <ContentRadio
           currentTrack={currentTrack}
           isPlaying={isPlaying}
           audioAnalyser={audioAnalyser}
@@ -112,8 +112,8 @@ export const RadioSection: React.FC<RadioSectionProps> = ({
           volume={volume}
           onVolumeChange={onVolumeChange}
           onSelectTrack={onSelectTrack}
-        /> */}
-        <RadioStream />
+        />
+        {/* <RadioStream /> */}
       </section>
     </div>
   );

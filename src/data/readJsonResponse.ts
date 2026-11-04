@@ -3,6 +3,13 @@ const getErrorMessage = (body: unknown): string | undefined => {
   return typeof body.error === 'string' ? body.error : undefined;
 };
 
+const isHtmlPayload = (response: Response, text: string): boolean => {
+  const contentType = (response.headers.get('content-type') ?? '').toLowerCase();
+  if (contentType.includes('text/html')) return true;
+  const trimmed = text.trimStart().toLowerCase();
+  return trimmed.startsWith('<!doctype html') || trimmed.startsWith('<html');
+};
+
 export const readJsonResponse = async <T>(
   response: Response,
   fallbackMessage: string,
@@ -11,6 +18,9 @@ export const readJsonResponse = async <T>(
   let body: unknown;
 
   if (text.trim()) {
+    if (isHtmlPayload(response, text)) {
+      throw new Error(`${fallbackMessage} (el servidor de archivos estáticos no soporta esta ruta API).`);
+    }
     try {
       body = JSON.parse(text);
     } catch {
@@ -31,11 +41,21 @@ export const readJsonResponse = async <T>(
   return body as T;
 };
 
-export const readJsonResponseOrFallback = <T>(
+export const readJsonResponseOrFallback = async <T>(
   response: Response,
   fallbackMessage: string,
   fallbackValue: T,
 ): Promise<T> => {
-  if (response.status === 404) return Promise.resolve(fallbackValue);
-  return readJsonResponse<T>(response, fallbackMessage);
+  if (!response.ok) return fallbackValue;
+
+  const contentType = (response.headers.get('content-type') ?? '').toLowerCase();
+  if (contentType.includes('text/html')) {
+    return fallbackValue;
+  }
+
+  try {
+    return await readJsonResponse<T>(response, fallbackMessage);
+  } catch {
+    return fallbackValue;
+  }
 };
