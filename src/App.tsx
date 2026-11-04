@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
-import { AudioTrack, SectionId } from './data/mockData';
+import React, { useState, useRef, useEffect } from 'react';
+import { AudioTrack } from './data/mockData';
 import { Navbar } from './components/organism/Navbar';
 import { Footer } from './components/organism/Footer';
 import { HomeSection } from './sections/HomeSection';
@@ -19,53 +19,7 @@ import {
 } from './data/Cms';
 import { readJsonResponseOrFallback } from './data/readJsonResponse';
 import { toHomeGalleryItems } from './data/HomePics';
-
-const VALID_SECTIONS: SectionId[] = [
-  'inicio',
-  'resenas',
-  'galeria',
-  'videopodcast',
-  'eventos',
-  'radio',
-  'merch',
-  'cms',
-];
-
-const SECTION_PATHS: Record<SectionId, string> = {
-  inicio: '/',
-  resenas: '/recomendaciones',
-  galeria: '/galeria',
-  videopodcast: '/videos',
-  eventos: '/giras',
-  radio: '/radio',
-  merch: '/merch',
-  cms: '/cms-admin',
-};
-
-const PATH_SECTIONS: Record<string, SectionId> = {
-  '/': 'inicio',
-  '/inicio': 'inicio',
-  '/recomendaciones': 'resenas',
-  '/galeria': 'galeria',
-  '/videos': 'videopodcast',
-  '/giras': 'eventos',
-  '/radio': 'radio',
-  '/merch': 'merch',
-  '/mercancia': 'merch',
-  '/cms-admin': 'cms',
-};
-
-const getInitialSection = (): SectionId => {
-  if (typeof window === 'undefined') return 'inicio';
-  const pathSection = PATH_SECTIONS[window.location.pathname.replace(/\/+$/, '').toLowerCase() || '/'];
-  if (pathSection) return pathSection;
-
-  const params = new URLSearchParams(window.location.search);
-  const sectionParam = params.get('section') || window.location.hash.replace(/^#/, '');
-  return VALID_SECTIONS.includes(sectionParam as SectionId)
-    ? (sectionParam as SectionId)
-    : 'inicio';
-};
+import { useSectionRouter } from './routes/useSectionRouter';
 
 const toAudioTrack = (track: (typeof AUDIO_ASSETS)[number]): AudioTrack => ({
   id: track.id,
@@ -80,7 +34,7 @@ const toAudioTrack = (track: (typeof AUDIO_ASSETS)[number]): AudioTrack => ({
 });
 
 export default function App() {
-  const [activeSection, setActiveSection] = useState<SectionId>(getInitialSection);
+  const { activeSection, navigateToSection: handleSelectSection } = useSectionRouter();
   const [currentTrack, setCurrentTrack] = useState<AudioTrack>(() => toAudioTrack(AUDIO_ASSETS[0]));
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [cmsPosts, setCmsPosts] = useState<CmsPostItem[]>(INITIAL_CMS_ITEMS);
@@ -145,30 +99,11 @@ export default function App() {
     };
   }, []);
 
-  useLayoutEffect(() => {
-    window.scrollTo(0, 0);
-  }, [activeSection]);
-
   useEffect(() => {
-    const previousScrollRestoration = window.history.scrollRestoration;
-    window.history.scrollRestoration = 'manual';
-
-    const handlePopState = () => {
-      const section = getInitialSection();
-      setActiveSection(section);
-      window.scrollTo(0, 0);
-      if (section === 'radio') {
-        audioRef.current?.pause();
-        setIsPlaying(false);
-      }
-    };
-
-    window.addEventListener('popstate', handlePopState);
-    return () => {
-      window.removeEventListener('popstate', handlePopState);
-      window.history.scrollRestoration = previousScrollRestoration;
-    };
-  }, []);
+    if (activeSection !== 'radio') return;
+    audioRef.current?.pause();
+    setIsPlaying(false);
+  }, [activeSection]);
 
   const handleTogglePlay = async () => {
     const audio = audioRef.current;
@@ -285,19 +220,6 @@ export default function App() {
   const handleVolumeChange = (nextVolume: number) => {
     setVolume(nextVolume);
     setIsMuted(false);
-  };
-
-  const handleSelectSection = (section: SectionId) => {
-    const nextPath = SECTION_PATHS[section];
-    if (window.location.pathname !== nextPath) {
-      window.history.pushState({ section }, '', nextPath);
-    }
-    setActiveSection(section);
-    window.scrollTo(0, 0);
-    if (section === 'radio') {
-      audioRef.current?.pause();
-      setIsPlaying(false);
-    }
   };
 
   const publishedRecommendations = cmsPosts.filter(
