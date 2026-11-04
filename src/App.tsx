@@ -10,6 +10,7 @@ import { CmsSection } from './sections/CmsSection';
 import { Tours } from './components/Tours/Tours';
 import { AUDIO_ASSETS } from './data/Radio';
 import { RadioSection } from './sections/RadioSection';
+import MerchSection from './sections/MerchSection';
 import {
   INITIAL_CMS_GALLERIES,
   INITIAL_CMS_ITEMS,
@@ -26,11 +27,39 @@ const VALID_SECTIONS: SectionId[] = [
   'videopodcast',
   'eventos',
   'radio',
+  'merch',
   'cms',
 ];
 
+const SECTION_PATHS: Record<SectionId, string> = {
+  inicio: '/',
+  resenas: '/recomendaciones',
+  galeria: '/galeria',
+  videopodcast: '/videos',
+  eventos: '/giras',
+  radio: '/radio',
+  merch: '/merch',
+  cms: '/cms-admin',
+};
+
+const PATH_SECTIONS: Record<string, SectionId> = {
+  '/': 'inicio',
+  '/inicio': 'inicio',
+  '/recomendaciones': 'resenas',
+  '/galeria': 'galeria',
+  '/videos': 'videopodcast',
+  '/giras': 'eventos',
+  '/radio': 'radio',
+  '/merch': 'merch',
+  '/mercancia': 'merch',
+  '/cms-admin': 'cms',
+};
+
 const getInitialSection = (): SectionId => {
   if (typeof window === 'undefined') return 'inicio';
+  const pathSection = PATH_SECTIONS[window.location.pathname.replace(/\/+$/, '').toLowerCase() || '/'];
+  if (pathSection) return pathSection;
+
   const params = new URLSearchParams(window.location.search);
   const sectionParam = params.get('section') || window.location.hash.replace(/^#/, '');
   return VALID_SECTIONS.includes(sectionParam as SectionId)
@@ -119,6 +148,27 @@ export default function App() {
   useLayoutEffect(() => {
     window.scrollTo(0, 0);
   }, [activeSection]);
+
+  useEffect(() => {
+    const previousScrollRestoration = window.history.scrollRestoration;
+    window.history.scrollRestoration = 'manual';
+
+    const handlePopState = () => {
+      const section = getInitialSection();
+      setActiveSection(section);
+      window.scrollTo(0, 0);
+      if (section === 'radio') {
+        audioRef.current?.pause();
+        setIsPlaying(false);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      window.history.scrollRestoration = previousScrollRestoration;
+    };
+  }, []);
 
   const handleTogglePlay = async () => {
     const audio = audioRef.current;
@@ -238,7 +288,12 @@ export default function App() {
   };
 
   const handleSelectSection = (section: SectionId) => {
+    const nextPath = SECTION_PATHS[section];
+    if (window.location.pathname !== nextPath) {
+      window.history.pushState({ section }, '', nextPath);
+    }
     setActiveSection(section);
+    window.scrollTo(0, 0);
     if (section === 'radio') {
       audioRef.current?.pause();
       setIsPlaying(false);
@@ -330,6 +385,8 @@ export default function App() {
             onSelectTrack={handleSelectTrack}
           />
         )}
+
+        {activeSection === 'merch' && <MerchSection />}
 
         {activeSection === 'cms' && (
           <CmsSection

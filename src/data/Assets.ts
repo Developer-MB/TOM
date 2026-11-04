@@ -21,5 +21,6 @@ export const ASSETS = {
     logoTOMVP: '/image/logos/TOM_PODCAST.jpg',
     logoPodcast: '/image/logos/podcast.jpg',
     logoRadio: '/image/logos/radio_time.jpg',
+    logoMerch: '/image/logos/merch_logo.jpg',
 };
 

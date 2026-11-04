@@ -9,7 +9,6 @@ interface FooterProps {
 export const Footer: React.FC<FooterProps> = ({ onSelectSection }) => {
   const navTo = (sec: SectionId) => {
     onSelectSection(sec);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const hoy = new Date();
@@ -69,6 +68,11 @@ export const Footer: React.FC<FooterProps> = ({ onSelectSection }) => {
               <li>
                 <button onClick={() => navTo('eventos')} className="hover:text-white transition-colors cursor-pointer">
                   Próximos Eventos
+                </button>
+              </li>
+              <li>
+                <button onClick={() => navTo('merch')} className="hover:text-white transition-colors cursor-pointer">
+                  Mercancía
                 </button>
               </li>
             </ul>

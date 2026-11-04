@@ -1,17 +1,18 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, ClipboardEdit, Eye, Search, Trash2 } from 'lucide-react';
 import type { SectionId } from '../../data/mockData';
-import type { CmsGalleryItem, CmsPostItem, CmsTourItem, CmsVideoItem } from '../../data/Cms';
+import type { CmsGalleryItem, CmsMerchProduct, CmsPostItem, CmsTourItem, CmsVideoItem } from '../../data/Cms';
 
 interface FilterRegisterProps {
     items: CmsPostItem[];
     galleries: CmsGalleryItem[];
     videos: CmsVideoItem[];
     tours: CmsTourItem[];
+    merchProducts: CmsMerchProduct[];
     searchQuery: string;
     onSearchQueryChange: (query: string) => void;
     onSelectSection: (section: SectionId) => void;
-    onDeleteItem: (id: string, type: 'post' | 'video' | 'tour') => void;
+    onDeleteItem: (id: string, type: 'post' | 'video' | 'tour' | 'merch') => void;
     onContinueGallery: (id: string) => void;
     onContinueVideo: (id: string) => void;
     onContinueTour: (id: string) => void;
@@ -22,6 +23,7 @@ const FilterRegister: React.FC<FilterRegisterProps> = ({
     galleries,
     videos,
     tours,
+    merchProducts,
     searchQuery,
     onSearchQueryChange,
     onSelectSection: _onSelectSection,
@@ -57,6 +59,7 @@ const FilterRegister: React.FC<FilterRegisterProps> = ({
             isGallery: false,
             isVideo: false,
             isTour: false,
+            isMerch: false,
         })),
         ...videos.map((video) => ({
             id: video.id,
@@ -71,6 +74,7 @@ const FilterRegister: React.FC<FilterRegisterProps> = ({
             isGallery: false,
             isVideo: true,
             isTour: false,
+            isMerch: false,
         })),
         ...tours.map((tour) => ({
             id: tour.id,
@@ -85,6 +89,7 @@ const FilterRegister: React.FC<FilterRegisterProps> = ({
             isGallery: false,
             isVideo: false,
             isTour: true,
+            isMerch: false,
         })),
         ...galleries.map((gallery, index) => ({
             id: gallery.id,
@@ -99,8 +104,24 @@ const FilterRegister: React.FC<FilterRegisterProps> = ({
             isGallery: true,
             isVideo: false,
             isTour: false,
+            isMerch: false,
         })),
-    ], [items, galleries, videos, tours]);
+        ...merchProducts.map((product) => ({
+            id: product.id,
+            code: product.code,
+            title: product.name,
+            details: `${product.category} · $${product.price.toFixed(2)} MXN · ${product.publish || 'Sin publicar'}`,
+            type: 'MERCH',
+            author: 'MERCANCÍA',
+            status: product.status,
+            date: product.publish,
+            section: 'merch' as const,
+            isGallery: false,
+            isVideo: false,
+            isTour: false,
+            isMerch: true,
+        })),
+    ], [items, galleries, videos, tours, merchProducts]);
 
     const authors = useMemo(
         () => [...new Set(entries.map((entry) => entry.author).filter(Boolean))]
@@ -180,7 +201,7 @@ const FilterRegister: React.FC<FilterRegisterProps> = ({
                             TIPO
                             <select aria-label="Filtrar por tipo" value={typeFilter} onChange={(event) => setTypeFilter(event.target.value)} className={selectClassName}>
                                 <option value="TODOS">Todos</option>
-                                {['RECOMENDACION', 'GALERIA', 'VIDEO', 'GIRAS'].map((type) => (
+                                {['RECOMENDACION', 'GALERIA', 'VIDEO', 'GIRAS', 'MERCH'].map((type) => (
                                     <option key={type} value={type}>{type}</option>
                                 ))}
                             </select>
@@ -236,7 +257,7 @@ const FilterRegister: React.FC<FilterRegisterProps> = ({
                             <td className="py-3.5 px-4 text-right">
                                 <div className="inline-flex items-center gap-2">
                                     <a
-                                        href={`/?section=${entry.section}`}
+                                    href={`/${entry.section === 'resenas' ? 'recomendaciones' : entry.section === 'videopodcast' ? 'videos' : entry.section === 'eventos' ? 'giras' : entry.section}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="p-1.5 text-zinc-400 hover:text-white border border-zinc-800 hover:border-zinc-600 cursor-pointer"
@@ -249,7 +270,7 @@ const FilterRegister: React.FC<FilterRegisterProps> = ({
                                         <button
                                             onClick={() => onDeleteItem(
                                                 entry.id,
-                                                entry.isTour ? 'tour' : entry.isVideo ? 'video' : 'post',
+                                                entry.isMerch ? 'merch' : entry.isTour ? 'tour' : entry.isVideo ? 'video' : 'post',
                                             )}
                                             className="p-1.5 text-zinc-400 hover:text-[#DC2626] border border-zinc-800 hover:border-[#DC2626] cursor-pointer"
                                             title="Eliminar entrada"

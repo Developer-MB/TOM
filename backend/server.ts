@@ -10,12 +10,15 @@ import {
 } from '../src/data/Cms';
 import type {
   CmsNodeStatus,
+  CmsMerchProduct,
   CmsPostItem,
   CmsPostStatus,
   CmsPostType,
   CmsTourItem,
   CmsVideoItem,
+  MerchCategory,
 } from '../src/data/CmsTypes';
+import { INITIAL_CMS_MERCH, MERCH_CATEGORIES } from '../src/data/Cms';
 import { AUDIO_ASSETS } from '../src/data/Radio';
 import { resolveHomeVideoUrl } from '../src/data/YouTubeUrl';
 import { INITIAL_CMS_TOURS } from '../src/data/HomeTours';
@@ -100,7 +103,9 @@ const cmsPostsPath = path.join(cmsDataDirectory, 'post-disc.json');
 const cmsGalleriesPath = path.join(cmsDataDirectory, 'post-pics.json');
 const cmsVideosPath = path.join(cmsDataDirectory, 'post-video.json');
 const cmsToursPath = path.join(cmsDataDirectory, 'post-tours.json');
+const cmsMerchPath = path.join(cmsDataDirectory, 'post-merch.json');
 const discCoversDirectory = path.join(projectDirectory, 'public', 'image', 'discos');
+const merchImagesDirectory = path.join(projectDirectory, 'public', 'image', 'merch');
 const concertPhotosDirectory = path.join(projectDirectory, 'public', 'image', 'concerts');
 const port = Number(process.env.PORT ?? 3001);
 const cacheDurationMs = 10 * 60 * 1000;
@@ -207,6 +212,11 @@ type CmsVideoInput = {
   url: string;
   status: CmsPostStatus;
   publish: string;
+};
+
+type CmsMerchInput = Omit<CmsMerchProduct, 'id' | 'code' | 'image' | 'publish'> & {
+  publish: string;
+  productImage: unknown;
 };
 
 type CmsTourInput = Omit<CmsTourItem, 'id' | 'code'>;
@@ -326,6 +336,70 @@ const readCmsVideos = async (): Promise<CmsVideoItem[]> => {
 const writeCmsVideos = async (videos: CmsVideoItem[]) => {
   await mkdir(cmsDataDirectory, { recursive: true });
   await writeFile(cmsVideosPath, `${JSON.stringify(videos, null, 2)}\n`, 'utf8');
+};
+
+const isValidMerchUrl = (value: string) => {
+  if (!value) return true;
+  try {
+    const url = new URL(value);
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch {
+    return false;
+  }
+};
+
+const isCmsMerchInput = (value: unknown): value is CmsMerchInput =>
+  isRecord(value) &&
+  typeof value.name === 'string' &&
+  typeof value.category === 'string' &&
+  MERCH_CATEGORIES.includes(value.category as MerchCategory) &&
+  typeof value.description === 'string' &&
+  typeof value.price === 'number' &&
+  Number.isFinite(value.price) &&
+  value.price >= 0 &&
+  typeof value.purchaseUrl === 'string' &&
+  isValidMerchUrl(value.purchaseUrl) &&
+  cmsPostStatuses.includes(value.status as CmsPostStatus) &&
+  typeof value.publish === 'string' &&
+  'productImage' in value;
+
+const isCmsMerchProduct = (value: unknown): value is CmsMerchProduct =>
+  isRecord(value) &&
+  typeof value.id === 'string' &&
+  typeof value.code === 'string' &&
+  /^TOM-MER-\d{4}$/.test(value.code) &&
+  typeof value.name === 'string' &&
+  MERCH_CATEGORIES.includes(value.category as MerchCategory) &&
+  typeof value.description === 'string' &&
+  typeof value.price === 'number' &&
+  Number.isFinite(value.price) &&
+  value.price >= 0 &&
+  typeof value.image === 'string' &&
+  typeof value.purchaseUrl === 'string' &&
+  isValidMerchUrl(value.purchaseUrl) &&
+  cmsPostStatuses.includes(value.status as CmsPostStatus) &&
+  typeof value.publish === 'string';
+
+const readCmsMerch = async (): Promise<CmsMerchProduct[]> => {
+  try {
+    const contents = await readFile(cmsMerchPath, 'utf8');
+    const products: unknown = JSON.parse(contents);
+    if (!Array.isArray(products) || !products.every(isCmsMerchProduct)) {
+      throw new Error('El archivo de mercancía del CMS tiene un formato no válido.');
+    }
+    return products;
+  } catch (error) {
+    if (!isRecord(error) || error.code !== 'ENOENT') throw error;
+
+    await mkdir(cmsDataDirectory, { recursive: true });
+    await writeFile(cmsMerchPath, `${JSON.stringify(INITIAL_CMS_MERCH, null, 2)}\n`, 'utf8');
+    return [...INITIAL_CMS_MERCH];
+  }
+};
+
+const writeCmsMerch = async (products: CmsMerchProduct[]) => {
+  await mkdir(cmsDataDirectory, { recursive: true });
+  await writeFile(cmsMerchPath, `${JSON.stringify(products, null, 2)}\n`, 'utf8');
 };
 
 const isGalleryRecord = (value: unknown): value is GalleryRecord =>
@@ -465,11 +539,12 @@ const writeCmsPosts = async (posts: CmsPostItem[]) => {
 
 const publishScheduledCmsEntries = async () => withCmsMutation(async () => {
   const now = Date.now();
-  const [posts, galleries, videos, tours] = await Promise.all([
+  const [posts, galleries, videos, tours, merch] = await Promise.all([
     readCmsPosts(),
     readCmsGalleries(),
     readCmsVideos(),
     readCmsTours(),
+    readCmsMerch(),
   ]);
   const publishedPosts = posts.map((post) =>
     post.status === 'PROGRAMADO' &&
@@ -500,17 +575,26 @@ const publishScheduledCmsEntries = async () => withCmsMutation(async () => {
       ? { ...tour, status: 'PUBLICADO' as const }
       : tour,
   );
+  const publishedMerch = merch.map((product) =>
+    product.status === 'PROGRAMADO' &&
+    Number.isFinite(Date.parse(product.publish)) &&
+    Date.parse(product.publish) <= now
+      ? { ...product, status: 'PUBLICADO' as const }
+      : product,
+  );
 
   const postsChanged = publishedPosts.some((post, index) => post !== posts[index]);
   const galleriesChanged = publishedGalleries.some((gallery, index) => gallery !== galleries[index]);
   const videosChanged = publishedVideos.some((video, index) => video !== videos[index]);
   const toursChanged = publishedTours.some((tour, index) => tour !== tours[index]);
+  const merchChanged = publishedMerch.some((product, index) => product !== merch[index]);
   if (postsChanged) await writeCmsPosts(publishedPosts);
   if (galleriesChanged) await writeCmsGalleries(publishedGalleries);
   if (videosChanged) await writeCmsVideos(publishedVideos);
   if (toursChanged) await writeCmsTours(publishedTours);
+  if (merchChanged) await writeCmsMerch(publishedMerch);
 
-  return postsChanged || galleriesChanged || videosChanged || toursChanged;
+  return postsChanged || galleriesChanged || videosChanged || toursChanged || merchChanged;
 });
 
 type GalleryCreateInput = Record<keyof typeof maxGalleryFieldLengths, string> & {
@@ -1139,6 +1223,107 @@ app.delete('/api/cms/tours/:id', async (request, response) => {
   } catch (error) {
     console.error('No se pudo eliminar la gira del CMS:', error);
     response.status(500).json({ error: 'No se pudo eliminar la gira.' });
+  }
+});
+
+app.get('/api/cms/merch', async (_request, response) => {
+  try {
+    response.setHeader('Cache-Control', 'no-store');
+    await publishScheduledCmsEntries();
+    response.json(await readCmsMerch());
+  } catch (error) {
+    console.error('No se pudo leer la mercancía del CMS:', error);
+    response.status(500).json({ error: 'No se pudo cargar la mercancía.' });
+  }
+});
+
+app.post('/api/cms/merch', async (request, response) => {
+  const body: unknown = request.body;
+  if (
+    !isCmsMerchInput(body) ||
+    !body.name.trim() ||
+    body.name.trim().length > 150 ||
+    body.description.trim().length > 2000 ||
+    body.price > 1_000_000_000 ||
+    body.purchaseUrl.length > 2048 ||
+    body.publish.length > 100
+  ) {
+    response.status(400).json({ error: 'Los datos del producto no son válidos. Revisa los campos.' });
+    return;
+  }
+  if (body.status === 'PROGRAMADO' && (!body.publish || !Number.isFinite(Date.parse(body.publish)))) {
+    response.status(400).json({ error: 'Indica una fecha y hora válida para la publicación programada.' });
+    return;
+  }
+
+  const productImage = parseCoverImage(body.productImage);
+  if (!productImage) {
+    response.status(400).json({ error: 'Selecciona una imagen válida de hasta 5 MB.' });
+    return;
+  }
+
+  try {
+    const created = await withCmsMutation(async () => {
+      const products = await readCmsMerch();
+      const highestCode = products.reduce((highest, product) => {
+        const codeNumber = Number(product.code.match(/^TOM-MER-(\d+)$/)?.[1]);
+        return Number.isFinite(codeNumber) ? Math.max(highest, codeNumber) : highest;
+      }, 0);
+      const filename = `${randomUUID()}.${productImage.extension}`;
+      const imagePath = path.join(merchImagesDirectory, filename);
+      await mkdir(merchImagesDirectory, { recursive: true });
+      await writeFile(imagePath, productImage.bytes, { flag: 'wx' });
+
+      try {
+        const product: CmsMerchProduct = {
+          id: randomUUID(),
+          code: `TOM-MER-${String(highestCode + 1).padStart(4, '0')}`,
+          name: body.name.trim(),
+          category: body.category,
+          description: body.description.trim(),
+          price: Math.round(body.price * 100) / 100,
+          image: `/image/merch/${filename}`,
+          purchaseUrl: body.purchaseUrl.trim(),
+          status: body.status,
+          publish: body.status === 'PUBLICADO'
+            ? new Date().toISOString()
+            : body.status === 'PROGRAMADO'
+              ? new Date(body.publish).toISOString()
+              : '',
+        };
+        await writeCmsMerch([product, ...products]);
+        return product;
+      } catch (error) {
+        await unlink(imagePath);
+        throw error;
+      }
+    });
+
+    response.status(201).json(created);
+  } catch (error) {
+    console.error('No se pudo guardar el producto del CMS:', error);
+    response.status(500).json({ error: 'No se pudo guardar el producto.' });
+  }
+});
+
+app.delete('/api/cms/merch/:id', async (request, response) => {
+  try {
+    const deleted = await withCmsMutation(async () => {
+      const products = await readCmsMerch();
+      const remainingProducts = products.filter((product) => product.id !== request.params.id);
+      if (remainingProducts.length === products.length) return false;
+      await writeCmsMerch(remainingProducts);
+      return true;
+    });
+
+    if (!deleted) {
+      response.status(404).json({ error: 'No se encontró el producto solicitado.' });
+      return;
+    }
+    response.status(204).end();
+  } catch (error) {
+    console.error('No se pudo eliminar el producto del CMS:', error);
+    response.status(500).json({ error: 'No se pudo eliminar el producto.' });
   }
 });
 

@@ -5,18 +5,21 @@ import {
     Mic,
     Camera,
     Radio,
+    ShoppingBag,
 } from 'lucide-react'
 
 interface ControlModuleProps {
     recommendationCount: number;
     videoCount: number;
     galleryCount: number;
+    merchCount: number;
 }
 
 const ControlModule: React.FC<ControlModuleProps> = ({
     recommendationCount,
     videoCount,
     galleryCount,
+    merchCount,
 }) => {
     const [activeNav, setActiveNav] = useState('PANEL CENTRAL');
     return (
@@ -30,6 +33,7 @@ const ControlModule: React.FC<ControlModuleProps> = ({
                     { label: 'RECOMENDACIONES', icon: Disc, count: recommendationCount },
                     { label: 'VIDEOPODCAST', icon: Mic, count: videoCount },
                     { label: 'GALERÍAS', icon: Camera, count: galleryCount },
+                    { label: 'MERCANCÍA', icon: ShoppingBag, count: merchCount },
                     { label: 'CABINA RADIO 24/7', icon: Radio, count: 'ON AIR', disableHover: true },
                 ].map((nav) => {
                     const Icon = nav.icon;

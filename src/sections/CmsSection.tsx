@@ -10,6 +10,8 @@ import PublishGalleryForm from '../components/CMS/PublishGalleryForm';
 import {
   INITIAL_CMS_GALLERIES,
   INITIAL_CMS_ITEMS,
+  INITIAL_CMS_MERCH,
+  type CmsMerchProduct,
   type CmsVideoItem,
   type CmsTourItem,
   type CmsGalleryItem,
@@ -21,6 +23,7 @@ import PublishVideoForm from '../components/CMS/PublishVideoForm';
 import { INITIAL_CMS_VIDEOS } from '../data/HomeVideo';
 import PublishTourForm from '../components/CMS/PublishTourForm';
 import { INITIAL_CMS_TOURS } from '../data/HomeTours';
+import PublishMerchForm from '../components/CMS/PublishMerchForm';
 
 interface CmsSectionProps {
   onSelectSection: (section: SectionId) => void;
@@ -29,7 +32,7 @@ interface CmsSectionProps {
   audioAnalyser?: AnalyserNode | null;
 }
 
-type CmsComposerType = 'RECOMENDACION' | 'GALERIA' | 'VIDEO' | 'TOUR';
+type CmsComposerType = 'RECOMENDACION' | 'GALERIA' | 'VIDEO' | 'TOUR' | 'MERCH';
 
 export const CmsSection: React.FC<CmsSectionProps> = ({
   onSelectSection,
@@ -41,6 +44,7 @@ export const CmsSection: React.FC<CmsSectionProps> = ({
   const [galleries, setGalleries] = useState<CmsGalleryItem[]>(INITIAL_CMS_GALLERIES);
   const [videos, setVideos] = useState<CmsVideoItem[]>(INITIAL_CMS_VIDEOS);
   const [tours, setTours] = useState<CmsTourItem[]>(INITIAL_CMS_TOURS);
+  const [merchProducts, setMerchProducts] = useState<CmsMerchProduct[]>(INITIAL_CMS_MERCH);
   const [editingGallery, setEditingGallery] = useState<CmsGalleryItem | null>(null);
   const [editingVideo, setEditingVideo] = useState<CmsVideoItem | null>(null);
   const [editingTour, setEditingTour] = useState<CmsTourItem | null>(null);
@@ -54,13 +58,14 @@ export const CmsSection: React.FC<CmsSectionProps> = ({
 
     const loadPosts = async () => {
       try {
-        const [postsResponse, galleriesResponse, videosResponse, toursResponse] = await Promise.all([
+        const [postsResponse, galleriesResponse, videosResponse, toursResponse, merchResponse] = await Promise.all([
           fetch('/api/cms/posts', { signal: controller.signal }),
           fetch('/api/cms/galleries', { signal: controller.signal }),
           fetch('/api/cms/videos', { signal: controller.signal }),
           fetch('/api/cms/tours', { signal: controller.signal }),
+          fetch('/api/cms/merch', { signal: controller.signal }),
         ]);
-        const [posts, savedGalleries, savedVideos, savedTours] = await Promise.all([
+        const [posts, savedGalleries, savedVideos, savedTours, savedMerch] = await Promise.all([
           readJsonResponseOrFallback<unknown>(
             postsResponse,
             'No se pudieron cargar las publicaciones.',
@@ -81,12 +86,18 @@ export const CmsSection: React.FC<CmsSectionProps> = ({
             'No se pudieron cargar las giras.',
             INITIAL_CMS_TOURS,
           ),
+          readJsonResponseOrFallback<unknown>(
+            merchResponse,
+            'No se pudo cargar la mercancía.',
+            INITIAL_CMS_MERCH,
+          ),
         ]);
         if (
           !Array.isArray(posts) ||
           !Array.isArray(savedGalleries) ||
           !Array.isArray(savedVideos) ||
-          !Array.isArray(savedTours)
+          !Array.isArray(savedTours) ||
+          !Array.isArray(savedMerch)
         ) {
           throw new Error('El servidor devolvió registros del CMS no válidos.');
         }
@@ -95,6 +106,7 @@ export const CmsSection: React.FC<CmsSectionProps> = ({
         setGalleries(savedGalleries as CmsGalleryItem[]);
         setVideos(savedVideos as CmsVideoItem[]);
         setTours(savedTours as CmsTourItem[]);
+        setMerchProducts(savedMerch as CmsMerchProduct[]);
         setPersistenceError(null);
       } catch (error) {
         if (controller.signal.aborted) return;
@@ -158,6 +170,14 @@ export const CmsSection: React.FC<CmsSectionProps> = ({
     setPersistenceError(null);
   };
 
+  const handleSaveMerchProduct = (product: CmsMerchProduct) => {
+    setMerchProducts((currentProducts) => [
+      product,
+      ...currentProducts.filter((current) => current.id !== product.id),
+    ]);
+    setPersistenceError(null);
+  };
+
   const handleContinueGallery = (id: string) => {
     const gallery = galleries.find((item) => item.id === id);
     if (!gallery) {
@@ -191,10 +211,16 @@ export const CmsSection: React.FC<CmsSectionProps> = ({
     setComposerType('TOUR');
   };
 
-  const handleDeleteItem = async (id: string, type: 'post' | 'video' | 'tour') => {
+  const handleDeleteItem = async (id: string, type: 'post' | 'video' | 'tour' | 'merch') => {
     try {
+      const endpoint = {
+        post: 'posts',
+        video: 'videos',
+        tour: 'tours',
+        merch: 'merch',
+      }[type];
       const response = await fetch(
-        `/api/cms/${type === 'post' ? 'posts' : `${type}s`}/${encodeURIComponent(id)}`,
+        `/api/cms/${endpoint}/${encodeURIComponent(id)}`,
         { method: 'DELETE' },
       );
       if (!response.ok) {
@@ -204,12 +230,15 @@ export const CmsSection: React.FC<CmsSectionProps> = ({
             ? 'No se pudo eliminar el video.'
             : type === 'tour'
               ? 'No se pudo eliminar la gira.'
+              : type === 'merch'
+                ? 'No se pudo eliminar el producto.'
               : 'No se pudo eliminar la publicación.',
         );
       }
 
       if (type === 'video') setVideos((currentVideos) => currentVideos.filter((item) => item.id !== id));
       else if (type === 'tour') setTours((currentTours) => currentTours.filter((item) => item.id !== id));
+      else if (type === 'merch') setMerchProducts((currentProducts) => currentProducts.filter((item) => item.id !== id));
       else setItems((currentItems) => currentItems.filter((item) => item.id !== id));
       setPersistenceError(null);
     } catch (error) {
@@ -252,6 +281,8 @@ export const CmsSection: React.FC<CmsSectionProps> = ({
             onFinishEditing={() => setEditingTour(null)}
           />
         );
+      case 'MERCH':
+        return <PublishMerchForm onSaveProduct={handleSaveMerchProduct} />;
       default:
         return null;
     }
@@ -273,6 +304,7 @@ export const CmsSection: React.FC<CmsSectionProps> = ({
               recommendationCount={items.filter((item) => item.type === 'RECOMENDACION').length}
               videoCount={videos.length}
               galleryCount={galleries.length}
+              merchCount={merchProducts.length}
             />
 
             {/* Icecast / FLAC Server Status Card */}
@@ -299,6 +331,7 @@ export const CmsSection: React.FC<CmsSectionProps> = ({
                   <option value="GALERIA">GALERÍA</option>
                   <option value="VIDEO">VIDEOS</option>
                   <option value="TOUR">TOUR</option>
+                  <option value="MERCH">MERCANCÍA</option>
                 </select>
               </label>
             </section>
@@ -318,13 +351,14 @@ export const CmsSection: React.FC<CmsSectionProps> = ({
                 </div>
               )}
               <HeadPubliRegister
-                count={items.length + galleries.length + videos.length + tours.length}
+                count={items.length + galleries.length + videos.length + tours.length + merchProducts.length}
               />
               <FilterRegister
                 items={items}
                 galleries={galleries}
                 videos={videos}
                 tours={tours}
+                merchProducts={merchProducts}
                 searchQuery={searchQuery}
                 onSearchQueryChange={setSearchQuery}
                 onSelectSection={onSelectSection}

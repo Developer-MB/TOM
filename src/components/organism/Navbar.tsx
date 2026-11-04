@@ -24,12 +24,8 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'videopodcast', label: 'VIDEOS' },
     { id: 'eventos', label: 'PRÓXIMOS EVENTOS' },
     { id: 'radio', label: 'RADIO' },
+    { id: 'merch', label: 'MERCH' },
   ];
-
-  const handleNavClick = (item: { id: SectionId; label: string; sub?: string }) => {
-    onSelectSection(item.id);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
 
   return (
     <header className="sticky top-0 z-50 bg-[#09090b]/95 backdrop-blur-md border-b border-[#27272a]">
@@ -39,7 +35,6 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             onClick={() => {
               onSelectSection('inicio');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
             className="text-left group flex flex-col leading-none"
           >
@@ -55,7 +50,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             return (
               <button
                 key={idx}
-                onClick={() => handleNavClick(item)}
+                onClick={() => onSelectSection(item.id)}
                 className={`font-mono text-[11px] tracking-[0.08em] uppercase transition-colors cursor-pointer py-1 border-b-2 whitespace-nowrap ${isActive
                     ? 'text-white border-[#dc2626] font-semibold'
                     : 'text-[#a1a1aa] border-transparent hover:text-white'
@@ -83,7 +78,6 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             onClick={() => {
               onSelectSection('cms');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-sm border font-mono text-[10px] tracking-wider uppercase transition-colors cursor-pointer ${activeSection === 'cms'
                 ? 'bg-[#dc2626] border-[#ef4444] text-white'
@@ -105,13 +99,13 @@ export const Navbar: React.FC<NavbarProps> = ({
           { id: 'videopodcast', label: 'VIDEOS' },
           { id: 'eventos', label: 'PRÓXIMOS EVENTOS' },
           { id: 'radio', label: 'RADIO' },
+          { id: 'merch', label: 'MERCH' },
           { id: 'cms', label: 'CMS ADMIN' },
         ].map((tab) => (
           <button
             key={tab.id}
             onClick={() => {
               onSelectSection(tab.id as SectionId);
-              window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
             className={`px-2.5 py-1 rounded-sm font-mono text-[10px] whitespace-nowrap uppercase ${activeSection === tab.id
                 ? 'bg-[#dc2626] text-white font-semibold'

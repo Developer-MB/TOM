@@ -1,0 +1,122 @@
+[
+  {
+    "id": "6a319db2-6a18-4648-9162-43d38c762c13",
+    "code": "TOM-MER-0010",
+    "name": "Taza Time of Metal",
+    "category": "OTROS",
+    "description": "Taza Time of Metal lista para tomar tu delicioso cafe",
+    "price": 100,
+    "image": "/image/merch/6698a20c-ad67-42bc-aad4-5e2aa7c70316.jpg",
+    "purchaseUrl": "",
+    "status": "PUBLICADO",
+    "publish": "2026-11-04T03:54:55.009Z"
+  },
+  {
+    "id": "558326f2-a063-417c-b1f5-e85c28b128b3",
+    "code": "TOM-MER-0009",
+    "name": "Vaso Time of Metal",
+    "category": "VASOS",
+    "description": "Vaso Time of Metal de plastico para tomar tu bebida favorita",
+    "price": 80,
+    "image": "/image/merch/ad884ea3-55d8-4196-a123-780978303e08.jpg",
+    "purchaseUrl": "",
+    "status": "PUBLICADO",
+    "publish": "2026-11-04T03:54:08.166Z"
+  },
+  {
+    "id": "92a7e4f0-3139-43a9-99bb-571eb43c3612",
+    "code": "TOM-MER-0008",
+    "name": "Llavero Time of Metal",
+    "category": "LLAVEROS",
+    "description": "Llavero Time of Metal para que nunca pierdas tus llaves",
+    "price": 50,
+    "image": "/image/merch/28478f23-c55b-4168-a6df-3ce28f21aaf3.jpg",
+    "purchaseUrl": "",
+    "status": "PUBLICADO",
+    "publish": "2026-11-04T03:52:52.030Z"
+  },
+  {
+    "id": "9337604e-06c8-4e32-85ad-518a2c273c36",
+    "code": "TOM-MER-0007",
+    "name": "Gorra Time of Metal",
+    "category": "GORRAS",
+    "description": "Gorra Time of Metal con logo bordado para taparte del sol en epocas de calor o cuando vas a la playa",
+    "price": 135,
+    "image": "/image/merch/863af81c-ec31-426a-adc7-835acbbd7e70.jpg",
+    "purchaseUrl": "",
+    "status": "PUBLICADO",
+    "publish": "2026-11-04T03:52:22.880Z"
+  },
+  {
+    "id": "c0f2f49e-8848-48a4-a620-586d7ddbec7b",
+    "code": "TOM-MER-0006",
+    "name": "Mousepad Time of Metal",
+    "category": "MOUSEPADS",
+    "description": "Mousepad Time of Metal para que trabajes en tu computadora muy agusto",
+    "price": 75,
+    "image": "/image/merch/60f8820a-0ccf-494f-864a-e4da6c83c1c3.jpg",
+    "purchaseUrl": "",
+    "status": "PUBLICADO",
+    "publish": "2026-11-04T03:51:11.908Z"
+  },
+  {
+    "id": "ad6adb79-7615-47da-8269-41a66d4d65c4",
+    "code": "TOM-MER-0005",
+    "name": "Vaso Time of Metal",
+    "category": "VASOS",
+    "description": "Vaso Time of Metal para qeu disfrutes de unos deliciosos Lemmy",
+    "price": 120,
+    "image": "/image/merch/aec6ad3a-5a86-4788-bbf6-8059c143b71a.jpg",
+    "purchaseUrl": "",
+    "status": "PUBLICADO",
+    "publish": "2026-11-04T03:50:13.913Z"
+  },
+  {
+    "id": "5bd93c76-aa26-42af-940a-eb6da632bbc4",
+    "code": "TOM-MER-0004",
+    "name": "Tarro Time of Metal",
+    "category": "TARROS",
+    "description": "Tarro cervecero para tomar tu bebida bien fria con el logo de tu marca favorita Time of Metal",
+    "price": 150,
+    "image": "/image/merch/55069c1d-3169-4a37-a6b2-a5de4c0f4e98.jpg",
+    "purchaseUrl": "",
+    "status": "PUBLICADO",
+    "publish": "2026-11-04T03:49:23.591Z"
+  },
+  {
+    "id": "c0a97b30-3c5a-4102-86e6-00018dbf7902",
+    "code": "TOM-MER-0003",
+    "name": "Parche Time of Metal",
+    "category": "OTROS",
+    "description": "Parche Time of Metal para tu chaleco",
+    "price": 50,
+    "image": "/image/merch/467f1b35-356f-48cc-8d88-d3036fe4af4d.png",
+    "purchaseUrl": "",
+    "status": "PUBLICADO",
+    "publish": "2026-11-04T03:48:01.536Z"
+  },
+  {
+    "id": "8e71f32b-90b4-4c20-9dec-9df2374c7994",
+    "code": "TOM-MER-0002",
+    "name": "Playera Time of Metal - Viking",
+    "category": "PLAYERAS",
+    "description": "Playera Time of Metal con un diseño vikingo para todo guerrero nordico que vive en nuestro interior.",
+    "price": 270,
+    "image": "/image/merch/2fc8b268-7100-4abc-a525-04750fa40c6b.png",
+    "purchaseUrl": "",
+    "status": "PUBLICADO",
+    "publish": "2026-11-04T03:39:08.850Z"
+  },
+  {
+    "id": "489b9b2f-9763-488c-b8c2-8aaa28187f1b",
+    "code": "TOM-MER-0001",
+    "name": "Playera Time of Metal - Death Logo",
+    "category": "PLAYERAS",
+    "description": "Playera Time of Metal con logo en diseño Death Logo, varias tallas y unisex",
+    "price": 250,
+    "image": "/image/merch/b195b609-f58d-4196-beaf-c7e8500ef293.jpg",
+    "purchaseUrl": "",
+    "status": "PUBLICADO",
+    "publish": "2026-11-04T03:35:09.457Z"
+  }
+]

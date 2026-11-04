@@ -70,6 +70,16 @@ Las giras se guardan en `data/post-tours.json`:
 
 Las giras programadas cambian a `PUBLICADO` al llegar la fecha y hora configuradas. En producción, el CMS necesita el backend Node.js para guardar cambios; los datos JSON incluidos en el build estático funcionan como respaldo de lectura.
 
+## Catálogo de mercancía
+
+Los productos se guardan en `data/post-merch.json` y sus imágenes en `public/image/merch/`:
+
+- `GET /api/cms/merch` carga los productos.
+- `POST /api/cms/merch` valida el nombre, categoría, precio, estado y enlace opcional de compra; asigna un ID y código `TOM-MER-0001`, y guarda una imagen JPG, PNG, WebP o GIF de hasta 5 MB.
+- `DELETE /api/cms/merch/:id` elimina el producto del catálogo.
+
+La sección pública `/merch` solo muestra productos publicados. Los productos programados se publican automáticamente al llegar su fecha. Para guardar desde el CMS en producción se requiere el backend Node.js con almacenamiento persistente, igual que los otros módulos del CMS. El endpoint de lectura de Vercel sirve el JSON incluido en el despliegue, pero no persiste altas ni eliminaciones.
+
 En desarrollo, el watcher del backend excluye `data/` para evitar reiniciarse al guardar archivos del CMS o publicar entradas programadas. Si el servidor ya estaba ejecutándose antes de este cambio, reinicia `npm run dev` para activar la exclusión.
 
 ## Producción

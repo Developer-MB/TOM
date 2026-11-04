@@ -1,5 +1,28 @@
 export type CmsPostType = 'RECOMENDACION' | 'GALERIA' | 'VIDEO' | 'GIRAS';
 export type CmsPostStatus = 'PUBLICADO' | 'PROGRAMADO' | 'BORRADOR';
+export const MERCH_CATEGORIES = [
+    'PLAYERAS',
+    'VASOS',
+    'TARROS',
+    'GORRAS',
+    'LLAVEROS',
+    'MOUSEPADS',
+    'OTROS',
+] as const;
+export type MerchCategory = (typeof MERCH_CATEGORIES)[number];
+
+export interface CmsMerchProduct {
+    id: string;
+    code: string;
+    name: string;
+    category: MerchCategory;
+    description: string;
+    price: number;
+    image: string;
+    purchaseUrl: string;
+    status: CmsPostStatus;
+    publish: string;
+}
 
 export interface CmsPostItem {
     id: string;
