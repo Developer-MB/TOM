@@ -3,6 +3,7 @@ import { Server } from 'lucide-react';
 import type { CmsNodeStatus } from '../../data/Cms';
 import type { AudioTrack } from '../../data/mockData';
 import { AUDIO_ASSETS } from '../../data/Radio';
+import { authenticatedCmsFetch } from '../../lib/firebaseClient';
 
 interface NodoProps {
     currentTrack?: AudioTrack;
@@ -110,7 +111,7 @@ const Nodo: React.FC<NodoProps> = ({
         const fetchNodeStatus = async () => {
             const startedAt = performance.now();
             try {
-                const response = await fetch('/api/cms/node-status', {
+                const response = await authenticatedCmsFetch('/api/cms/node-status', {
                     signal: controller.signal,
                     cache: 'no-store',
                 });

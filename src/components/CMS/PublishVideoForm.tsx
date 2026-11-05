@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Play, Save } from 'lucide-react';
 import type { CmsPostStatus, CmsVideoItem } from '../../data/Cms';
 import { readJsonResponse } from '../../data/readJsonResponse';
+import { authenticatedCmsFetch } from '../../lib/firebaseClient';
 
 type VideoFields = Pick<CmsVideoItem, 'title' | 'description' | 'url' | 'status'>;
 
@@ -70,7 +71,7 @@ const PublishVideoForm: React.FC<PublishVideoFormProps> = ({
         setFormError(null);
         setSuccessMessage(null);
         try {
-            const response = await fetch(
+            const response = await authenticatedCmsFetch(
                 draft ? `/api/cms/videos/${encodeURIComponent(draft.id)}` : '/api/cms/videos',
                 {
                     method: draft ? 'PUT' : 'POST',
@@ -102,7 +103,7 @@ const PublishVideoForm: React.FC<PublishVideoFormProps> = ({
             setSuccessMessage(
                 draft
                     ? `Borrador actualizado (${savedVideo.code}).`
-                    : `Video guardado en post-video.json (ID: ${savedVideo.id}, código: ${savedVideo.code}).`,
+                    : `Video guardado en Firestore (ID: ${savedVideo.id}, código: ${savedVideo.code}).`,
             );
             if (draft) onFinishEditing();
         } catch (error) {

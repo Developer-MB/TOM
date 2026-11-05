@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { CalendarDays, Save } from 'lucide-react';
 import type { CmsPostStatus, CmsTourItem } from '../../data/CmsTypes';
 import { readJsonResponse } from '../../data/readJsonResponse';
+import { authenticatedCmsFetch } from '../../lib/firebaseClient';
 
 type TourFields = Omit<CmsTourItem, 'id' | 'code' | 'publish'>;
 
@@ -92,7 +93,7 @@ const PublishTourForm: React.FC<PublishTourFormProps> = ({
         setFormError(null);
         setSuccessMessage(null);
         try {
-            const response = await fetch(
+            const response = await authenticatedCmsFetch(
                 draft ? `/api/cms/tours/${encodeURIComponent(draft.id)}` : '/api/cms/tours',
                 {
                     method: draft ? 'PUT' : 'POST',
@@ -123,7 +124,7 @@ const PublishTourForm: React.FC<PublishTourFormProps> = ({
             setSuccessMessage(
                 draft
                     ? `Gira actualizada (${savedTour.code}).`
-                    : `Gira guardada en post-tours.json (ID: ${savedTour.id}, código: ${savedTour.code}).`,
+                    : `Gira guardada en Firestore (ID: ${savedTour.id}, código: ${savedTour.code}).`,
             );
             if (draft) onFinishEditing();
         } catch (error) {

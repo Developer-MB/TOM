@@ -1,94 +1,113 @@
-# Backend de YouTube
+# Backend de Time of Metal
 
-Este servidor Express obtiene los videos públicos del canal `@TimeOfMetal-mx` con YouTube Data API v3. La clave se mantiene en el servidor y no se incluye en el bundle del frontend.
+La API está organizada por dominios en `src/routes/cms`, `src/routes/public`,
+`src/services` y `src/middleware`. Todas las escrituras del CMS usan Firestore;
+las imágenes nuevas se almacenan en Firebase Storage. La misma aplicación
+Express se ejecuta en Firebase Functions, Vercel y en el servidor local.
 
-## Configuración local
+## Requisitos
 
-1. Crea una API key de YouTube Data API v3 en Google Cloud Console.
-2. En la raíz del proyecto, crea `.env` usando `.env.example` como referencia y define `YOUTUBE_API_KEY`. No uses el prefijo `VITE_` ni subas `.env` al repositorio.
-3. Instala dependencias con `npm install`.
-4. Inicia el backend y el frontend juntos:
+- Node.js 22.
+- Un proyecto Firebase con Firestore, Storage y Authentication habilitados.
+- Proveedor **Correo electrónico/contraseña** habilitado en Firebase Authentication.
+- Acceso de administrador a Firebase CLI (`firebase login`) y credenciales
+  Admin SDK para tareas locales y despliegues fuera de Firebase.
+
+## Variables de entorno
+
+Usa `.env.example` como referencia para las variables del frontend y cópialo
+localmente a `.env`. Los valores `VITE_FIREBASE_*` son configuración web pública;
+no pongas credenciales de servicio bajo el prefijo `VITE_`.
+
+El backend usa Application Default Credentials en Google Cloud/Firebase. Para
+desarrollo local o Vercel configura `FIREBASE_PROJECT_ID` y la variable secreta
+`FIREBASE_SERVICE_ACCOUNT_JSON` con el JSON completo de una cuenta de servicio.
+Configura `FIREBASE_STORAGE_BUCKET` con el bucket exacto del proyecto. Nunca
+guardes ni publiques ese JSON en el repositorio. `CMS_ADMIN_EMAILS` es una lista
+opcional de correos verificados separados por comas para autorizar el API; para
+subir imágenes, el usuario también necesita el custom claim `admin: true`.
+
+## Habilitar un administrador
+
+1. Crea la cuenta en Firebase Authentication y verifica su correo.
+2. Desde un entorno con credenciales Admin SDK del proyecto correcto, ejecuta:
+
+   ```sh
+   npm --prefix backend run set-admin -- admin@tudominio.com
+   ```
+
+3. La persona debe cerrar sesión y volver a iniciarla para recibir el claim.
+
+El claim autoriza operaciones CMS y cargas de imágenes. Firestore no permite
+acceso directo desde clientes; la API verifica el Firebase ID token en cada
+ruta `/api/cms/**`.
+
+## Migrar los datos JSON existentes
+
+Antes de migrar, confirma que `FIREBASE_PROJECT_ID` apunta al proyecto deseado y
+que las cinco listas `data/post-*.json` contienen los datos correctos. Después:
+
+```sh
+npm --prefix backend run migrate:cms
+```
+
+El script crea documentos en `cms_posts`, `cms_galleries`, `cms_videos`,
+`cms_tours` y `cms_merch`, y prepara los contadores de códigos. No borra ni
+modifica los JSON. No sobrescribe documentos existentes: permite reintentos
+cuando los documentos existentes coinciden con el origen y se detiene si
+encuentra diferencias o registros no incluidos en los JSON. Conserva las rutas
+de imágenes antiguas bajo `public/image/`; las cargas nuevas van a Storage.
+
+## Desarrollo local
+
+1. Configura `.env`, credenciales Firebase Admin y las variables `VITE_*`.
+2. Instala dependencias en la raíz y en `backend` si aún no están instaladas.
+3. Inicia frontend y API:
 
    ```sh
    npm run dev
    ```
 
-El comando inicia ambos procesos. Vite sirve el frontend en el puerto `3000` y reenvía `/api` al backend, que escucha en el puerto `3001`. También puedes ejecutar `npm run server:dev` por separado para iniciar solo el backend.
+Vite corre en el puerto `3000` y envía `/api` a Express en el `3001`. Para
+compilar la función:
 
-## Endpoint
+```sh
+npm --prefix backend run build
+```
 
-`GET /api/home/videos` devuelve los videos publicados en `data/post-video.json`, incluyendo sus datos, ID de YouTube, URL de inserción y miniatura. No requiere una API key.
+## Despliegue en Firebase
 
-`GET /api/youtube/videos` devuelve los videos más recientes del canal. Para solicitar otra página, envía el `nextPageToken` recibido como query param:
-
-`GET /api/youtube/videos?pageToken=<token>`
-
-Cada respuesta contiene el título del canal, `items` con ID, título, descripción, fecha y miniatura, y el token de paginación si hay más videos. Las respuestas se almacenan en memoria durante 10 minutos.
-
-## Publicaciones del CMS
-
-Las publicaciones del CMS se guardan en `data/post-disc.json` en el servidor:
-
-- `GET /api/cms/posts` carga la cola editorial.
-- `POST /api/cms/posts` valida y guarda los datos, genera un ID y un código secuencial por tipo (por ejemplo, `TOM-REC-0009`), y almacena la portada en `public/image/discos/`.
-- `DELETE /api/cms/posts/:id` elimina una publicación.
-
-El archivo se inicializa con las publicaciones de ejemplo si todavía no existe. Estos endpoints requieren que el backend de Node.js esté ejecutándose; un despliegue estático por sí solo no puede escribir en el JSON.
-
-## Galerías del CMS
-
-Las galerías creadas desde el CMS se guardan en `data/post-pics.json`:
-
-- `GET /api/cms/galleries` carga las galerías guardadas.
-- `POST /api/cms/galleries` genera un ID y código, guarda hasta 15 imágenes JPG, PNG, WebP o GIF (máximo 5 MB cada una) en `public/image/concerts/` y registra sus rutas, estado y fecha de publicación junto con los datos del evento. Los borradores pueden guardarse sin imágenes; las galerías publicadas o programadas requieren al menos una.
-- `PUT /api/cms/galleries/:id` permite continuar un borrador, conservar sus fotos existentes y agregar imágenes sin superar 15 en total. Mantiene el ID y código, y actualiza el estado y la fecha de publicación.
-
-Como con las publicaciones, guardar galerías requiere que el backend de Node.js esté ejecutándose.
-
-## Videos del CMS
-
-Los videos creados desde la cola editorial se guardan en `data/post-video.json`:
-
-- `GET /api/cms/videos` carga todos los videos de la cola editorial.
-- `POST /api/cms/videos` valida el título, descripción, URL de YouTube y estado, y genera un ID y código secuencial `TOM-VID-0000`.
-- `PUT /api/cms/videos/:id` permite continuar un borrador conservando su ID y código.
-- `DELETE /api/cms/videos/:id` elimina un video.
-
-Los videos publicados aparecen en la sección Videopodcast y en el reproductor destacado de Home. Los videos programados cambian a `PUBLICADO` cuando llega su fecha/hora. El backend revisa las entradas programadas al consultar las listas del CMS o los videos públicos.
-
-Las publicaciones, galerías y videos programados cambian a `PUBLICADO` cuando llega su fecha/hora. El backend las revisa periódicamente y también al consultar las listas del CMS.
-
-## Giras del CMS
-
-Las giras se guardan en `data/post-tours.json`:
-
-- `GET /api/cms/tours` carga las giras de la cola editorial.
-- `POST /api/cms/tours` valida los datos y la fecha del evento, y genera el ID y el código secuencial `TOM-GIR-0000`.
-- `PUT /api/cms/tours/:id` permite continuar un borrador conservando su ID y código.
-- `DELETE /api/cms/tours/:id` elimina una gira.
-- `GET /api/home/tours` devuelve las giras publicadas para la sección pública de eventos.
-
-Las giras programadas cambian a `PUBLICADO` al llegar la fecha y hora configuradas. En producción, el CMS necesita el backend Node.js para guardar cambios; los datos JSON incluidos en el build estático funcionan como respaldo de lectura.
-
-## Catálogo de mercancía
-
-Los productos se guardan en `data/post-merch.json` y sus imágenes en `public/image/merch/`:
-
-- `GET /api/cms/merch` carga los productos.
-- `POST /api/cms/merch` valida el nombre, categoría, precio, estado y enlace opcional de compra; asigna un ID y código `TOM-MER-0001`, y guarda una imagen JPG, PNG, WebP o GIF de hasta 5 MB.
-- `DELETE /api/cms/merch/:id` elimina el producto del catálogo.
-
-La sección pública `/merch` solo muestra productos publicados. Los productos programados se publican automáticamente al llegar su fecha. Para guardar desde el CMS en producción se requiere el backend Node.js con almacenamiento persistente, igual que los otros módulos del CMS. El endpoint de lectura de Vercel sirve el JSON incluido en el despliegue, pero no persiste altas ni eliminaciones.
-
-En desarrollo, el watcher del backend excluye `data/` para evitar reiniciarse al guardar archivos del CMS o publicar entradas programadas. Si el servidor ya estaba ejecutándose antes de este cambio, reinicia `npm run dev` para activar la exclusión.
-
-## Producción
-
-Despliega la aplicación en un hosting que ejecute Node.js, configura `YOUTUBE_API_KEY` como variable secreta del entorno y ejecuta:
+Configura el proyecto correcto en `.firebaserc`, las variables del frontend en
+el entorno de build y despliega:
 
 ```sh
 npm run build
-npm start
+firebase deploy --only functions:api,hosting,firestore:rules,storage
 ```
 
-El servidor sirve tanto `/api/youtube/videos` como los archivos compilados del frontend. En Vercel, las funciones en `api/` exponen las lecturas del CMS y las secciones públicas desde los archivos JSON incluidos en el despliegue, evitando respuestas `404`. Estas funciones de lectura no guardan cambios: para persistir publicaciones, galerías, videos y giras creados desde el CMS, despliega el backend Node.js con almacenamiento persistente y enruta `/api` hacia él.
+La función `api` utiliza la identidad de servicio de Firebase; no es necesario
+subir un JSON de credenciales. Firestore y Storage deben desplegar también sus
+reglas. El hosting Firebase por sí solo sirve el frontend; las escrituras CMS
+se ejecutan en la Function.
+
+## Despliegue en Vercel
+
+Conecta el repositorio a Vercel con el build `npm run build` y output `dist`.
+Agrega las variables `VITE_FIREBASE_*` al entorno de build y agrega como secretos
+de runtime `FIREBASE_PROJECT_ID`, `FIREBASE_STORAGE_BUCKET` y
+`FIREBASE_SERVICE_ACCOUNT_JSON`. Configura también `CMS_ADMIN_EMAILS` si usarás
+la lista opcional de correos. El endpoint catch-all `api/[[...path]].ts` envía
+todas las rutas API al mismo Express que Firebase.
+
+En ambos proveedores, crea/actualiza Firestore y Storage antes de habilitar el
+CMS. El proyecto Firebase, sus reglas, proveedores de Authentication y cuentas
+de administrador son configuración externa y no se crean mediante el deploy.
+
+## Endpoints
+
+- Públicos: `GET /api/home/posts`, `/galleries`, `/videos`, `/tours`, `/merch`;
+  `GET /api/youtube/videos` requiere `YOUTUBE_API_KEY`.
+- Privados: `/api/cms/posts`, `/galleries`, `/videos`, `/tours`, `/merch` y
+  `/node-status`. Requieren `Authorization: Bearer <Firebase ID token>` y
+  privilegios de administrador.
+- `GET /api/health` comprueba que la API responde.

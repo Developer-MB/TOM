@@ -1,6 +1,10 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react';
 import type { AudioTrack } from '../../data/mockData';
-import { AUDIO_ASSETS } from '../../data/Radio';
+import {
+    RADIO_UPDATED_EVENT,
+    readStoredRadioTracks,
+    type CmsRadioTrack,
+} from '../../data/Radio';
 
 interface ListRadioProps {
     currentTrack: AudioTrack;
@@ -8,6 +12,20 @@ interface ListRadioProps {
 }
 
 const ListRadio: React.FC<ListRadioProps> = ({ currentTrack, onSelectTrack }) => {
+    const [tracks, setTracks] = useState<CmsRadioTrack[]>(() => readStoredRadioTracks());
+
+    useEffect(() => {
+        const handleSync = () => {
+            setTracks(readStoredRadioTracks());
+        };
+        window.addEventListener(RADIO_UPDATED_EVENT, handleSync);
+        window.addEventListener('storage', handleSync);
+        return () => {
+            window.removeEventListener(RADIO_UPDATED_EVENT, handleSync);
+            window.removeEventListener('storage', handleSync);
+        };
+    }, []);
+
     return (
         <div>
             <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-zinc-500 pb-3 mb-4 border-b border-zinc-800">
@@ -16,10 +34,10 @@ const ListRadio: React.FC<ListRadioProps> = ({ currentTrack, onSelectTrack }) =>
 
             <div className="border-t border-zinc-800 pt-4">
                 <h3 className="font-mono text-[10px] uppercase tracking-widest text-zinc-500 mb-3">
-                    Lista de reproducción
+                    Lista de reproducción ({tracks.length})
                 </h3>
                 <div className="h-[248px] space-y-2 overflow-y-auto overscroll-contain pr-2" aria-label="Canciones disponibles">
-                    {AUDIO_ASSETS.map((track) => (
+                    {tracks.map((track) => (
                         <button
                             key={track.id}
                             type="button"
@@ -51,7 +69,7 @@ const ListRadio: React.FC<ListRadioProps> = ({ currentTrack, onSelectTrack }) =>
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default ListRadio
+export default ListRadio;

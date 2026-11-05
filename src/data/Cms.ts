@@ -2,6 +2,7 @@ import cmsPosts from '../../data/post-disc.json';
 import cmsGalleries from '../../data/post-pics.json';
 import type { CmsGalleryItem, CmsPostItem } from './CmsTypes';
 import { INITIAL_CMS_MERCH } from './Merch';
+import { CMS_USERS_DICTIONARY } from './CmsUsers';
 
 export type {
     CmsGalleryItem,
@@ -16,7 +17,8 @@ export type {
     MerchCategory,
 } from './CmsTypes';
 export { MERCH_CATEGORIES } from './CmsTypes';
+export type { CmsAuthSession, CmsUserAccount } from './CmsUsers';
 
 export const INITIAL_CMS_ITEMS = cmsPosts as CmsPostItem[];
 export const INITIAL_CMS_GALLERIES = cmsGalleries as CmsGalleryItem[];
-export { INITIAL_CMS_MERCH };
+export { INITIAL_CMS_MERCH, CMS_USERS_DICTIONARY };

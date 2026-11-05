@@ -56,8 +56,8 @@ export default function App() {
     const loadCmsEntries = async () => {
       try {
         const [postsResponse, galleriesResponse] = await Promise.all([
-          fetch('/api/cms/posts', { signal: controller.signal }),
-          fetch('/api/cms/galleries', { signal: controller.signal }),
+          fetch('/api/home/posts', { signal: controller.signal }),
+          fetch('/api/home/galleries', { signal: controller.signal }),
         ]);
         const [posts, galleries] = await Promise.all([
           readJsonResponseOrFallback<unknown>(

@@ -18,6 +18,7 @@ export interface CmsMerchProduct {
     category: MerchCategory;
     description: string;
     price: number;
+    stock: number;
     image: string;
     purchaseUrl: string;
     status: CmsPostStatus;
@@ -86,10 +87,7 @@ export interface CmsTourItem {
 }
 
 export type CmsPostCreateInput = Omit<CmsPostItem, 'id' | 'code' | 'cover'> & {
-    coverImage: {
-        mimeType: string;
-        data: string;
-    };
+    coverImage: string;
 };
 
 export interface CmsNodeStatus {

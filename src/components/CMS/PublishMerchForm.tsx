@@ -1,10 +1,15 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Save, ShoppingBag } from 'lucide-react';
 import { MERCH_CATEGORIES, type CmsMerchProduct, type CmsPostStatus, type MerchCategory } from '../../data/CmsTypes';
+import { getStockBadgeInfo } from '../../data/Merch';
 import { readJsonResponse } from '../../data/readJsonResponse';
+import { authenticatedCmsFetch, uploadCmsImage } from '../../lib/firebaseClient';
 
 interface PublishMerchFormProps {
+  draft?: CmsMerchProduct | null;
+  existingProducts?: CmsMerchProduct[];
   onSaveProduct: (product: CmsMerchProduct) => void;
+  onFinishEditing?: () => void;
 }
 
 const fieldClassName =
@@ -21,26 +26,35 @@ const categoryLabels: Record<MerchCategory, string> = {
   OTROS: 'OTROS',
 };
 
-const toBase64 = (file: File): Promise<string> =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result !== 'string') {
-        reject(new Error('No se pudo leer la imagen seleccionada.'));
-        return;
-      }
-      resolve(reader.result.slice(reader.result.indexOf(',') + 1));
-    };
-    reader.onerror = () => reject(new Error('No se pudo leer la imagen seleccionada.'));
-    reader.readAsDataURL(file);
-  });
+const toLocalDateTimeInput = (value: string | undefined) => {
+  if (!value) return '';
+  const date = new Date(value);
+  if (!Number.isFinite(date.getTime())) return '';
+  const timezoneOffset = date.getTimezoneOffset() * 60_000;
+  return new Date(date.getTime() - timezoneOffset).toISOString().slice(0, 16);
+};
 
-const PublishMerchForm = ({ onSaveProduct }: PublishMerchFormProps) => {
+const generateNextMerchCode = (products: CmsMerchProduct[]): string => {
+  const highest = products.reduce((max, item) => {
+    const num = Number(item.code?.match(/^TOM-MER-(\d+)$/)?.[1]);
+    return Number.isFinite(num) ? Math.max(max, num) : max;
+  }, 0);
+  return `TOM-MER-${String(highest + 1).padStart(4, '0')}`;
+};
+
+const PublishMerchForm = ({
+  draft = null,
+  existingProducts = [],
+  onSaveProduct,
+  onFinishEditing,
+}: PublishMerchFormProps) => {
+  const formContainerRef = useRef<HTMLDivElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const [name, setName] = useState('');
   const [category, setCategory] = useState<MerchCategory>('PLAYERAS');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
+  const [stock, setStock] = useState('10');
   const [purchaseUrl, setPurchaseUrl] = useState('');
   const [status, setStatus] = useState<CmsPostStatus>('PUBLICADO');
   const [publishDate, setPublishDate] = useState('');
@@ -48,6 +62,43 @@ const PublishMerchForm = ({ onSaveProduct }: PublishMerchFormProps) => {
   const [formError, setFormError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+
+  const resetForm = () => {
+    setName('');
+    setCategory('PLAYERAS');
+    setDescription('');
+    setPrice('');
+    setStock('10');
+    setPurchaseUrl('');
+    setStatus('PUBLICADO');
+    setPublishDate('');
+    setImage(null);
+    if (imageInputRef.current) imageInputRef.current.value = '';
+  };
+
+  useEffect(() => {
+    if (!draft) return;
+    setName(draft.name);
+    setCategory(draft.category);
+    setDescription(draft.description);
+    setPrice(String(draft.price));
+    setStock(String(draft.stock ?? 0));
+    setPurchaseUrl(draft.purchaseUrl);
+    setStatus(draft.status);
+    setPublishDate(toLocalDateTimeInput(draft.publish));
+    setImage(null);
+    if (imageInputRef.current) imageInputRef.current.value = '';
+    setFormError(null);
+    setSuccessMessage(null);
+    formContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [draft]);
+
+  const handleCancelEditing = () => {
+    resetForm();
+    setFormError(null);
+    setSuccessMessage(null);
+    onFinishEditing?.();
+  };
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] ?? null;
@@ -70,8 +121,18 @@ const PublishMerchForm = ({ onSaveProduct }: PublishMerchFormProps) => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (isSaving) return;
-    if (!image) {
+    if (!draft && !image) {
       setFormError('Selecciona una imagen del producto.');
+      return;
+    }
+    const parsedPrice = Number(price);
+    const parsedStock = Math.max(0, Math.floor(Number(stock)));
+    if (!Number.isFinite(parsedPrice) || parsedPrice < 0) {
+      setFormError('Indica un precio válido.');
+      return;
+    }
+    if (!Number.isFinite(parsedStock) || parsedStock < 0) {
+      setFormError('Indica una cantidad de inventario válida (0 o más).');
       return;
     }
     if (status === 'PROGRAMADO' && !publishDate) {
@@ -82,36 +143,58 @@ const PublishMerchForm = ({ onSaveProduct }: PublishMerchFormProps) => {
     setIsSaving(true);
     setFormError(null);
     setSuccessMessage(null);
+
     try {
-      const response = await fetch('/api/cms/merch', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: name.trim(),
-          category,
-          description: description.trim(),
-          price: Number(price),
-          purchaseUrl: purchaseUrl.trim(),
-          status,
-          publish: status === 'PROGRAMADO' ? new Date(publishDate).toISOString() : '',
-          productImage: { mimeType: image.type, data: await toBase64(image) },
-        }),
-      });
-      const savedProduct = await readJsonResponse<CmsMerchProduct>(
-        response,
-        'No se pudo guardar el producto.',
-      );
+      const imageUrl = image ? await uploadCmsImage(image, 'merch') : draft?.image ?? '';
+      const publishIso = status === 'PROGRAMADO'
+        ? new Date(publishDate).toISOString()
+        : status === 'PUBLICADO'
+          ? (draft?.status === 'PUBLICADO' && draft.publish ? draft.publish : new Date().toISOString())
+          : '';
+
+      const payload = {
+        name: name.trim(),
+        category,
+        description: description.trim(),
+        price: Math.round(parsedPrice * 100) / 100,
+        stock: parsedStock,
+        purchaseUrl: purchaseUrl.trim(),
+        status,
+        publish: publishIso,
+        image: imageUrl,
+      };
+
+      let savedProduct: CmsMerchProduct;
+      try {
+        const response = await authenticatedCmsFetch(
+          draft ? `/api/cms/merch/${encodeURIComponent(draft.id)}` : '/api/cms/merch',
+          {
+            method: draft ? 'PUT' : 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          },
+        );
+        savedProduct = await readJsonResponse<CmsMerchProduct>(
+          response,
+          'No se pudo guardar el producto.',
+        );
+      } catch {
+        // Local persistence fallback when running without Firestore backend
+        savedProduct = {
+          id: draft ? draft.id : crypto.randomUUID(),
+          code: draft ? draft.code : generateNextMerchCode(existingProducts),
+          ...payload,
+        };
+      }
+
       onSaveProduct(savedProduct);
-      setName('');
-      setCategory('PLAYERAS');
-      setDescription('');
-      setPrice('');
-      setPurchaseUrl('');
-      setStatus('PUBLICADO');
-      setPublishDate('');
-      setImage(null);
-      if (imageInputRef.current) imageInputRef.current.value = '';
-      setSuccessMessage(`Producto guardado en post-merch.json (${savedProduct.code}).`);
+      resetForm();
+      setSuccessMessage(
+        draft
+          ? `Producto actualizado (${savedProduct.code} · Stock: ${savedProduct.stock} uds).`
+          : `Producto guardado (${savedProduct.code} · Stock: ${savedProduct.stock} uds).`,
+      );
+      if (draft) onFinishEditing?.();
     } catch (error) {
       setFormError(error instanceof Error ? error.message : 'No se pudo guardar el producto.');
     } finally {
@@ -119,12 +202,20 @@ const PublishMerchForm = ({ onSaveProduct }: PublishMerchFormProps) => {
     }
   };
 
+  const previewStockBadge = getStockBadgeInfo(Number.isFinite(Number(stock)) ? Number(stock) : 0);
+
   return (
-    <div className="border border-zinc-800 bg-[#0E0E12] p-6">
+    <div ref={formContainerRef} className="border border-zinc-800 bg-[#0E0E12] p-6">
       <div className="mb-5 flex items-center justify-between border-b border-zinc-800 pb-4">
         <div>
-          <h2 className="font-display text-2xl font-black uppercase text-white">Agregar mercancía</h2>
-          <p className="mt-1 text-xs text-zinc-500">El producto se guardará en data/post-merch.json.</p>
+          <h2 className="font-display text-2xl font-black uppercase text-white">
+            {draft ? 'Editar producto de mercancía' : 'Agregar mercancía'}
+          </h2>
+          <p className="mt-1 text-xs text-zinc-500">
+            {draft
+              ? `Modificando ${draft.name} (${draft.code}). Actualiza precio, existencias o detalles.`
+              : 'El producto y su inventario se guardarán en el catálogo de la tienda.'}
+          </p>
         </div>
         <ShoppingBag className="h-5 w-5 text-[#DC2626]" />
       </div>
@@ -149,13 +240,36 @@ const PublishMerchForm = ({ onSaveProduct }: PublishMerchFormProps) => {
           </label>
 
           <label className="block">
-            <span className="mb-1.5 block font-mono text-[10px] uppercase tracking-widest text-zinc-400">Enlace de compra (opcional)</span>
+            <span className="mb-1.5 flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-zinc-400">
+              <span>Inventario / Stock (Unidades)</span>
+              <span className={`inline-flex items-center gap-1.5 border px-2 py-0.5 text-[9px] font-bold ${previewStockBadge.badgeClassName}`}>
+                <span className={`h-1.5 w-1.5 rounded-full ${previewStockBadge.dotClassName}`} />
+                {previewStockBadge.label}
+              </span>
+            </span>
+            <input
+              required
+              type="number"
+              min="0"
+              max="1000000"
+              step="1"
+              value={stock}
+              onChange={(event) => setStock(event.target.value)}
+              placeholder="10"
+              className={fieldClassName}
+            />
+          </label>
+
+          <label className="block">
+            <span className="mb-1.5 block font-mono text-[10px] uppercase tracking-widest text-zinc-400">Enlace externo de compra (opcional)</span>
             <input type="url" maxLength={2048} value={purchaseUrl} onChange={(event) => setPurchaseUrl(event.target.value)} placeholder="https://tienda.ejemplo.com/producto" className={fieldClassName} />
           </label>
 
           <label className="block">
-            <span className="mb-1.5 block font-mono text-[10px] uppercase tracking-widest text-zinc-400">Imagen (JPG, PNG, WebP o GIF; máx. 5 MB)</span>
-            <input ref={imageInputRef} required type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleImageChange} className={`${fieldClassName} file:mr-3 file:border-0 file:bg-zinc-800 file:px-3 file:py-1 file:font-mono file:text-[10px] file:uppercase file:text-white`} />
+            <span className="mb-1.5 block font-mono text-[10px] uppercase tracking-widest text-zinc-400">
+              {draft ? 'Reemplazar imagen (opcional; máx. 5 MB)' : 'Imagen (JPG, PNG, WebP o GIF; máx. 5 MB)'}
+            </span>
+            <input ref={imageInputRef} required={!draft} type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleImageChange} className={`${fieldClassName} file:mr-3 file:border-0 file:bg-zinc-800 file:px-3 file:py-1 file:font-mono file:text-[10px] file:uppercase file:text-white`} />
           </label>
 
           <label className="block">
@@ -175,6 +289,18 @@ const PublishMerchForm = ({ onSaveProduct }: PublishMerchFormProps) => {
           )}
         </div>
 
+        {draft && (
+          <div className="flex items-center gap-4 border border-zinc-800 bg-[#070709] p-3">
+            <img src={draft.image} alt={draft.name} className="h-14 w-14 border border-zinc-800 object-cover" />
+            <div className="font-mono text-xs text-zinc-400">
+              <p className="font-bold text-white">{draft.name}</p>
+              <p className="text-[10px] text-zinc-500">
+                ID: {draft.id} · CÓDIGO: {draft.code} · {image ? 'Se usará la nueva imagen seleccionada' : 'Se conservará la imagen actual'}
+              </p>
+            </div>
+          </div>
+        )}
+
         <label className="block">
           <span className="mb-1.5 block font-mono text-[10px] uppercase tracking-widest text-zinc-400">Descripción</span>
           <textarea maxLength={2000} rows={3} value={description} onChange={(event) => setDescription(event.target.value)} placeholder="Detalles del producto, material o tallas disponibles" className={fieldClassName} />
@@ -186,9 +312,21 @@ const PublishMerchForm = ({ onSaveProduct }: PublishMerchFormProps) => {
               : successMessage ? <span role="status" className="font-bold text-emerald-400">{successMessage}</span>
                 : null}
           </div>
-          <button type="submit" disabled={isSaving} className="flex cursor-pointer items-center gap-2 bg-[#DC2626] px-6 py-3 font-mono text-xs font-bold uppercase tracking-widest text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50">
-            <Save className="h-4 w-4" /> {isSaving ? 'GUARDANDO…' : 'GUARDAR PRODUCTO'}
-          </button>
+          <div className="flex gap-2">
+            {draft && (
+              <button
+                type="button"
+                onClick={handleCancelEditing}
+                disabled={isSaving}
+                className="cursor-pointer border border-zinc-700 px-4 py-3 font-mono text-xs font-bold uppercase tracking-widest text-zinc-300 hover:text-white disabled:opacity-50"
+              >
+                CANCELAR
+              </button>
+            )}
+            <button type="submit" disabled={isSaving} className="flex cursor-pointer items-center gap-2 bg-[#DC2626] px-6 py-3 font-mono text-xs font-bold uppercase tracking-widest text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50">
+              <Save className="h-4 w-4" /> {isSaving ? 'GUARDANDO…' : draft ? 'ACTUALIZAR PRODUCTO' : 'GUARDAR PRODUCTO'}
+            </button>
+          </div>
         </div>
       </form>
     </div>

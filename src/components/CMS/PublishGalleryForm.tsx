@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Camera, Save, X } from 'lucide-react';
 import type { CmsGalleryItem, CmsPostStatus } from '../../data/Cms';
 import { readJsonResponse } from '../../data/readJsonResponse';
+import { authenticatedCmsFetch, uploadCmsImage } from '../../lib/firebaseClient';
 
 type GalleryFields = Omit<CmsGalleryItem, 'id' | 'img' | 'code' | 'publish'> & {
     status: CmsPostStatus;
@@ -12,20 +13,6 @@ const fieldClassName =
 const allowedImageTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 const maxImageSize = 5 * 1024 * 1024;
 const maxImages = 15;
-
-const toBase64 = (file: File): Promise<string> =>
-    new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-            if (typeof reader.result !== 'string') {
-                reject(new Error(`No se pudo leer ${file.name}.`));
-                return;
-            }
-            resolve(reader.result.slice(reader.result.indexOf(',') + 1));
-        };
-        reader.onerror = () => reject(new Error(`No se pudo leer ${file.name}.`));
-        reader.readAsDataURL(file);
-    });
 
 interface PublishGalleryFormProps {
     draft: CmsGalleryItem | null;
@@ -146,7 +133,8 @@ const PublishGalleryForm: React.FC<PublishGalleryFormProps> = ({
         setSuccessMessage(null);
 
         try {
-            const response = await fetch(
+            const uploadedImages = await Promise.all(images.map((file) => uploadCmsImage(file, 'galleries')));
+            const response = await authenticatedCmsFetch(
                 draft ? `/api/cms/galleries/${encodeURIComponent(draft.id)}` : '/api/cms/galleries',
                 {
                 method: draft ? 'PUT' : 'POST',
@@ -157,10 +145,7 @@ const PublishGalleryForm: React.FC<PublishGalleryFormProps> = ({
                     publish: formData.status === 'PROGRAMADO'
                         ? new Date(publishDate).toISOString()
                         : '',
-                    img: await Promise.all(images.map(async (file) => ({
-                        mimeType: file.type,
-                        data: await toBase64(file),
-                    }))),
+                    img: uploadedImages.map((pic) => ({ pic })),
                 }),
                 },
             );
@@ -186,7 +171,7 @@ const PublishGalleryForm: React.FC<PublishGalleryFormProps> = ({
             setSuccessMessage(
                 draft
                     ? `Borrador actualizado (${created.code ?? created.id}).`
-                    : `Galería guardada en post-pics.json (ID: ${created.id}).`,
+                    : `Galería guardada en Firestore (ID: ${created.id}).`,
             );
             if (draft) onFinishEditing();
         } catch (error) {

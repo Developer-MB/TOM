@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { Plus, Save } from 'lucide-react';
 import type { CmsPostCreateInput, CmsPostItem, CmsPostStatus, CmsPostType } from '../../data/Cms';
+import { uploadCmsImage } from '../../lib/firebaseClient';
 
 type CmsPostFields = Omit<CmsPostItem, 'id' | 'code' | 'cover' | 'publish' | 'type'>;
 
@@ -15,20 +16,6 @@ const fieldClassName =
     'w-full bg-[#070709] border border-zinc-800 focus:border-[#DC2626] px-3.5 py-2.5 text-xs font-mono text-white outline-none';
 const allowedImageTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 const maxImageSize = 5 * 1024 * 1024;
-
-const toBase64 = (file: File): Promise<string> =>
-    new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-            if (typeof reader.result !== 'string') {
-                reject(new Error('No se pudo leer la imagen seleccionada.'));
-                return;
-            }
-            resolve(reader.result.slice(reader.result.indexOf(',') + 1));
-        };
-        reader.onerror = () => reject(new Error('No se pudo leer la imagen seleccionada.'));
-        reader.readAsDataURL(file);
-    });
 
 const PublishDiscForm: React.FC<PublishDiscFormProps> = ({
     type,
@@ -99,16 +86,13 @@ const PublishDiscForm: React.FC<PublishDiscFormProps> = ({
                 type,
                 author: formData.author.trim().toLocaleUpperCase('es'),
                 publish: formData.status === 'PROGRAMADO' ? new Date(publishDate).toISOString() : '',
-                coverImage: {
-                    mimeType: coverImage.type,
-                    data: await toBase64(coverImage),
-                },
+                coverImage: await uploadCmsImage(coverImage, 'discs'),
             });
             setFormData((current) => ({ ...current, band: '', disc: '', excerpt: '' }));
             setCoverImage(null);
             if (coverInputRef.current) coverInputRef.current.value = '';
             setPublishDate('');
-            setPublishToast(`✓ ENTRADA [${created.code}] GUARDADA EN post-disc.json.`);
+            setPublishToast(`✓ ENTRADA [${created.code}] GUARDADA EN FIRESTORE.`);
             window.setTimeout(() => setPublishToast(null), 4000);
         } catch (error) {
             const message = error instanceof Error ? error.message : 'No se pudo guardar la publicación.';

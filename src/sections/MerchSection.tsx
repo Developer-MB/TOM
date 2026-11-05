@@ -1,26 +1,45 @@
 import { useEffect, useState } from 'react';
 import MerchCatalog from '../components/Merch/MerchCatalog';
-import { INITIAL_CMS_MERCH } from '../data/Merch';
+import {
+  MERCH_UPDATED_EVENT,
+  normalizeMerchProduct,
+  readStoredMerchCatalog,
+  writeStoredMerchCatalog,
+} from '../data/Merch';
 import type { CmsMerchProduct } from '../data/CmsTypes';
 import { readJsonResponseOrFallback } from '../data/readJsonResponse';
 
 const MerchSection = () => {
-  const [products, setProducts] = useState<CmsMerchProduct[]>(INITIAL_CMS_MERCH);
+  const [products, setProducts] = useState<CmsMerchProduct[]>(() => readStoredMerchCatalog());
+
+  useEffect(() => {
+    const syncFromStorage = () => {
+      setProducts(readStoredMerchCatalog());
+    };
+    window.addEventListener(MERCH_UPDATED_EVENT, syncFromStorage);
+    window.addEventListener('storage', syncFromStorage);
+    return () => {
+      window.removeEventListener(MERCH_UPDATED_EVENT, syncFromStorage);
+      window.removeEventListener('storage', syncFromStorage);
+    };
+  }, []);
 
   useEffect(() => {
     const controller = new AbortController();
     const loadProducts = async () => {
       try {
-        const response = await fetch('/api/cms/merch', { signal: controller.signal });
+        const localCatalog = readStoredMerchCatalog();
+        const response = await fetch('/api/home/merch', { signal: controller.signal });
         const savedProducts = await readJsonResponseOrFallback<unknown>(
           response,
           'No se pudieron cargar los productos.',
-          INITIAL_CMS_MERCH,
+          localCatalog,
         );
         if (!Array.isArray(savedProducts)) {
           throw new Error('El servidor devolvió un catálogo de mercancía no válido.');
         }
-        setProducts(savedProducts as CmsMerchProduct[]);
+        const normalized = (savedProducts as CmsMerchProduct[]).map(normalizeMerchProduct);
+        setProducts(normalized);
       } catch (error) {
         if (controller.signal.aborted) return;
         console.error('No se pudo actualizar el catálogo de mercancía:', error);
@@ -31,7 +50,17 @@ const MerchSection = () => {
     return () => controller.abort();
   }, []);
 
-  return <MerchCatalog products={products} />;
+  const handleUpdateProducts = (nextProducts: CmsMerchProduct[]) => {
+    setProducts(nextProducts);
+    writeStoredMerchCatalog(nextProducts);
+  };
+
+  return (
+    <MerchCatalog
+      products={products}
+      onUpdateProducts={handleUpdateProducts}
+    />
+  );
 };
 
 export default MerchSection;

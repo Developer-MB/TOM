@@ -1,0 +1,49 @@
+{
+  "manro": {
+    "username": "manro",
+    "password": "tom$sha256$b1bdbbe717052e6b$91c7d68c9aa677b31ac1fbdafcf3197d930618be82aad2cbaedd07bdc09351d5",
+    "displayName": "Manro",
+    "role": "SUPERADMIN",
+    "permissions": [
+      "RECOMENDACION",
+      "GALERIA",
+      "VIDEO",
+      "TOUR",
+      "RADIO",
+      "MERCH",
+      "CMS"
+    ]
+  },
+  "editor": {
+    "username": "editor",
+    "password": "tom$sha256$a62888d3ac73270b$d28f9fa43ea4b4d9db2fdf7bab9b99b7b61eaf6a69685fb78bd1d772dc674f9d",
+    "displayName": "Editor Editorial",
+    "role": "EDITOR",
+    "permissions": [
+      "RECOMENDACION",
+      "GALERIA",
+      "VIDEO",
+      "GIRAS"
+    ]
+  },
+  "moderador": {
+    "username": "moderador",
+    "password": "tom$sha256$8518c93ee6a4aa41$f1a90b859366994ca913a18ef358d8c5b790d6376679e478485c9f918f541f39",
+    "displayName": "Moderador Giras y Radio",
+    "role": "MODERADOR",
+    "permissions": [
+      "TOUR",
+      "RADIO"
+    ]
+  },
+  "merchadmin": {
+    "username": "merchadmin",
+    "password": "tom$sha256$10de372e4de7d1ef$944b421665625b90706a3db8f7a1657b32f6786aa906a121f6c6786e1f03675a",
+    "displayName": "Encargado Merch",
+    "role": "ADMIN",
+    "permissions": [
+      "MERCH",
+      "TOUR"
+    ]
+  }
+}
