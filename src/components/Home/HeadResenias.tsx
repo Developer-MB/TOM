@@ -1,8 +1,7 @@
-import React from 'react'
-import { ArrowRight } from 'lucide-react'
+import React from 'react';
+import { ArrowRight } from 'lucide-react';
 import { SectionId } from '../../data/mockData';
 import { ASSETS } from '@/src/data/Assets';
-
 
 interface HeadResniasProps {
     onSelectSection: (section: SectionId) => void;
@@ -10,22 +9,24 @@ interface HeadResniasProps {
 
 export const HeadResenias: React.FC<HeadResniasProps> = ({ onSelectSection }) => {
     return (
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
-                <img src={ASSETS.logoTONM2}
+                <img
+                    src={ASSETS.logoTONM2}
                     alt="Time of New Music Logo"
-                    className="w-100 sm:w-64 lg:w-100"
+                    className="w-full max-w-[260px] sm:max-w-[300px] lg:max-w-[380px] h-auto object-contain"
                 />
             </div>
             <button
+                type="button"
                 onClick={() => onSelectSection('resenas')}
-                className="font-mono text-xs text-[#a1a1aa] hover:text-white flex items-center gap-1.5 uppercase tracking-wider cursor-pointer"
+                className="font-mono text-xs text-[#a1a1aa] hover:text-white flex items-center gap-1.5 uppercase tracking-wider cursor-pointer self-start sm:self-end"
             >
                 <span>RECOMENDACIONES COMPLETAS</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <ArrowRight className="w-3.5 h-3.5 shrink-0" />
             </button>
         </div>
-    )
-}
+    );
+};
 
-export default HeadResenias
+export default HeadResenias;

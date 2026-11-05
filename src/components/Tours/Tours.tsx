@@ -109,7 +109,7 @@ export const Tours: React.FC = () => {
           onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
           disabled={currentPage === 1}
           aria-label="Página anterior"
-          className="border border-zinc-700 p-2 text-zinc-300 hover:border-[#DC2626] disabled:cursor-not-allowed disabled:opacity-40"
+          className="border border-zinc-700 p-2 text-zinc-300 hover:border-[#DC2626] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
         >
           <ChevronLeft className="h-4 w-4" />
         </button>
@@ -119,7 +119,7 @@ export const Tours: React.FC = () => {
           onClick={() => setCurrentPage((page) => Math.min(pageCount, page + 1))}
           disabled={currentPage >= pageCount}
           aria-label="Página siguiente"
-          className="border border-zinc-700 p-2 text-zinc-300 hover:border-[#DC2626] disabled:cursor-not-allowed disabled:opacity-40"
+          className="border border-zinc-700 p-2 text-zinc-300 hover:border-[#DC2626] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
         >
           <ChevronRight className="h-4 w-4" />
         </button>
@@ -128,10 +128,10 @@ export const Tours: React.FC = () => {
   );
 
   return (
-    <section className="min-h-screen bg-black px-4 py-8 text-[#F4F4F6] lg:px-8">
-      <div className="mx-auto max-w-[1440px] space-y-6">
+    <section className="min-h-screen bg-black py-8 text-[#F4F4F6]">
+      <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8 space-y-6">
         <header className="border-b border-zinc-800 pb-5">
-          <h1 className="font-display text-3xl font-black uppercase text-white sm:text-4xl">
+          <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-black uppercase text-white">
             PRÓXIMOS EVENTOS &amp; GIRAS
           </h1>
           <p className="mt-2 font-mono text-xs text-zinc-400">
@@ -187,7 +187,9 @@ export const Tours: React.FC = () => {
                   type="button"
                   onClick={() => setView('table')}
                   aria-pressed={view === 'table'}
-                  className={`flex items-center gap-2 px-3 font-mono text-[10px] uppercase ${view === 'table' ? 'bg-[#DC2626] text-white' : 'text-zinc-400 hover:text-white'}`}
+                  className={`flex flex-1 sm:flex-initial items-center justify-center gap-2 px-3 font-mono text-[10px] uppercase cursor-pointer ${
+                    view === 'table' ? 'bg-[#DC2626] text-white' : 'text-zinc-400 hover:text-white'
+                  }`}
                 >
                   <Table2 className="h-3.5 w-3.5" /> Tabla
                 </button>
@@ -195,7 +197,9 @@ export const Tours: React.FC = () => {
                   type="button"
                   onClick={() => setView('calendar')}
                   aria-pressed={view === 'calendar'}
-                  className={`flex items-center gap-2 border-l border-zinc-800 px-3 font-mono text-[10px] uppercase ${view === 'calendar' ? 'bg-[#DC2626] text-white' : 'text-zinc-400 hover:text-white'}`}
+                  className={`flex flex-1 sm:flex-initial items-center justify-center gap-2 border-l border-zinc-800 px-3 font-mono text-[10px] uppercase cursor-pointer ${
+                    view === 'calendar' ? 'bg-[#DC2626] text-white' : 'text-zinc-400 hover:text-white'
+                  }`}
                 >
                   <CalendarDays className="h-3.5 w-3.5" /> Calendario
                 </button>
@@ -212,7 +216,7 @@ export const Tours: React.FC = () => {
                   key={tour.id}
                   className="flex flex-col gap-4 rounded-sm border border-zinc-800 bg-[#121214] p-4 transition-colors hover:border-zinc-600 sm:flex-row sm:items-center sm:justify-between"
                 >
-                  <div className="flex min-w-0 items-center gap-4">
+                  <div className="flex min-w-0 items-start sm:items-center gap-4">
                     <div className="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-sm border border-zinc-800 bg-[#18181b] font-mono">
                       <span className="text-[9px] font-bold uppercase text-red-500">
                         {formatTourMonth(tour.month)}
@@ -224,7 +228,7 @@ export const Tours: React.FC = () => {
                     </div>
 
                     <div className="min-w-0 space-y-1">
-                      <div className="flex flex-wrap items-center gap-2.5">
+                      <div className="flex flex-wrap items-center gap-2">
                         <h2 className="font-display text-base font-bold text-white sm:text-lg">
                           {tour.band}
                         </h2>
@@ -234,14 +238,14 @@ export const Tours: React.FC = () => {
                       </div>
                       <p className="flex flex-wrap items-center gap-x-1.5 font-mono text-xs text-zinc-400">
                         <MapPin className="h-3.5 w-3.5 shrink-0 text-zinc-500" />
-                        <span>{tour.venue}</span>
-                        {tour.info && <><span>•</span><span>{tour.info}</span></>}
+                        <span className="break-words">{tour.venue}</span>
+                        {tour.info && <><span>•</span><span className="break-words">{tour.info}</span></>}
                       </p>
                     </div>
                   </div>
 
                   <span
-                    className={`self-start rounded-sm border px-2.5 py-1 font-mono text-[10px] uppercase sm:ml-4 sm:self-center ${
+                    className={`self-start shrink-0 rounded-sm border px-2.5 py-1 font-mono text-[10px] uppercase sm:ml-4 sm:self-center ${
                       tour.ticketsLow
                         ? 'border-red-900 bg-red-950/30 text-red-400'
                         : 'border-zinc-800 bg-[#18181b] text-zinc-400'
@@ -266,58 +270,60 @@ export const Tours: React.FC = () => {
                 type="button"
                 onClick={() => changeCalendarMonth(-1)}
                 aria-label="Mes anterior"
-                className="border border-zinc-700 p-2 text-zinc-300 hover:border-[#DC2626]"
+                className="border border-zinc-700 p-2 text-zinc-300 hover:border-[#DC2626] cursor-pointer"
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
-              <h2 className="font-display text-xl font-bold uppercase text-white">
+              <h2 className="font-display text-lg sm:text-xl font-bold uppercase text-white text-center">
                 {calendarDate.toLocaleDateString('es-MX', { month: 'long', year: 'numeric' })}
               </h2>
               <button
                 type="button"
                 onClick={() => changeCalendarMonth(1)}
                 aria-label="Mes siguiente"
-                className="border border-zinc-700 p-2 text-zinc-300 hover:border-[#DC2626]"
+                className="border border-zinc-700 p-2 text-zinc-300 hover:border-[#DC2626] cursor-pointer"
               >
                 <ChevronRight className="h-4 w-4" />
               </button>
             </div>
 
-            <div className="grid grid-cols-7 border-l border-t border-zinc-800">
-              {weekdayHeaders.map((weekday) => (
-                <div key={weekday} className="border-b border-r border-zinc-800 bg-[#070709] py-2 text-center font-mono text-[9px] text-zinc-500">
-                  {weekday}
-                </div>
-              ))}
-              {Array.from({ length: firstWeekday }, (_, index) => (
-                <div key={`empty-${index}`} className="min-h-24 border-b border-r border-zinc-800 bg-[#09090b] sm:min-h-32" />
-              ))}
-              {Array.from({ length: daysInMonth }, (_, index) => {
-                const day = index + 1;
-                const dayTours = toursByDay.get(day) ?? [];
-                return (
-                  <div key={day} className="min-h-24 border-b border-r border-zinc-800 p-1.5 sm:min-h-32 sm:p-2">
-                    <span className="font-mono text-[10px] text-zinc-500">{day}</span>
-                    <div className="mt-1 space-y-1">
-                      {dayTours.map((tour) => (
-                        <article key={tour.id} className="border border-red-900/70 bg-red-950/30 p-1.5">
-                          <h3 className="line-clamp-2 font-sans text-[10px] font-bold text-white">{tour.band}</h3>
-                          <p className="mt-0.5 line-clamp-2 font-mono text-[9px] text-zinc-400">{tour.venue}</p>
-                          {tour.ticketsLow && (
-                            <span className="mt-1 inline-block font-mono text-[8px] uppercase text-red-300">
-                              Pocas ventas
-                            </span>
-                          )}
-                        </article>
-                      ))}
-                    </div>
+            <div className="overflow-x-auto">
+              <div className="min-w-[640px] grid grid-cols-7 border-l border-t border-zinc-800">
+                {weekdayHeaders.map((weekday) => (
+                  <div key={weekday} className="border-b border-r border-zinc-800 bg-[#070709] py-2 text-center font-mono text-[9px] text-zinc-500">
+                    {weekday}
                   </div>
-                );
-              })}
+                ))}
+                {Array.from({ length: firstWeekday }, (_, index) => (
+                  <div key={`empty-${index}`} className="min-h-24 border-b border-r border-zinc-800 bg-[#09090b] sm:min-h-32" />
+                ))}
+                {Array.from({ length: daysInMonth }, (_, index) => {
+                  const day = index + 1;
+                  const dayTours = toursByDay.get(day) ?? [];
+                  return (
+                    <div key={day} className="min-h-24 border-b border-r border-zinc-800 p-1.5 sm:min-h-32 sm:p-2">
+                      <span className="font-mono text-[10px] text-zinc-500">{day}</span>
+                      <div className="mt-1 space-y-1">
+                        {dayTours.map((tour) => (
+                          <article key={tour.id} className="border border-red-900/70 bg-red-950/30 p-1.5">
+                            <h3 className="line-clamp-2 font-sans text-[10px] font-bold text-white">{tour.band}</h3>
+                            <p className="mt-0.5 line-clamp-2 font-mono text-[9px] text-zinc-400">{tour.venue}</p>
+                            {tour.ticketsLow && (
+                              <span className="mt-1 inline-block font-mono text-[8px] uppercase text-red-300">
+                                Pocas ventas
+                              </span>
+                            )}
+                          </article>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
             {pagination}
             <p className="flex items-center gap-2 font-mono text-[10px] text-zinc-500">
-              <List className="h-3.5 w-3.5" />
+              <List className="h-3.5 w-3.5 shrink-0" />
               El calendario muestra las giras de la página actual; usa el paginador para ver más.
             </p>
           </div>

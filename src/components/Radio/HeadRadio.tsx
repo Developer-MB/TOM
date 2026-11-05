@@ -1,5 +1,5 @@
-import React from 'react'
-import { Activity, Users } from 'lucide-react'
+import React from 'react';
+import { Activity, Users } from 'lucide-react';
 import { ASSETS } from '../../data/Assets';
 
 const HeadRadio = () => {
@@ -12,13 +12,13 @@ const HeadRadio = () => {
                 <img
                     src={ASSETS.logoRadio}
                     alt="Time of Metal Radio"
-                    className="w-full max-w-[320px] sm:max-w-[400px] h-auto object-contain"
+                    className="w-full max-w-[260px] sm:max-w-[340px] lg:max-w-[400px] h-auto object-contain"
                 />
             </div>
 
-            <div className="flex flex-col sm:flex-row flex-wrap gap-3 lg:justify-end">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex gap-3 lg:justify-end w-full lg:w-auto">
                 <div className="min-h-[72px] border border-zinc-800 bg-[#0E0E12] px-4 py-3 flex items-center gap-3">
-                    <Users className="w-5 h-5 text-[#DC2626]" />
+                    <Users className="w-5 h-5 text-[#DC2626] shrink-0" />
                     <div>
                         <div className="font-display font-black text-xl text-white leading-none">
                             666
@@ -29,7 +29,7 @@ const HeadRadio = () => {
                     </div>
                 </div>
                 <div className="min-h-[72px] border border-zinc-800 bg-[#0E0E12] px-4 py-3 flex items-center gap-3">
-                    <Activity className="w-5 h-5 text-emerald-500" />
+                    <Activity className="w-5 h-5 text-emerald-500 shrink-0" />
                     <div>
                         <div className="font-display font-black text-xl text-emerald-400 leading-none">
                             1411 KBPS
@@ -41,7 +41,7 @@ const HeadRadio = () => {
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default HeadRadio
+export default HeadRadio;

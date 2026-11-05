@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import type { AudioTrack } from '@/src/data/mockData';
 import { Radio, Volume2, VolumeX } from 'lucide-react';
 
@@ -56,27 +56,28 @@ const PlayerRadio: React.FC<PlayerRadioProps> = ({
     }, [audioAnalyser]);
 
     return (
-        <div className="lg:col-span-7 p-6 sm:p-8 border-b lg:border-b-0 lg:border-r border-zinc-800 flex flex-col justify-between">
+        <div className="lg:col-span-7 p-5 sm:p-8 border-b lg:border-b-0 lg:border-r border-zinc-800 flex flex-col justify-between">
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
                 {/* Vinyl Artwork */}
-                <div className="relative w-44 h-44 sm:w-52 sm:h-52 shrink-0 border border-zinc-700 bg-black overflow-hidden group">
+                <div className="relative w-40 h-40 sm:w-52 sm:h-52 shrink-0 border border-zinc-700 bg-black overflow-hidden group">
                     <img
                         src={currentTrack.cover}
                         alt={currentTrack.title}
-                        className={`w-full h-full object-cover transition-transform duration-700 ${isPlaying ? 'scale-105' : 'opacity-80'
-                            }`}
+                        className={`w-full h-full object-cover transition-transform duration-700 ${
+                            isPlaying ? 'scale-105' : 'opacity-80'
+                        }`}
                     />
                 </div>
 
                 {/* Track Info */}
-                <div className="flex-1 text-center sm:text-left">
+                <div className="flex-1 w-full min-w-0 text-center sm:text-left">
                     <div className="inline-flex items-center gap-2 bg-zinc-900 border border-zinc-800 px-3 py-1 font-mono text-[10px] text-[#DC2626] uppercase tracking-widest mb-3">
                         <Radio className="w-3.5 h-3.5" />
                     </div>
-                    <h2 className="font-display font-black text-2xl sm:text-3xl uppercase tracking-tight text-white leading-none mb-2">
+                    <h2 className="font-display font-black text-xl sm:text-2xl lg:text-3xl uppercase tracking-tight text-white leading-tight mb-2 break-words">
                         {currentTrack.title}
                     </h2>
-                    <div className="font-display font-bold text-lg text-[#DC2626] uppercase tracking-wide mb-1">
+                    <div className="font-display font-bold text-base sm:text-lg text-[#DC2626] uppercase tracking-wide mb-1">
                         {currentTrack.artist}
                     </div>
                     <div className="font-mono text-xs text-zinc-400 mb-5">
@@ -92,14 +93,13 @@ const PlayerRadio: React.FC<PlayerRadioProps> = ({
                             {Array.from({ length: 30 }, (_, index) => (
                                 <div
                                     key={index}
-                                    className={`flex-1 transition-all duration-100 ${(
-                                        spectrum[index] ?? (isPlaying ? 4 : 0)
-                                    ) > 70
-                                        ? 'bg-blue-700'
-                                        : (spectrum[index] ?? 0) > 40
-                                            ? 'bg-amber-500'
-                                            : 'bg-[#DC2626]'
-                                        }`}
+                                    className={`flex-1 transition-all duration-100 ${
+                                        (spectrum[index] ?? (isPlaying ? 4 : 0)) > 70
+                                            ? 'bg-blue-700'
+                                            : (spectrum[index] ?? 0) > 40
+                                                ? 'bg-amber-500'
+                                                : 'bg-[#DC2626]'
+                                    }`}
                                     style={{
                                         height: `${spectrum[index] ?? 4}%`,
                                     }}
@@ -112,8 +112,9 @@ const PlayerRadio: React.FC<PlayerRadioProps> = ({
 
             {/* Volume Control */}
             <div className="pt-6 mt-6 border-t border-zinc-800">
-                <div className="inline-flex items-center gap-2.5 bg-[#070709] border border-zinc-800 px-3.5 py-2.5">
+                <div className="flex sm:inline-flex items-center justify-between sm:justify-start gap-2.5 bg-[#070709] border border-zinc-800 px-3.5 py-2.5">
                     <button
+                        type="button"
                         onClick={onToggleMute}
                         className="text-zinc-400 hover:text-white cursor-pointer"
                         aria-label={isMuted ? 'Activar sonido' : 'Silenciar'}
@@ -130,7 +131,7 @@ const PlayerRadio: React.FC<PlayerRadioProps> = ({
                         max={100}
                         value={isMuted ? 0 : volume}
                         onChange={(e) => onVolumeChange(Number(e.target.value))}
-                        className="w-24 accent-[#DC2626] cursor-pointer"
+                        className="flex-1 sm:w-28 accent-[#DC2626] cursor-pointer"
                     />
                     <span className="font-mono text-[11px] text-zinc-300 w-8 text-right">
                         {isMuted ? '0%' : `${volume}%`}
@@ -138,7 +139,7 @@ const PlayerRadio: React.FC<PlayerRadioProps> = ({
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default PlayerRadio
+export default PlayerRadio;

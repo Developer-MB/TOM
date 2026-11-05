@@ -11,23 +11,21 @@ interface HeadRecProps {
 
 const HeadRec: FC<HeadRecProps> = ({ reviews, filters, onFiltersChange }) => {
     return (
-        <div className="max-w-[1440px] mx-auto px-4 space-y-12">
-            {/* HERO HEADER + METRICS BOX */}
-
+        <div className="w-full space-y-8 sm:space-y-10">
             <div className="flex flex-col lg:flex-row lg:items-end justify-center">
-                <img src={ASSETS.logoTONM2}
+                <img
+                    src={ASSETS.logoTONM2}
                     alt="Time of New Music Logo"
-                    className="w-100 sm:w-64 lg:w-100"
+                    className="w-full max-w-[260px] sm:max-w-[320px] lg:max-w-[400px] h-auto object-contain"
                 />
             </div>
 
-
             {/* SEARCH & GENRE FILTER BAR */}
-            <div className="bg-[#121214] border border-[#27272a] rounded-sm p-4 space-y-4">
+            <div className="bg-[#121214] border border-[#27272a] rounded-sm p-4 sm:p-5 space-y-4">
                 <Filter reviews={reviews} filters={filters} onFiltersChange={onFiltersChange} />
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default HeadRec
+export default HeadRec;

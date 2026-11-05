@@ -66,13 +66,12 @@ export const VideopodcastSection: React.FC<VideopodcastSectionProps> = ({
   return (
     <div className="min-h-screen bg-[#000] text-[#F4F4F6]">
       {/* SECTION HEADER */}
-      <section className="max-w-[1440px] mx-auto px-4 lg:px-8 pb-6">
+      <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-6">
         <HeadVideo onTogglePlay={onTogglePlay} />
       </section>
 
-
       {/* VIDEO MÁS RECIENTE */}
-      <section className="max-w-[1440px] mx-auto px-4 lg:px-8 pb-8">
+      <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pb-8">
         {videoError && (
           <p role="alert" className="mb-4 border border-red-900 bg-red-950/40 p-4 text-sm text-red-300">
             {videoError} Se muestran los videos guardados localmente.
@@ -88,12 +87,12 @@ export const VideopodcastSection: React.FC<VideopodcastSectionProps> = ({
       </section>
 
       {/* SEARCH */}
-      <section className="max-w-[1440px] mx-auto px-4 lg:px-8 pb-8">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-[#0E0E12] border border-zinc-800 p-4">
+      <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#0E0E12] border border-zinc-800 p-4">
           <p className="font-mono text-xs uppercase tracking-wider text-zinc-400">
             VIDEOS DEL VIDEOPODCAST
           </p>
-          <div className="relative w-full lg:w-96">
+          <div className="relative w-full sm:w-80 lg:w-96">
             <Search className="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
@@ -107,8 +106,8 @@ export const VideopodcastSection: React.FC<VideopodcastSectionProps> = ({
       </section>
 
       {/* VIDEOS ANTERIORES */}
-      <section className="max-w-[1440px] mx-auto px-4 lg:px-8 pb-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredVideos.map((video) => (
             <article
               key={video.id}
@@ -131,8 +130,8 @@ export const VideopodcastSection: React.FC<VideopodcastSectionProps> = ({
                 </div>
 
                 {/* Body */}
-                <div className="p-6">
-                  <h3 className="font-display font-black text-xl uppercase tracking-tight text-white group-hover:text-[#DC2626] transition-colors mb-3 leading-snug">
+                <div className="p-5 sm:p-6">
+                  <h3 className="font-display font-black text-lg sm:text-xl uppercase tracking-tight text-white group-hover:text-[#DC2626] transition-colors mb-3 leading-snug">
                     {video.title}
                   </h3>
                   <p className="text-zinc-400 text-xs leading-relaxed line-clamp-4">
@@ -142,7 +141,7 @@ export const VideopodcastSection: React.FC<VideopodcastSectionProps> = ({
               </div>
 
               {/* Action Footer */}
-              <div className="px-6 py-4 border-t border-zinc-800/80 bg-[#0A0A0D] flex items-center justify-between">
+              <div className="px-5 sm:px-6 py-4 border-t border-zinc-800/80 bg-[#0A0A0D] flex flex-wrap items-center justify-between gap-2">
                 <a
                   href={`https://www.youtube.com/watch?v=${encodeURIComponent(video.id)}`}
                   target="_blank"
@@ -152,6 +151,7 @@ export const VideopodcastSection: React.FC<VideopodcastSectionProps> = ({
                   <Play className="w-3.5 h-3.5 text-[#DC2626]" /> VER EN YOUTUBE
                 </a>
                 <button
+                  type="button"
                   onClick={onTogglePlay}
                   className="font-mono text-[11px] uppercase tracking-wider text-zinc-400 hover:text-white flex items-center gap-1.5 transition-colors cursor-pointer"
                 >

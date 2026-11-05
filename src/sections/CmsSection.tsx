@@ -64,19 +64,19 @@ const COMPOSER_CATALOG: Array<{
   permission: CmsSectionPermission;
   superAdminOnly?: boolean;
 }> = [
-  { value: 'RECOMENDACION', label: 'RECOMENDACIONES', permission: 'RECOMENDACION' },
-  { value: 'GALERIA', label: 'GALERÍA', permission: 'GALERIA' },
-  { value: 'VIDEO', label: 'VIDEOS', permission: 'VIDEO' },
-  { value: 'TOUR', label: 'GIRAS', permission: 'TOUR' },
-  { value: 'RADIO', label: 'RADIO 24/7', permission: 'RADIO' },
-  { value: 'MERCH', label: 'MERCH / MERCANCÍA', permission: 'MERCH' },
-  {
-    value: 'USUARIOS',
-    label: 'USUARIOS Y PERMISOS (SUPERADMIN)',
-    permission: 'CMS',
-    superAdminOnly: true,
-  },
-];
+    { value: 'RECOMENDACION', label: 'RECOMENDACIONES', permission: 'RECOMENDACION' },
+    { value: 'GALERIA', label: 'GALERÍA', permission: 'GALERIA' },
+    { value: 'VIDEO', label: 'VIDEOS', permission: 'VIDEO' },
+    { value: 'TOUR', label: 'GIRAS', permission: 'TOUR' },
+    { value: 'RADIO', label: 'RADIO 24/7', permission: 'RADIO' },
+    { value: 'MERCH', label: 'MERCH / MERCANCÍA', permission: 'MERCH' },
+    {
+      value: 'USUARIOS',
+      label: 'USUARIOS Y PERMISOS (SUPERADMIN)',
+      permission: 'CMS',
+      superAdminOnly: true,
+    },
+  ];
 
 export const CmsSection: React.FC<CmsSectionProps> = (props) => {
   const [session, setSession] = useState<CmsAuthSession | null>(() => getStoredCmsSession());
@@ -101,36 +101,38 @@ export const CmsSection: React.FC<CmsSectionProps> = (props) => {
 
   return (
     <>
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800 bg-[#09090b] px-4 py-2 font-mono text-[10px] text-zinc-400">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="uppercase tracking-widest text-zinc-500">SECCIONES HABILITADAS:</span>
-          {session.permissions.map((perm) => (
-            <span
-              key={perm}
-              className="border border-zinc-800 bg-[#0E0E12] px-2 py-0.5 text-[9px] uppercase text-zinc-300"
-            >
-              {CMS_PERMISSION_LABELS[perm]}
-            </span>
-          ))}
-        </div>
+      <div className="border-b border-zinc-800 bg-[#09090b] font-mono text-[10px] text-zinc-400">
+        <div className="max-w-[1440px] mx-auto px-8 sm:px-6 lg:px-8 py-2.5 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+            <span className="uppercase tracking-widest text-zinc-500">SECCIONES HABILITADAS:</span>
+            {session.permissions.map((perm) => (
+              <span
+                key={perm}
+                className="border border-zinc-800 bg-[#0E0E12] px-2 py-0.5 text-[9px] uppercase text-zinc-300"
+              >
+                {CMS_PERMISSION_LABELS[perm]}
+              </span>
+            ))}
+          </div>
 
-        <div className="flex items-center gap-3 ml-auto">
-          <span className="flex items-center gap-1.5 text-xs">
-            <strong className="text-white">{session.username}</strong>
-            <span className={`font-bold uppercase ${roleStyle.textClass}`}>
-              ({roleStyle.label})
+          <div className="flex items-center gap-3 ml-auto">
+            <span className="flex items-center gap-1.5 text-xs">
+              <strong className="text-white">{session.username}</strong>
+              <span className={`font-bold uppercase ${roleStyle.textClass}`}>
+                ({roleStyle.label})
+              </span>
             </span>
-          </span>
-          <button
-            type="button"
-            onClick={() => {
-              clearCmsSession();
-              setSession(null);
-            }}
-            className="cursor-pointer border border-zinc-700 px-3 py-1.5 uppercase text-white hover:border-[#DC2626]"
-          >
-            Cerrar sesión
-          </button>
+            <button
+              type="button"
+              onClick={() => {
+                clearCmsSession();
+                setSession(null);
+              }}
+              className="cursor-pointer border border-zinc-700 px-3 py-1.5 uppercase text-white hover:border-[#DC2626]"
+            >
+              Cerrar sesión
+            </button>
+          </div>
         </div>
       </div>
       <CmsWorkspace
@@ -560,7 +562,7 @@ const CmsWorkspace: React.FC<CmsWorkspaceProps> = ({
 
   return (
     <div className="min-h-screen bg-[#070709] text-[#F4F4F6]">
-      <div className="max-w-[1440px] mx-auto px-4 lg:px-8 py-6">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* TOP ADMIN COMMAND BAR */}
         <div className="border border-zinc-800 bg-[#0E0E12] px-6 py-4 mb-6 flex flex-wrap items-center justify-between gap-4">
           <HeadCMS onSelectSection={onSelectSection} />
@@ -617,11 +619,10 @@ const CmsWorkspace: React.FC<CmsWorkspaceProps> = ({
                 <button
                   type="button"
                   onClick={() => setComposerType(composerType === 'USUARIOS' ? 'RECOMENDACION' : 'USUARIOS')}
-                  className={`border px-4 py-2.5 font-mono text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer ${
-                    composerType === 'USUARIOS'
-                      ? 'border-[#DC2626] bg-[#DC2626] text-white'
-                      : 'border-zinc-700 bg-[#070709] text-zinc-200 hover:border-[#DC2626] hover:text-white'
-                  }`}
+                  className={`border px-4 py-2.5 font-mono text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer ${composerType === 'USUARIOS'
+                    ? 'border-[#DC2626] bg-[#DC2626] text-white'
+                    : 'border-zinc-700 bg-[#070709] text-zinc-200 hover:border-[#DC2626] hover:text-white'
+                    }`}
                 >
                   {composerType === 'USUARIOS' ? '← VOLVER A PUBLICACIONES' : 'GESTIONAR USUARIOS Y ROLES'}
                 </button>

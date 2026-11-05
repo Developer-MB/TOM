@@ -183,7 +183,7 @@ const MerchCatalog = ({ products, onUpdateProducts }: MerchCatalogProps) => {
 
   return (
     <div className="min-h-screen bg-black text-[#F4F4F6]">
-      <section className="mx-auto max-w-[1440px] px-4 pb-8 pt-12 lg:px-8">
+      <section className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8 pb-8 pt-6 sm:pt-10">
         <div className="flex flex-col justify-between gap-6 border-b border-zinc-800 pb-8 lg:flex-row lg:items-end">
           <div>
             <img
@@ -231,7 +231,7 @@ const MerchCatalog = ({ products, onUpdateProducts }: MerchCatalogProps) => {
         </div>
       </section>
 
-      <section className="mx-auto max-w-[1440px] px-4 pb-16 lg:px-8">
+      <section className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8 pb-16">
         {checkoutSuccess && (
           <div
             role="status"

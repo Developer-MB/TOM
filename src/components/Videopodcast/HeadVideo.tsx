@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 import { Video, Disc } from 'lucide-react';
 import { ASSETS } from '../../data/Assets';
 
@@ -7,18 +7,19 @@ type HeadVideoProps = {
     onToggleVideo?: () => void;
 };
 
-const HeadVideo: React.FC<HeadVideoProps> = ({ onTogglePlay, onToggleVideo }) => {
+const HeadVideo: React.FC<HeadVideoProps> = () => {
     return (
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-8 border-b border-zinc-800/80">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-8 border-b border-zinc-800/80">
             <div>
-                <img src={ASSETS.logoPodcast}
-                    alt="Time of New Music Logo"
-                    className="w-100 sm:w-64 lg:w-100"
+                <img
+                    src={ASSETS.logoPodcast}
+                    alt="Time of Metal Videopodcast Logo"
+                    className="w-full max-w-[260px] sm:max-w-[320px] lg:max-w-[380px] h-auto object-contain"
                 />
             </div>
 
             {/* Subscription Badges */}
-            <div className="flex flex-wrap items-center gap-2.5 self-start lg:self-end">
+            <div className="flex flex-wrap items-center gap-2.5 self-start sm:self-end">
                 <a
                     href="https://www.youtube.com/@TimeOfMetal-mx"
                     target="_blank"
@@ -37,7 +38,7 @@ const HeadVideo: React.FC<HeadVideoProps> = ({ onTogglePlay, onToggleVideo }) =>
                 </a>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default HeadVideo
+export default HeadVideo;

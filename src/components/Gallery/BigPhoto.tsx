@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react'
-import { Calendar, Eye, MapPin } from 'lucide-react'
-import type { HomeGalleryItem } from '@/src/data/HomePics'
-import ModalGal from './ModalGal'
+import React, { useEffect, useState } from 'react';
+import { Calendar, Eye, MapPin } from 'lucide-react';
+import type { HomeGalleryItem } from '@/src/data/HomePics';
+import ModalGal from './ModalGal';
 
 type HomePhotoGallery = HomeGalleryItem;
 
@@ -12,41 +12,41 @@ interface BigPhotoProps {
 const BigPhoto: React.FC<BigPhotoProps> = ({ galleries }) => {
     const fotoGallery: HomePhotoGallery | undefined = galleries.find(
         (gallery) => gallery.img.length > 0,
-    )
-    const photos = fotoGallery?.img ?? []
-    const featuredPhoto = photos[0]
-    const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0)
-    const [isModalOpen, setIsModalOpen] = useState(false)
+    );
+    const photos = fotoGallery?.img ?? [];
+    const featuredPhoto = photos[0];
+    const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const openPhoto = (index: number) => {
-        if (!fotoGallery || !photos[index]) return
+        if (!fotoGallery || !photos[index]) return;
 
-        setCurrentPhotoIndex(index)
-        setIsModalOpen(true)
-    }
+        setCurrentPhotoIndex(index);
+        setIsModalOpen(true);
+    };
 
     useEffect(() => {
-        if (!isModalOpen) return
+        if (!isModalOpen) return;
 
         const handleKeyDown = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
-                setIsModalOpen(false)
+                setIsModalOpen(false);
             } else if (event.key === 'ArrowRight' && photos.length > 1) {
-                setCurrentPhotoIndex((index) => (index + 1) % photos.length)
+                setCurrentPhotoIndex((index) => (index + 1) % photos.length);
             } else if (event.key === 'ArrowLeft' && photos.length > 1) {
-                setCurrentPhotoIndex((index) => (index - 1 + photos.length) % photos.length)
+                setCurrentPhotoIndex((index) => (index - 1 + photos.length) % photos.length);
             }
-        }
+        };
 
-        window.addEventListener('keydown', handleKeyDown)
-        return () => window.removeEventListener('keydown', handleKeyDown)
-    }, [isModalOpen, photos.length])
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isModalOpen, photos.length]);
 
     return (
         <div className="border border-zinc-800 bg-[#0E0E12] relative overflow-hidden group">
             <div className="grid grid-cols-1 lg:grid-cols-12">
                 {/* Left / Main Image */}
-                <div className="lg:col-span-8 relative min-h-[380px] sm:min-h-[480px] overflow-hidden bg-black">
+                <div className="lg:col-span-8 relative min-h-[260px] sm:min-h-[380px] lg:min-h-[480px] overflow-hidden bg-black">
                     {featuredPhoto ? (
                         <img
                             src={featuredPhoto.pic}
@@ -69,21 +69,21 @@ const BigPhoto: React.FC<BigPhotoProps> = ({ galleries }) => {
                 </div>
 
                 {/* Right / Editorial Details */}
-                <div className="lg:col-span-4 p-6 sm:p-8 flex flex-col justify-between border-t lg:border-t-0 lg:border-l border-zinc-800 bg-[#0B0B0E]">
+                <div className="lg:col-span-4 p-5 sm:p-8 flex flex-col justify-between border-t lg:border-t-0 lg:border-l border-zinc-800 bg-[#0B0B0E]">
                     <div>
-                        <div className="flex items-center justify-between font-mono text-[10px] text-zinc-400 mb-4 pb-3 border-b border-zinc-800/80">
+                        <div className="flex flex-wrap items-center justify-between gap-2 font-mono text-[10px] text-zinc-400 mb-4 pb-3 border-b border-zinc-800/80">
                             <span className="flex items-center gap-1.5">
-                                <MapPin className="w-4 h-4 text-[#DC2626]" /> {fotoGallery?.venue} / {fotoGallery?.city}
+                                <MapPin className="w-4 h-4 text-[#DC2626] shrink-0" /> {fotoGallery?.venue} / {fotoGallery?.city}
                             </span>
                             <span className="flex items-center gap-2">
-                                <Calendar className="w-3.5 h-3.5 text-zinc-500" /> {fotoGallery?.date}
+                                <Calendar className="w-3.5 h-3.5 text-zinc-500 shrink-0" /> {fotoGallery?.date}
                             </span>
                         </div>
 
-                        <h2 className="font-display text-2xl sm:text-2xl tracking-tight leading-tight text-[#DC2626]">
+                        <h2 className="font-display text-xl sm:text-2xl tracking-tight leading-tight text-[#DC2626]">
                             {fotoGallery?.concert}
                         </h2>
-                        <span className='font-display text-2xl sm:text-2xl tracking-tight leading-tight text-[#f0f0f0a2]'>
+                        <span className="font-display text-xl sm:text-2xl tracking-tight leading-tight text-[#f0f0f0a2] block mt-1">
                             {fotoGallery?.title}
                         </span>
 
@@ -96,6 +96,7 @@ const BigPhoto: React.FC<BigPhotoProps> = ({ galleries }) => {
                                 {photos.slice(0, 4).map((photo, idx) => (
                                     <button
                                         key={photo.id}
+                                        type="button"
                                         onClick={() => openPhoto(idx)}
                                         className="aspect-square border border-zinc-800 hover:border-[#DC2626] overflow-hidden relative group/thumb cursor-pointer"
                                     >
@@ -112,24 +113,26 @@ const BigPhoto: React.FC<BigPhotoProps> = ({ galleries }) => {
                     </div>
 
                     <div className="pt-4 border-t border-zinc-800/80 space-y-4">
-                        <div className="flex items-center justify-between font-mono text-xs">
-                            <span className="text-zinc-500 uppercase">FOTOGRAFÍA:</span>                            <span className="text-blue-700 font-light text-[15px] uppercase">
+                        <div className="flex flex-wrap items-center justify-between gap-2 font-mono text-xs">
+                            <span className="text-zinc-500 uppercase">FOTOGRAFÍA:</span>
+                            <span className="text-blue-500 font-light text-sm sm:text-[15px] uppercase">
                                 {fotoGallery?.credit}
                             </span>
                         </div>
 
                         {featuredPhoto && (
                             <button
+                                type="button"
                                 onClick={() => openPhoto(0)}
                                 className="w-full bg-[#DC2626] hover:bg-red-700 text-white font-mono text-xs font-bold uppercase tracking-widest py-3.5 px-5 flex items-center justify-center gap-2 transition-colors cursor-pointer"
                             >
-                                <Eye className="w-4 h-4" /> VER GALERIA ({photos.length} FOTOS)
+                                <Eye className="w-4 h-4" /> VER GALERÍA ({photos.length} FOTOS)
                             </button>
                         )}
                     </div>
                 </div>
             </div>
-            
+
             {/* LIGHTBOX MODAL */}
             {isModalOpen && fotoGallery && (
                 <ModalGal
@@ -145,7 +148,7 @@ const BigPhoto: React.FC<BigPhotoProps> = ({ galleries }) => {
                 />
             )}
         </div>
-    )
-}
+    );
+};
 
-export default BigPhoto
+export default BigPhoto;

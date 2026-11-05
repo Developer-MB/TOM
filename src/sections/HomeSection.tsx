@@ -39,21 +39,15 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
     .slice(0, 3);
 
   return (
-    <div className="space-y-16">
+    <div className="space-y-12 sm:space-y-16">
       {/* HERO SECTION */}
-      <section className="relative pb-12 border-b border-[#27272a] overflow-hidden">
-        <HeadHome
-          onSelectSection={onSelectSection}
-        />
+      <section className="relative pt-6 sm:pt-8 pb-10 sm:pb-12 border-b border-[#27272a] overflow-hidden">
+        <HeadHome onSelectSection={onSelectSection} />
       </section>
 
-      {/* SECCION MUSICA*/}
-      <section className="max-w-[1280px] mx-auto px-4 lg:px-8 space-y-6">
+      {/* SECCION MUSICA */}
+      <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         <HeadResenias onSelectSection={onSelectSection} />
-      </section>
-
-      {/* TIME OF NEW MUSIC */}
-      <section className="max-w-[1280px] mx-auto px-4 lg:px-8 space-y-6">
         <ContentResenia
           reviews={reviews}
           isLoading={isLoadingReviews}
@@ -62,19 +56,17 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
       </section>
 
       {/* VIDEOPODCAST */}
-      <section className="max-w-[1280px] mx-auto px-4 lg:px-8">
-        <ContentVideo
-          onSelectSection={onSelectSection}
-        />
+      <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+        <ContentVideo onSelectSection={onSelectSection} />
       </section>
 
       {/* GALERÍA DE CONCIERTOS RECIENTES */}
-      <section className="max-w-[1280px] mx-auto px-4 lg:px-8 space-y-6">
+      <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         <ContentGallery galleries={recentGalleries} onSelectSection={onSelectSection} />
       </section>
 
       {/* PRÓXIMOS EVENTOS & GIRAS */}
-      <section className="max-w-[1280px] mx-auto px-4 lg:px-8 space-y-6">
+      <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         <NextTour onSelectSection={onSelectSection} />
       </section>
     </div>
