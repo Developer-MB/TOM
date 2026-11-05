@@ -12,7 +12,8 @@
     "preview": "vite preview",
     "test:preview": "npm run build:local && vite preview --port=4173",
     "clean": "rm -rf dist server.js",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "deploy": "npm run build && firebase deploy --only hosting"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
