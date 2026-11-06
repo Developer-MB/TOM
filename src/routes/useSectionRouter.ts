@@ -9,6 +9,7 @@ export const SECTION_PATHS: Record<SectionId, string> = {
   eventos: '/giras',
   radio: '/radio',
   merch: '/merch',
+  contacto: '/contacto',
   cms: '/cms-admin',
 };
 
@@ -22,6 +23,8 @@ const PATH_SECTIONS: Record<string, SectionId> = {
   '/radio': 'radio',
   '/merch': 'merch',
   '/mercancia': 'merch',
+  '/contacto': 'contacto',
+  '/prensa': 'contacto',
   '/cms-admin': 'cms',
 };
 
@@ -36,7 +39,7 @@ export const getSectionFromLocation = (
 
   const params = new URLSearchParams(location.search);
   const sectionParam = params.get('section') || location.hash.replace(/^#/, '');
-  return VALID_SECTIONS.has(sectionParam as SectionId) ? sectionParam as SectionId : 'inicio';
+  return VALID_SECTIONS.has(sectionParam as SectionId) ? (sectionParam as SectionId) : 'inicio';
 };
 
 export const useSectionRouter = () => {

@@ -272,11 +272,102 @@ export interface CmsAuthSession {
     displayName: string;
     role: CmsUserRole;
     permissions: CmsSectionPermission[];
+    expiresAt?: number;
+    signature?: string;
 }
 
 const CMS_SESSION_STORAGE_KEY = 'tom_cms_auth_session';
 const CMS_USERS_STORAGE_KEY = 'tom_cms_users_dictionary_v1';
+const CMS_LOGIN_ATTEMPTS_KEY = 'tom_cms_login_attempts_v1';
+const SESSION_TTL_MS = 8 * 60 * 60 * 1000; // 8 horas de vigencia máxima por sesión
+export const MAX_LOGIN_ATTEMPTS = 5;
+export const LOGIN_LOCKOUT_MS = 60_000; // 60 segundos de bloqueo tras 5 intentos fallidos
 export const CMS_USERS_UPDATED_EVENT = 'tom:cms-users-updated';
+
+interface LoginAttemptRecord {
+    failedAttempts: number;
+    lockedUntil: number;
+}
+
+const computeSessionSignature = (
+    username: string,
+    role: CmsUserRole,
+    permissions: CmsSectionPermission[],
+    expiresAt: number,
+): string => {
+    const payload = `${username}|${role}|${permissions.join(',')}|${expiresAt}|${PASSWORD_PEPPER}`;
+    return sha256Hex(payload);
+};
+
+export const getLoginRateLimitState = (): {
+    isLocked: boolean;
+    remainingSeconds: number;
+    failedAttempts: number;
+} => {
+    if (typeof window === 'undefined') {
+        return { isLocked: false, remainingSeconds: 0, failedAttempts: 0 };
+    }
+    try {
+        const raw = window.localStorage.getItem(CMS_LOGIN_ATTEMPTS_KEY);
+        if (!raw) return { isLocked: false, remainingSeconds: 0, failedAttempts: 0 };
+        const parsed = JSON.parse(raw) as Partial<LoginAttemptRecord>;
+        const now = Date.now();
+        const lockedUntil = typeof parsed.lockedUntil === 'number' ? parsed.lockedUntil : 0;
+        const failedAttempts = typeof parsed.failedAttempts === 'number' ? parsed.failedAttempts : 0;
+
+        if (lockedUntil > now) {
+            return {
+                isLocked: true,
+                remainingSeconds: Math.ceil((lockedUntil - now) / 1000),
+                failedAttempts,
+            };
+        }
+        return { isLocked: false, remainingSeconds: 0, failedAttempts };
+    } catch {
+        return { isLocked: false, remainingSeconds: 0, failedAttempts: 0 };
+    }
+};
+
+export const recordFailedLoginAttempt = (): {
+    isLocked: boolean;
+    remainingSeconds: number;
+    failedAttempts: number;
+} => {
+    if (typeof window === 'undefined') {
+        return { isLocked: false, remainingSeconds: 0, failedAttempts: 1 };
+    }
+    try {
+        const current = getLoginRateLimitState();
+        const nextAttempts = current.isLocked ? current.failedAttempts : current.failedAttempts + 1;
+        const shouldLock = nextAttempts >= MAX_LOGIN_ATTEMPTS;
+        const lockedUntil = shouldLock ? Date.now() + LOGIN_LOCKOUT_MS : 0;
+
+        window.localStorage.setItem(
+            CMS_LOGIN_ATTEMPTS_KEY,
+            JSON.stringify({
+                failedAttempts: shouldLock ? 0 : nextAttempts,
+                lockedUntil,
+            }),
+        );
+
+        return {
+            isLocked: shouldLock,
+            remainingSeconds: shouldLock ? Math.ceil(LOGIN_LOCKOUT_MS / 1000) : 0,
+            failedAttempts: nextAttempts,
+        };
+    } catch {
+        return { isLocked: false, remainingSeconds: 0, failedAttempts: 1 };
+    }
+};
+
+export const resetLoginAttempts = (): void => {
+    if (typeof window === 'undefined') return;
+    try {
+        window.localStorage.removeItem(CMS_LOGIN_ATTEMPTS_KEY);
+    } catch {
+        // Ignore storage errors
+    }
+};
 
 const normalizeUserAccount = (key: string, raw: Partial<CmsUserAccount>): CmsUserAccount => {
     const username = (raw.username || key).trim().toLowerCase();
@@ -406,20 +497,47 @@ export const getStoredCmsSession = (): CmsAuthSession | null => {
         const raw = window.sessionStorage.getItem(CMS_SESSION_STORAGE_KEY);
         if (!raw) return null;
         const parsed = JSON.parse(raw) as Partial<CmsAuthSession>;
-        if (typeof parsed.username !== 'string') return null;
+        if (
+            typeof parsed.username !== 'string' ||
+            typeof parsed.expiresAt !== 'number' ||
+            typeof parsed.signature !== 'string'
+        ) {
+            window.sessionStorage.removeItem(CMS_SESSION_STORAGE_KEY);
+            return null;
+        }
+
+        if (Date.now() > parsed.expiresAt) {
+            window.sessionStorage.removeItem(CMS_SESSION_STORAGE_KEY);
+            return null;
+        }
 
         const dictionary = readUsersDictionary();
         const normalizedUsername = parsed.username.trim().toLowerCase();
         const account = dictionary[normalizedUsername];
         if (!account) return null;
 
+        const canonicalPermissions = account.role === 'SUPERADMIN'
+            ? [...ALL_SUPERADMIN_PERMISSIONS]
+            : [...account.permissions];
+
+        const expectedSig = computeSessionSignature(
+            account.username,
+            account.role,
+            canonicalPermissions,
+            parsed.expiresAt,
+        );
+        if (!timingSafeEqualString(expectedSig, parsed.signature)) {
+            window.sessionStorage.removeItem(CMS_SESSION_STORAGE_KEY);
+            return null;
+        }
+
         return {
             username: account.username,
             displayName: account.displayName,
             role: account.role,
-            permissions: account.role === 'SUPERADMIN'
-                ? [...ALL_SUPERADMIN_PERMISSIONS]
-                : [...account.permissions],
+            permissions: canonicalPermissions,
+            expiresAt: parsed.expiresAt,
+            signature: parsed.signature,
         };
     } catch {
         return null;
@@ -429,7 +547,19 @@ export const getStoredCmsSession = (): CmsAuthSession | null => {
 export const saveCmsSession = (session: CmsAuthSession): void => {
     if (typeof window === 'undefined') return;
     try {
-        window.sessionStorage.setItem(CMS_SESSION_STORAGE_KEY, JSON.stringify(session));
+        const expiresAt = session.expiresAt ?? Date.now() + SESSION_TTL_MS;
+        const signature = computeSessionSignature(
+            session.username,
+            session.role,
+            session.permissions,
+            expiresAt,
+        );
+        const signedSession: CmsAuthSession = {
+            ...session,
+            expiresAt,
+            signature,
+        };
+        window.sessionStorage.setItem(CMS_SESSION_STORAGE_KEY, JSON.stringify(signedSession));
     } catch (error) {
         console.error('No se pudo guardar la sesión del CMS:', error);
     }

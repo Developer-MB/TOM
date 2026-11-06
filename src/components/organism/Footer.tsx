@@ -1,14 +1,41 @@
-import React from 'react';
-import { Youtube } from 'lucide-react';
+import React, { useState } from 'react';
+import { CheckCircle2, Send, Youtube } from 'lucide-react';
 import { SectionId } from '../../data/mockData';
 
 interface FooterProps {
   onSelectSection: (section: SectionId) => void;
 }
 
+const NEWSLETTER_STORAGE_KEY = 'tom_newsletter_subscribers_v1';
+
 export const Footer: React.FC<FooterProps> = ({ onSelectSection }) => {
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterFeedback, setNewsletterFeedback] = useState<string | null>(null);
+
   const navTo = (sec: SectionId) => {
     onSelectSection(sec);
+  };
+
+  const handleSubscribeNewsletter = (event: React.FormEvent) => {
+    event.preventDefault();
+    const clean = newsletterEmail.trim().toLowerCase();
+    if (!clean || !clean.includes('@')) return;
+
+    try {
+      const raw = window.localStorage.getItem(NEWSLETTER_STORAGE_KEY);
+      const list: string[] = raw ? JSON.parse(raw) : [];
+      if (!list.includes(clean)) {
+        window.localStorage.setItem(
+          NEWSLETTER_STORAGE_KEY,
+          JSON.stringify([clean, ...list].slice(0, 50)),
+        );
+      }
+    } catch {
+      // Ignore storage errors
+    }
+
+    setNewsletterFeedback(`¡Suscripción activada para ${clean}!`);
+    setNewsletterEmail('');
   };
 
   const hoy = new Date();
@@ -75,31 +102,74 @@ export const Footer: React.FC<FooterProps> = ({ onSelectSection }) => {
                   Mercancía
                 </button>
               </li>
-            </ul>
-          </div>
-
-          {/* Transmisión */}
-          <div className="lg:col-span-2 space-y-3">
-            <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-white">
-              TRANSMISIÓN
-            </h4>
-            <ul className="space-y-2 text-xs">
               <li>
-                <button onClick={() => navTo('radio')} className="hover:text-white transition-colors cursor-pointer">
-                  Radio
+                <button onClick={() => navTo('contacto')} className="hover:text-white transition-colors cursor-pointer">
+                  Contacto &amp; Prensa
                 </button>
               </li>
             </ul>
           </div>
 
-          {/* Comunidad */}
+          {/* Transmisión & Redacción */}
+          <div className="lg:col-span-2 space-y-3">
+            <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-white">
+              TRANSMISIÓN &amp; PRENSA
+            </h4>
+            <ul className="space-y-2 text-xs">
+              <li>
+                <button onClick={() => navTo('radio')} className="hover:text-white transition-colors cursor-pointer">
+                  Radio 24/7 en Vivo
+                </button>
+              </li>
+              <li>
+                <button onClick={() => navTo('contacto')} className="hover:text-white transition-colors cursor-pointer">
+                  Enviar Demo / EPK
+                </button>
+              </li>
+              <li>
+                <button onClick={() => navTo('cms')} className="hover:text-white transition-colors cursor-pointer">
+                  Acceso Editorial CMS
+                </button>
+              </li>
+            </ul>
+          </div>
+
+          {/* Comunidad & Newsletter */}
           <div className="sm:col-span-2 lg:col-span-3 space-y-3">
             <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-white">
-              COMUNIDAD
+              COMUNIDAD &amp; BOLETÍN
             </h4>
             <p className="text-xs text-[#a1a1aa] leading-relaxed">
               Únete al moshpit digital y recibe el boletín semanal de lanzamientos oscuros.
             </p>
+
+            {/* Formulario funcional de suscripción al boletín */}
+            <form onSubmit={handleSubscribeNewsletter} className="space-y-2 pt-1">
+              <div className="flex gap-1.5">
+                <input
+                  required
+                  type="email"
+                  value={newsletterEmail}
+                  onChange={(e) => setNewsletterEmail(e.target.value)}
+                  placeholder="tu-correo@metal.fm"
+                  aria-label="Correo electrónico para el boletín"
+                  className="min-w-0 flex-1 bg-[#121214] border border-[#27272a] focus:border-[#dc2626] px-3 py-2 font-mono text-xs text-white outline-none"
+                />
+                <button
+                  type="submit"
+                  className="bg-[#dc2626] hover:bg-red-700 px-3 py-2 font-mono text-[10px] font-bold uppercase text-white flex items-center gap-1 shrink-0 cursor-pointer transition-colors"
+                >
+                  <Send className="w-3 h-3" /> Unirse
+                </button>
+              </div>
+              {newsletterFeedback && (
+                <p className="flex items-center gap-1.5 font-mono text-[10px] text-emerald-400">
+                  <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                  {newsletterFeedback}
+                </p>
+              )}
+            </form>
+
             <div className="flex flex-wrap items-center gap-2 pt-2" role="group" aria-label="Redes sociales">
               {[
                 {

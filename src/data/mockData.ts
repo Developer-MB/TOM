@@ -1,7 +1,7 @@
 import { ASSETS } from "./Assets";
 export { ASSETS } from "./Assets";
 
-export type SectionId = 'inicio' | 'resenas' | 'galeria' | 'videopodcast' | 'eventos' | 'radio' | 'merch' | 'cms';
+export type SectionId = 'inicio' | 'resenas' | 'galeria' | 'videopodcast' | 'eventos' | 'radio' | 'merch' | 'contacto' | 'cms';
 export interface AudioTrack {
   id: string;
   title: string;

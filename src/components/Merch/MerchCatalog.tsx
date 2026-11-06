@@ -78,6 +78,19 @@ const MerchCatalog = ({ products, onUpdateProducts }: MerchCatalogProps) => {
     writeStoredMerchCart(cart);
   }, [cart]);
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      if (selectedOrderId) {
+        setSelectedOrderId(null);
+      } else if (isCartOpen) {
+        setIsCartOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedOrderId, isCartOpen]);
+
   // Keep cart quantities clamped to current product stock if edited from CMS
   useEffect(() => {
     setCart((currentCart) => {

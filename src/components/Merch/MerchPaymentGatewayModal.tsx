@@ -31,6 +31,7 @@ import {
     type PaymentPlanType,
     type PromoCoupon,
 } from '../../data/Merch';
+import { isCardExpiryValid, sanitizePlainText } from '../../utils/security';
 
 export interface CartDetailedEntry {
     product: CmsMerchProduct;
@@ -202,8 +203,8 @@ const MerchPaymentGatewayModal: React.FC<MerchPaymentGatewayModalProps> = ({
             if (!cardHolder.trim() || cardHolder.trim().length < 3) {
                 return 'Ingresa el nombre del titular como aparece en la tarjeta.';
             }
-            if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(cardExpiry)) {
-                return 'Ingresa una fecha de vencimiento válida en formato MM/AA.';
+            if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(cardExpiry) || !isCardExpiryValid(cardExpiry)) {
+                return 'Ingresa una fecha de vencimiento vigente en formato MM/AA.';
             }
             if (!/^\d{3,4}$/.test(cardCvv)) {
                 return 'Ingresa un código de seguridad CVV válido (3 o 4 dígitos).';
@@ -265,7 +266,7 @@ const MerchPaymentGatewayModal: React.FC<MerchPaymentGatewayModalProps> = ({
                         ? `SPEI CLABE ${speiReference.clabe} · Ref ${speiReference.reference}${planSuffix}`
                         : paymentMethod === 'OXXO'
                             ? `OXXO Pay · Referencia ${oxxoReference}${planSuffix}`
-                            : `PayPal (${paypalEmail.trim()})${planSuffix}`;
+                            : `PayPal (${sanitizePlainText(paypalEmail, 120)})${planSuffix}`;
 
             const orderItems: MerchOrderItem[] = items.map(({ product, quantity, subtotal: itemSub }) => ({
                 productId: product.id,
@@ -289,14 +290,14 @@ const MerchPaymentGatewayModal: React.FC<MerchPaymentGatewayModalProps> = ({
                     minute: '2-digit',
                 }),
                 createdAtTimestamp: now.getTime(),
-                customerName: customerName.trim(),
-                customerEmail: customerEmail.trim(),
-                customerPhone: customerPhone.trim(),
+                customerName: sanitizePlainText(customerName, 120),
+                customerEmail: sanitizePlainText(customerEmail, 120),
+                customerPhone: sanitizePlainText(customerPhone, 30),
                 deliveryMethod,
                 shippingAddress:
                     deliveryMethod === 'PICKUP'
                         ? 'Recolección en Cabina Central CDMX (Sin costo)'
-                        : `${streetAddress.trim()}, ${cityState.trim()}, C.P. ${postalCode.trim()}`,
+                        : `${sanitizePlainText(streetAddress, 180)}, ${sanitizePlainText(cityState, 100)}, C.P. ${sanitizePlainText(postalCode, 10)}`,
                 paymentMethod,
                 paymentPlanType,
                 paymentSummary,
@@ -314,6 +315,10 @@ const MerchPaymentGatewayModal: React.FC<MerchPaymentGatewayModalProps> = ({
                 items: orderItems,
             };
 
+            // Purgar datos sensibles de tarjeta (PAN y CVV) de la memoria tras tokenizar
+            setCardNumber('');
+            setCardCvv('');
+
             setCompletedOrder(order);
             onOrderCompleted(order);
             setStep('RECEIPT');
@@ -324,6 +329,8 @@ const MerchPaymentGatewayModal: React.FC<MerchPaymentGatewayModalProps> = ({
         setStep('SHIPPING');
         setCompletedOrder(null);
         setErrorMessage(null);
+        setCardNumber('');
+        setCardCvv('');
         onClose();
     };
 

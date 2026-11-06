@@ -1,5 +1,6 @@
 import initialMerch from '../../data/post-merch.json';
 import type { CmsMerchProduct } from './CmsTypes';
+import { sanitizeHttpUrl, sanitizePlainText } from '../utils/security';
 
 export const LOW_STOCK_THRESHOLD = 5;
 export const FREE_SHIPPING_THRESHOLD = 999;
@@ -109,16 +110,16 @@ export const detectCardBrand = (cardNumber: string): 'VISA' | 'MASTERCARD' | 'AM
 
 export const normalizeMerchProduct = (raw: Partial<CmsMerchProduct> & { id: string }): CmsMerchProduct => ({
     id: raw.id,
-    code: raw.code ?? 'TOM-MER-0000',
-    name: raw.name ?? 'Producto sin nombre',
+    code: sanitizePlainText(raw.code ?? 'TOM-MER-0000', 40) || 'TOM-MER-0000',
+    name: sanitizePlainText(raw.name ?? 'Producto sin nombre', 150) || 'Producto sin nombre',
     category: raw.category ?? 'OTROS',
-    description: raw.description ?? '',
-    price: typeof raw.price === 'number' && Number.isFinite(raw.price) ? raw.price : 0,
+    description: sanitizePlainText(raw.description ?? '', 2000),
+    price: typeof raw.price === 'number' && Number.isFinite(raw.price) ? Math.max(0, raw.price) : 0,
     stock: typeof raw.stock === 'number' && Number.isFinite(raw.stock)
         ? Math.max(0, Math.floor(raw.stock))
         : 10,
     image: raw.image ?? '',
-    purchaseUrl: raw.purchaseUrl ?? '',
+    purchaseUrl: sanitizeHttpUrl(raw.purchaseUrl ?? ''),
     status: raw.status ?? 'PUBLICADO',
     publish: raw.publish ?? '',
 });

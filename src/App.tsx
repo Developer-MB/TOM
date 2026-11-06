@@ -11,6 +11,7 @@ import { Tours } from './components/Tours/Tours';
 import { AUDIO_ASSETS } from './data/Radio';
 import { RadioSection } from './sections/RadioSection';
 import MerchSection from './sections/MerchSection';
+import ContactSection from './sections/ContactSection';
 import {
   INITIAL_CMS_GALLERIES,
   INITIAL_CMS_ITEMS,
@@ -309,6 +310,10 @@ export default function App() {
         )}
 
         {activeSection === 'merch' && <MerchSection />}
+
+        {activeSection === 'contacto' && (
+          <ContactSection onSelectSection={handleSelectSection} />
+        )}
 
         {activeSection === 'cms' && (
           <CmsSection

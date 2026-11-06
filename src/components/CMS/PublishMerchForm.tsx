@@ -4,6 +4,7 @@ import { MERCH_CATEGORIES, type CmsMerchProduct, type CmsPostStatus, type MerchC
 import { getStockBadgeInfo } from '../../data/Merch';
 import { readJsonResponse } from '../../data/readJsonResponse';
 import { authenticatedCmsFetch, uploadCmsImage } from '../../lib/firebaseClient';
+import { sanitizeHttpUrl, sanitizePlainText } from '../../utils/security';
 
 interface PublishMerchFormProps {
   draft?: CmsMerchProduct | null;
@@ -140,6 +141,12 @@ const PublishMerchForm = ({
       return;
     }
 
+    const cleanPurchaseUrl = purchaseUrl.trim() ? sanitizeHttpUrl(purchaseUrl) : '';
+    if (purchaseUrl.trim() && !cleanPurchaseUrl) {
+      setFormError('El enlace externo debe iniciar con https:// o http://.');
+      return;
+    }
+
     setIsSaving(true);
     setFormError(null);
     setSuccessMessage(null);
@@ -153,12 +160,12 @@ const PublishMerchForm = ({
           : '';
 
       const payload = {
-        name: name.trim(),
+        name: sanitizePlainText(name, 150),
         category,
-        description: description.trim(),
+        description: sanitizePlainText(description, 2000),
         price: Math.round(parsedPrice * 100) / 100,
         stock: parsedStock,
-        purchaseUrl: purchaseUrl.trim(),
+        purchaseUrl: cleanPurchaseUrl,
         status,
         publish: publishIso,
         image: imageUrl,

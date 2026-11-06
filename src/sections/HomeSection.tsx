@@ -5,6 +5,7 @@ import HeadResenias from '../components/Home/HeadResenias';
 import ContentResenia from '../components/Home/ContentResenia';
 import ContentVideo from '../components/Home/ContentVideo';
 import ContentGallery from '../components/Home/ContentGallery';
+import ContentMerch from '../components/Home/ContentMerch';
 import NextTour from '../components/Tours/NextTour';
 import type { CmsPostItem } from '../data/Cms';
 import type { HomeGalleryItem } from '../data/HomePics';
@@ -39,7 +40,7 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
     .slice(0, 3);
 
   return (
-    <div className="space-y-12 sm:space-y-16">
+    <div className="space-y-12 sm:space-y-16 pb-8">
       {/* HERO SECTION */}
       <section className="relative pt-6 sm:pt-8 pb-10 sm:pb-12 border-b border-[#27272a] overflow-hidden">
         <HeadHome onSelectSection={onSelectSection} />
@@ -63,6 +64,11 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
       {/* GALERÍA DE CONCIERTOS RECIENTES */}
       <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         <ContentGallery galleries={recentGalleries} onSelectSection={onSelectSection} />
+      </section>
+
+      {/* MERCH OFICIAL DESTACADO */}
+      <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        <ContentMerch onSelectSection={onSelectSection} />
       </section>
 
       {/* PRÓXIMOS EVENTOS & GIRAS */}

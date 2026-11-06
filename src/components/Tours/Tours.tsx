@@ -77,7 +77,7 @@ export const Tours: React.FC = () => {
   const firstWeekday = (new Date(calendarYear, calendarMonth, 1).getDay() + 6) % 7;
   const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
   const toursByDay = new Map<number, HomeTour[]>();
-  for (const tour of pageTours) {
+  for (const tour of filteredTours) {
     if (Number(tour.year) !== calendarYear || Number(tour.month) !== calendarMonth + 1) continue;
     const day = Number(tour.day);
     const dayTours = toursByDay.get(day) ?? [];
