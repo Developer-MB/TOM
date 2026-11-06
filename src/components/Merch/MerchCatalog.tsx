@@ -284,10 +284,9 @@ const MerchCatalog = ({ products, onUpdateProducts }: MerchCatalogProps) => {
     setOrders(updatedOrders);
     setCart({});
     setCheckoutSuccess(
-      `¡Pedido registrado! Orden ${order.orderId} (${
-        order.paymentPlanType === 'CREDITO'
-          ? `Crédito a ${order.installments} pagos`
-          : 'Pago de Contado'
+      `¡Pedido registrado! Orden ${order.orderId} (${order.paymentPlanType === 'CREDITO'
+        ? `Crédito a ${order.installments} pagos`
+        : 'Pago de Contado'
       }) por ${formatPrice(order.total)}. Puedes consultarla en "Mis Pedidos".`,
     );
   };
@@ -397,11 +396,10 @@ const MerchCatalog = ({ products, onUpdateProducts }: MerchCatalogProps) => {
                     ? 'El carrito está vacío — agrega productos para activarlo'
                     : 'Ver contenido del carrito de compras'
                 }
-                className={`flex items-center justify-center gap-2 border px-3.5 py-2.5 font-mono text-xs font-bold uppercase tracking-wider transition-colors ${
-                  isCartEmpty
-                    ? 'cursor-not-allowed border-zinc-800 bg-zinc-900/40 text-zinc-600 opacity-60'
-                    : 'cursor-pointer border-[#DC2626] bg-[#14090B] text-white hover:bg-[#DC2626]'
-                }`}
+                className={`flex items-center justify-center gap-2 border px-3.5 py-2.5 font-mono text-xs font-bold uppercase tracking-wider transition-colors ${isCartEmpty
+                  ? 'cursor-not-allowed border-zinc-800 bg-zinc-900/40 text-zinc-600 opacity-60'
+                  : 'cursor-pointer border-[#DC2626] bg-[#14090B] text-white hover:bg-[#DC2626]'
+                  }`}
               >
                 <ShoppingCart className="h-4 w-4 shrink-0" />
                 <span className="truncate">Carrito ({totalItemsInCart})</span>
@@ -424,13 +422,12 @@ const MerchCatalog = ({ products, onUpdateProducts }: MerchCatalogProps) => {
                     ? 'Aún no tienes pedidos registrados'
                     : 'Ver listado completo de Mis Pedidos'
                 }
-                className={`flex items-center justify-center gap-2 border px-3.5 py-2.5 font-mono text-xs font-bold uppercase tracking-wider transition-colors ${
-                  isOrdersEmpty
-                    ? 'cursor-not-allowed border-zinc-800 bg-zinc-900/40 text-zinc-600 opacity-60'
-                    : activeView === 'ORDERS'
-                      ? 'cursor-pointer border-[#DC2626] bg-[#DC2626] text-white'
-                      : 'cursor-pointer border-amber-500/70 bg-[#141008] text-amber-300 hover:border-amber-400 hover:bg-amber-500/20 hover:text-white'
-                }`}
+                className={`flex items-center justify-center gap-2 border px-3.5 py-2.5 font-mono text-xs font-bold uppercase tracking-wider transition-colors ${isOrdersEmpty
+                  ? 'cursor-not-allowed border-zinc-800 bg-zinc-900/40 text-zinc-600 opacity-60'
+                  : activeView === 'ORDERS'
+                    ? 'cursor-pointer border-[#DC2626] bg-[#DC2626] text-white'
+                    : 'cursor-pointer border-amber-500/70 bg-[#141008] text-amber-300 hover:border-amber-400 hover:bg-amber-500/20 hover:text-white'
+                  }`}
               >
                 <Receipt className="h-4 w-4 shrink-0" />
                 <span className="truncate">Mis Pedidos ({orders.length})</span>
@@ -480,17 +477,6 @@ const MerchCatalog = ({ products, onUpdateProducts }: MerchCatalogProps) => {
             {/* Barra superior con enlace de retorno a Merch y resumen de estados */}
             <div className="flex flex-col justify-between gap-4 border border-zinc-800 bg-[#0E0E12] p-5 sm:flex-row sm:items-center">
               <div className="space-y-1">
-                <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-zinc-400">
-                  <button
-                    type="button"
-                    onClick={() => setActiveView('CATALOG')}
-                    className="cursor-pointer text-[#DC2626] underline-offset-4 hover:underline font-bold"
-                  >
-                    Catálogo de Merch
-                  </button>
-                  <span>/</span>
-                  <span className="text-white">Mis Pedidos</span>
-                </div>
                 <h2 className="font-display text-2xl font-black uppercase text-white flex items-center gap-2.5">
                   <Receipt className="h-6 w-6 text-[#DC2626]" />
                   Historial y Control de Mis Pedidos ({orders.length})
@@ -605,11 +591,10 @@ const MerchCatalog = ({ products, onUpdateProducts }: MerchCatalogProps) => {
                   return (
                     <article
                       key={ord.orderId}
-                      className={`flex flex-col justify-between border bg-[#0E0E12] transition-colors ${
-                        isCredit
-                          ? 'border-zinc-800 border-l-4 border-l-purple-500 hover:border-purple-500/60'
-                          : 'border-zinc-800 border-l-4 border-l-cyan-500 hover:border-cyan-500/60'
-                      }`}
+                      className={`flex flex-col justify-between border bg-[#0E0E12] transition-colors ${isCredit
+                        ? 'border-zinc-800 border-l-4 border-l-purple-500 hover:border-purple-500/60'
+                        : 'border-zinc-800 border-l-4 border-l-cyan-500 hover:border-cyan-500/60'
+                        }`}
                     >
                       <div className="p-5 space-y-4">
                         {/* Encabezado de la tarjeta del pedido */}
@@ -727,11 +712,10 @@ const MerchCatalog = ({ products, onUpdateProducts }: MerchCatalogProps) => {
                                 {ord.installmentSchedule.map((inst) => (
                                   <div
                                     key={inst.installmentNumber}
-                                    className={`flex items-center justify-between gap-2 border px-3 py-2 text-[11px] transition-colors ${
-                                      inst.paid
-                                        ? 'border-emerald-700/50 bg-emerald-950/25 text-emerald-200'
-                                        : 'border-red-900/50 bg-red-950/20 text-zinc-200'
-                                    }`}
+                                    className={`flex items-center justify-between gap-2 border px-3 py-2 text-[11px] transition-colors ${inst.paid
+                                      ? 'border-emerald-700/50 bg-emerald-950/25 text-emerald-200'
+                                      : 'border-red-900/50 bg-red-950/20 text-zinc-200'
+                                      }`}
                                   >
                                     <div className="min-w-0">
                                       <span className="font-bold text-white">
@@ -759,11 +743,10 @@ const MerchCatalog = ({ products, onUpdateProducts }: MerchCatalogProps) => {
                                             inst.installmentNumber,
                                           )
                                         }
-                                        className={`cursor-pointer border px-2.5 py-1 text-[10px] font-bold uppercase transition-colors ${
-                                          inst.paid
-                                            ? 'border-emerald-500 bg-emerald-600 text-black hover:bg-emerald-500'
-                                            : 'border-red-500/80 bg-red-950/70 text-red-300 hover:bg-red-600 hover:text-white'
-                                        }`}
+                                        className={`cursor-pointer border px-2.5 py-1 text-[10px] font-bold uppercase transition-colors ${inst.paid
+                                          ? 'border-emerald-500 bg-emerald-600 text-black hover:bg-emerald-500'
+                                          : 'border-red-500/80 bg-red-950/70 text-red-300 hover:bg-red-600 hover:text-white'
+                                          }`}
                                       >
                                         {inst.paid ? '✓ Liquidado' : 'Pagar Cuota'}
                                       </button>
@@ -839,11 +822,10 @@ const MerchCatalog = ({ products, onUpdateProducts }: MerchCatalogProps) => {
                   type="button"
                   onClick={() => setSelectedCategory('TODOS')}
                   aria-pressed={selectedCategory === 'TODOS'}
-                  className={`cursor-pointer border px-4 py-2 font-mono text-[10px] uppercase tracking-wider transition-colors ${
-                    selectedCategory === 'TODOS'
-                      ? 'border-[#DC2626] bg-[#DC2626] text-white'
-                      : 'border-zinc-800 bg-[#0E0E12] text-zinc-400 hover:border-zinc-600 hover:text-white'
-                  }`}
+                  className={`cursor-pointer border px-4 py-2 font-mono text-[10px] uppercase tracking-wider transition-colors ${selectedCategory === 'TODOS'
+                    ? 'border-[#DC2626] bg-[#DC2626] text-white'
+                    : 'border-zinc-800 bg-[#0E0E12] text-zinc-400 hover:border-zinc-600 hover:text-white'
+                    }`}
                 >
                   Todo ({publishedProducts.length})
                 </button>
@@ -853,11 +835,10 @@ const MerchCatalog = ({ products, onUpdateProducts }: MerchCatalogProps) => {
                     type="button"
                     onClick={() => setSelectedCategory(category)}
                     aria-pressed={selectedCategory === category}
-                    className={`cursor-pointer border px-4 py-2 font-mono text-[10px] uppercase tracking-wider transition-colors ${
-                      selectedCategory === category
-                        ? 'border-[#DC2626] bg-[#DC2626] text-white'
-                        : 'border-zinc-800 bg-[#0E0E12] text-zinc-400 hover:border-zinc-600 hover:text-white'
-                    }`}
+                    className={`cursor-pointer border px-4 py-2 font-mono text-[10px] uppercase tracking-wider transition-colors ${selectedCategory === category
+                      ? 'border-[#DC2626] bg-[#DC2626] text-white'
+                      : 'border-zinc-800 bg-[#0E0E12] text-zinc-400 hover:border-zinc-600 hover:text-white'
+                      }`}
                   >
                     {categoryLabels[category]}
                   </button>
@@ -889,9 +870,8 @@ const MerchCatalog = ({ products, onUpdateProducts }: MerchCatalogProps) => {
                             src={product.image}
                             alt={product.name}
                             loading="lazy"
-                            className={`h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 ${
-                              isOutOfStock ? 'opacity-45 grayscale' : ''
-                            }`}
+                            className={`h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 ${isOutOfStock ? 'opacity-45 grayscale' : ''
+                              }`}
                           />
                           {/* Aviso de inventario con código de color */}
                           <div className="absolute left-3 top-3 right-3 flex items-center justify-between gap-2">
@@ -970,11 +950,10 @@ const MerchCatalog = ({ products, onUpdateProducts }: MerchCatalogProps) => {
                                 type="button"
                                 onClick={() => handleAddToCart(product)}
                                 disabled={isOutOfStock}
-                                className={`flex flex-1 cursor-pointer items-center justify-center gap-2 px-3 py-2.5 font-mono text-[10px] font-bold uppercase tracking-wider transition-colors ${
-                                  isOutOfStock
-                                    ? 'cursor-not-allowed border border-red-900/50 bg-red-950/30 text-red-400/70'
-                                    : 'bg-[#DC2626] text-white hover:bg-red-700'
-                                }`}
+                                className={`flex flex-1 cursor-pointer items-center justify-center gap-2 px-3 py-2.5 font-mono text-[10px] font-bold uppercase tracking-wider transition-colors ${isOutOfStock
+                                  ? 'cursor-not-allowed border border-red-900/50 bg-red-950/30 text-red-400/70'
+                                  : 'bg-[#DC2626] text-white hover:bg-red-700'
+                                  }`}
                               >
                                 <ShoppingCart className="h-3.5 w-3.5" />
                                 {isOutOfStock ? 'Producto agotado' : 'Agregar al carrito'}
@@ -1186,11 +1165,10 @@ const MerchCatalog = ({ products, onUpdateProducts }: MerchCatalogProps) => {
                       {selectedOrder.installmentSchedule.map((inst) => (
                         <div
                           key={inst.installmentNumber}
-                          className={`flex items-center justify-between border p-2.5 ${
-                            inst.paid
-                              ? 'border-emerald-700/60 bg-emerald-950/30'
-                              : 'border-red-900/60 bg-red-950/20'
-                          }`}
+                          className={`flex items-center justify-between border p-2.5 ${inst.paid
+                            ? 'border-emerald-700/60 bg-emerald-950/30'
+                            : 'border-red-900/60 bg-red-950/20'
+                            }`}
                         >
                           <div>
                             <p className="font-bold text-white">
@@ -1206,11 +1184,10 @@ const MerchCatalog = ({ products, onUpdateProducts }: MerchCatalogProps) => {
                                 inst.installmentNumber,
                               )
                             }
-                            className={`cursor-pointer border px-2.5 py-1 text-[10px] font-bold uppercase ${
-                              inst.paid
-                                ? 'border-emerald-500 bg-emerald-600 text-black'
-                                : 'border-red-500/80 bg-red-950/70 text-red-300 hover:bg-red-600 hover:text-white'
-                            }`}
+                            className={`cursor-pointer border px-2.5 py-1 text-[10px] font-bold uppercase ${inst.paid
+                              ? 'border-emerald-500 bg-emerald-600 text-black'
+                              : 'border-red-500/80 bg-red-950/70 text-red-300 hover:bg-red-600 hover:text-white'
+                              }`}
                           >
                             {inst.paid ? '✓ Liquidado' : 'Pagar Cuota'}
                           </button>
